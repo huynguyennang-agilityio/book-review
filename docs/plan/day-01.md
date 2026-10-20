@@ -36,9 +36,9 @@ Trả lời bằng thử nghiệm thật 4 câu hỏi media trước khi viết 
 
 ## Tiêu chí hoàn thành
 
-- [ ] Đã chốt model ảnh tham chiếu (ghi lý do và giá)
+- [x] Đã chốt model ảnh tham chiếu (ghi lý do và giá)
 - [x] Đã chốt cách Ken Burns không rung
-- [ ] Đã chốt nguồn word timing chính và phương án dự phòng
+- [x] Đã chốt nguồn word timing chính và phương án dự phòng
 - [x] Burn phụ đề tiếng Việt hiển thị đúng dấu
 
 ## Ghi chú

@@ -12,7 +12,7 @@
 | Forced alignment (whisperX / stable-ts) | ✅ Đã đo | stable-ts khớp WordBoundary, lệch start trung bình 39–60 ms |
 | So sánh model ảnh tham chiếu trên Fal | ✅ Đã chạy | Chọn Seedream v4 edit; Qwen-Image-Edit làm phương án rẻ hơn |
 
-Mục ⏳ cần nạp tiền vào tài khoản Fal rồi chạy lại. Hướng dẫn chạy nằm ở [spikes/media/README.md](../../spikes/media/README.md).
+Hướng dẫn chạy lại nằm ở [spikes/media/README.md](../../spikes/media/README.md).
 
 ## 1. Ken Burns: zoompan thuần so với phóng 2× rồi crop
 
@@ -74,12 +74,13 @@ So sánh thời điểm bắt đầu của từng từ giữa stable-ts và Word
 
 - Dùng WordBoundary làm nguồn word timing chính cho edge-tts. Không cần forced alignment ở bước này.
 - Giữ stable-ts làm phương án dự phòng cho nhà cung cấp TTS không trả timestamp.
+- Chi tiết trong [ADR 0002](../decisions/0002-word-timing-source.md).
 
 ### Ghi chú môi trường
 
 Máy chạy chưa có FFmpeg (brew phải build từ source, quá chậm), nên lần đo này dùng FFmpeg 7.1 đóng gói trong `imageio-ffmpeg` và một shim `ffprobe` đọc thời lượng qua PyAV. Shim nằm ngoài repo. Thời lượng mp3 vì thế là ước lượng của libav, cùng cách `ffprobe -show_entries format=duration` làm.
 
-## 4. Model ảnh tham chiếu (chưa có số liệu)
+## 4. Model ảnh tham chiếu
 
 Script `spikes/media/fal_compare.py` chạy 3 model (FLUX.1 Kontext, Qwen-Image-Edit, Seedream v4 edit) với cùng ảnh nhân vật và 4 prompt cảnh, rồi ghi `out/fal/scores.csv` để chấm tay.
 
@@ -95,6 +96,6 @@ Tổng chi phí lần chạy: khoảng 0,39 USD cho 12 ảnh.
 
 Quyết định:
 
-- Chọn Seedream v4 edit làm model ảnh nhân vật chính. Qwen-Image-Edit là phương án dự phòng rẻ hơn.
+- Chọn Seedream v4 edit làm model ảnh nhân vật chính. Qwen-Image-Edit là phương án dự phòng rẻ hơn. Chi tiết trong [ADR 0003](../decisions/0003-reference-image-model.md).
 - Ảnh tham chiếu phải sạch: không watermark, nền trung tính, tư thế đứng thẳng. Cả 3 model đều chép một phần nền, tư thế hoặc watermark của ảnh gốc khi prompt cảnh gần giống ảnh gốc (cảnh bàn gỗ). Đây là lý do kế hoạch cần sheet nhân vật nhiều góc ở ngày 16–18.
 - Ở ngày 16–18 cần chạy lại với sheet nhân vật thật và nhiều cảnh hơn trước khi chốt hẳn mốc "nhận ra nhân vật ở ≥ 80% cảnh".
