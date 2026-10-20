@@ -31,7 +31,7 @@ Chứng minh toàn bộ đường đi kỹ thuật chạy được end-to-end �
 
 ### Observability
 
-- [ ] Bật `LANGSMITH_TRACING=true`, kiểm tra trace có đủ 2 node và gom theo `thread_id`.
+- [x] Bật `LANGSMITH_TRACING=true`, kiểm tra trace có đủ 2 node và gom theo `thread_id`.
 
 ## Đầu ra
 
@@ -43,7 +43,7 @@ Chứng minh toàn bộ đường đi kỹ thuật chạy được end-to-end �
 
 - [x] Một interrupt đi từ graph lên UI và quay lại thành công
 - [x] Resume sau khi restart server
-- [ ] Có trace trên LangSmith
+- [x] Có trace trên LangSmith
 
 ## Ghi chú
 

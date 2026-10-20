@@ -20,9 +20,13 @@ def _greeting() -> str:
         return "Xin chào! Mình là trợ lý review sách."
     from langchain_google_genai import ChatGoogleGenerativeAI
 
-    llm = ChatGoogleGenerativeAI(model=os.getenv("GEMINI_MODEL", "gemini-2.5-flash"))
+    # max_retries thấp: hết quota (429) thì báo lỗi ngay thay vì treo stream vì retry ngầm.
+    llm = ChatGoogleGenerativeAI(
+        model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash"), max_retries=1, timeout=30
+    )
     reply = llm.invoke("Chào người dùng bằng một câu tiếng Việt ngắn, bạn là trợ lý review sách.")
-    return str(reply.content)
+    # Gemini 3.x trả content dạng list block (kèm signature), .text chỉ lấy phần chữ.
+    return reply.text
 
 
 def hello(state: State) -> State:

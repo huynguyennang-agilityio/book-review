@@ -12,10 +12,10 @@
 | Resume sau khi restart API (HTTP và UI) | ✅ Đã chạy | Tắt uvicorn lúc đang chờ interrupt, bật lại, gửi câu trả lời, graph chạy tiếp |
 | FastAPI `/agent` qua AG-UI | ✅ Đã chạy | `ag-ui-langgraph`, bọc trong `api/agui_adapter.py` |
 | Next.js + CopilotKit hiện interrupt và gửi câu trả lời | ✅ Đã chạy | Kiểm bằng Playwright (`web/e2e.mjs`), có cả biến thể restart API giữa chừng |
-| Trace LangSmith đủ 2 node, gom theo `thread_id` | ⏳ Chưa kiểm | Cần `LANGSMITH_API_KEY`; chạy `api/check_trace.py` |
-| Gọi Gemini thật trong node `hello` | ⏳ Chưa kiểm | Cần `GOOGLE_API_KEY`; không có key thì node trả câu cố định |
+| Trace LangSmith đủ 2 node, gom theo `thread_id` | ✅ Đã chạy | Key thật trên máy local, project `review-book`. `check_trace.py day2-trace-1` ra 15 run: `LangGraph`, `hello`, `ChatGoogleGenerativeAI`, `ask_user`. Filter `metadata_key`/`metadata_value` theo `thread_id` dùng được, không phải sửa |
+| Gọi Gemini thật trong node `hello` | ✅ Đã chạy | `gemini-3.5-flash`. CLI và E2E đều nhận câu chào do model sinh, run `ChatGoogleGenerativeAI` có trong trace. Xem lỗi 8, 9, 10 |
 
-Chạy ngày 2026-10-20 trong container Linux (cloud), Python 3.12, Node 22.
+Chạy ngày 2026-10-20 trong container Linux (cloud), Python 3.12, Node 22. LangSmith và Gemini kiểm lại ngày 2026-10-21 trên macOS (máy local) với key thật, Node 20; E2E (`npm run e2e`, bản build `next start`) qua trong khoảng 12 giây.
 
 ## Version đã pin
 
@@ -55,8 +55,12 @@ Docker: `pgvector/pgvector:pg16`, `redis:7-alpine` (đã có từ scaffold).
 5. **Gõ chat trước khi `/api/copilotkit/info` trả về thì tin nhắn bị bỏ.** Chỉ gặp khi test tự động gõ ngay lúc trang vừa load. E2E chờ `networkidle`. Trang thật cần trạng thái "đang kết nối" trước khi cho gõ.
 6. **CopilotKit runtime bật telemetry mặc định.** Tắt bằng `COPILOTKIT_TELEMETRY_DISABLED=true` (đã thêm vào `.env.example`).
 7. **Docker Hub trả 429 trong container cloud.** Chỉ ảnh hưởng môi trường cloud; đã kéo ảnh qua `mirror.gcr.io` rồi tag lại. Máy local không cần.
+8. **`gemini-2.5-flash` trả 404 với key mới** ("no longer available to new users"). Đổi mặc định sang `gemini-3.5-flash` (trong `graph.py` và `GEMINI_MODEL` ở `.env.example`). Lỗi gợi ý `gemini-3.8-flash`, nhưng free tier của 3.8 và 3.7 chỉ cho 20 request/ngày mỗi model, hết sau vài lần chạy; 3.5-flash và 3.1-flash-lite vẫn gọi được. Ngày 6 chọn model cho `llm_gemini.py` cần tính quota này.
+9. **Gemini 3.x trả `content` dạng list block** (`[{"type": "text", "text": ..., "extras": {"signature": ...}}]`), `str(reply.content)` ra cả chữ ký. Dùng `reply.text`.
+10. **Hết quota thì stream AG-UI treo, không báo lỗi.** `ChatGoogleGenerativeAI` tự retry 429 có backoff, UI đứng sau `on_chat_model_start`, E2E timeout ở chỗ chờ form. Đặt `max_retries=1, timeout=30` để lỗi nổi lên ngay. Graph thật cần bắt lỗi provider và báo cho người dùng.
+11. **Trùng cổng trên máy local.** Máy đã có Postgres khác ở 5432 và một uvicorn khác ở 8000. Lúc kiểm chạy Postgres ở 5433 bằng file override ngoài repo (`ports: !override ["5433:5432"]`), `DATABASE_URL` trỏ 5433 trong `api/.env`, API ở 8001 và web chạy với `AGENT_URL=http://localhost:8001/agent`. Không đổi gì trong repo.
+12. **`Client.list_runs()` của LangSmith báo deprecated** (gỡ sau 31/01/2027, thay bằng `client.runs.query()`). `check_trace.py` vẫn chạy, đổi khi làm observability thật.
 
 ## Việc còn lại
 
-- Chạy với `LANGSMITH_TRACING=true` và key thật, xác nhận trace có run `hello` và `ask_user`, gom theo `thread_id` (`check_trace.py`).
-- Chạy với `GOOGLE_API_KEY` để node `hello` gọi Gemini, xác nhận run LLM xuất hiện trong trace.
+- Không còn việc nào của spike. Ghi chú cho các ngày sau: chọn model Gemini theo quota (lỗi 8), bắt lỗi provider trong graph (lỗi 10), chuyển `check_trace.py` sang `client.runs.query()` (lỗi 12).
