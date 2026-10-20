@@ -16,10 +16,10 @@ Trả lời bằng thử nghiệm thật 4 câu hỏi media trước khi viết 
 
 ### Sáng: TTS và word timing
 
-- [ ] Chạy `edge-tts` với `vi-VN-HoaiMyNeural` và `vi-VN-NamMinhNeural`, bật `boundary="WordBoundary"`, lưu mp3 + danh sách từ kèm offset.
+- [x] Chạy `edge-tts` với `vi-VN-HoaiMyNeural` và `vi-VN-NamMinhNeural`, bật `boundary="WordBoundary"`, lưu mp3 + danh sách từ kèm offset.
 - [ ] Kiểm tra WordBoundary có trả đủ từ tiếng Việt có dấu không, đo độ lệch so với nghe thực tế trên 3 đoạn 30 giây.
-- [ ] Chạy `whisperX` (hoặc `stable-ts`) forced alignment trên cùng audio, so sánh timing với WordBoundary.
-- [ ] Đo thời lượng bằng `ffprobe`, so với tổng offset từ WordBoundary.
+- [x] Chạy `whisperX` (hoặc `stable-ts`) forced alignment trên cùng audio, so sánh timing với WordBoundary.
+- [x] Đo thời lượng bằng `ffprobe`, so với tổng offset từ WordBoundary.
 
 ### Chiều: ảnh và motion
 

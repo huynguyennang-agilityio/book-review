@@ -8,7 +8,7 @@ Cần FAL_KEY trong môi trường và `pip install fal-client`.
 Ra: out/fal/<model>/<scene>.jpg, out/fal/results.json (thời gian, URL)
 và out/fal/scores.csv (chấm tay: giống nhân vật, 9:16, lỗi, giá).
 
-Lưu ý: ID endpoint và tên tham số phải kiểm tra lại trên fal.ai trước khi chạy,
+Lưu ý: ID endpoint và tên tham số đã kiểm tra ngày 2026-10-20; kiểm tra lại nếu lâu không chạy,
 vì Fal đổi tên model khá thường xuyên.
 """
 
@@ -23,10 +23,13 @@ import fal_client
 
 OUT = pathlib.Path(__file__).parent / "out" / "fal"
 
+# Đã đối chiếu OpenAPI của Fal ngày 2026-10-20: Kontext nhận `aspect_ratio`,
+# Qwen và Seedream nhận `image_size` (preset hoặc {width, height}).
 MODELS = {
-    "flux-kontext": {"endpoint": "fal-ai/flux-pro/kontext", "multi": False},
-    "qwen-image-edit": {"endpoint": "fal-ai/qwen-image-edit", "multi": False},
-    "seedream-edit": {"endpoint": "fal-ai/bytedance/seedream/v4/edit", "multi": True},
+    "flux-kontext": {"endpoint": "fal-ai/flux-pro/kontext", "multi": False, "size": {"aspect_ratio": "9:16"}},
+    "qwen-image-edit": {"endpoint": "fal-ai/qwen-image-edit", "multi": False, "size": {"image_size": {"width": 720, "height": 1280}}},
+    # Seedream yêu cầu diện tích tối thiểu 921600 px.
+    "seedream-edit": {"endpoint": "fal-ai/bytedance/seedream/v4/edit", "multi": True, "size": {"image_size": {"width": 1080, "height": 1920}}},
 }
 
 SCENES = {
@@ -38,13 +41,12 @@ SCENES = {
 
 
 def build_args(model: dict, ref_url: str, prompt: str) -> dict:
-    # Tất cả model đều yêu cầu 9:16; nếu model không nhận tham số này thì bỏ và ghi chú trong scores.csv.
     args = {"prompt": f"{prompt}, vertical 9:16 composition, keep the same face and outfit as the reference"}
     if model["multi"]:
         args["image_urls"] = [ref_url]
     else:
         args["image_url"] = ref_url
-    args["aspect_ratio"] = "9:16"
+    args.update(model["size"])
     return args
 
 

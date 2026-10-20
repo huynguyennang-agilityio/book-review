@@ -19,9 +19,10 @@ Thư mục `out/` chứa output khi chạy, đã được gitignore.
 | Đo rung | `python jitter_check.py out/kenburns/A_zoompan.mp4` | Không |
 | Burn phụ đề | `bash subtitle_burn_test.sh` | Không (cần bước Ken Burns A trước) |
 | WordBoundary edge-tts | `python tts_wordboundary.py samples/*.txt` | Có, tới speech.platform.bing.com |
+| Forced alignment | `python align_compare.py` (venv riêng, `pip install stable-ts`) | Lần đầu tải model whisper |
 | So sánh model ảnh | `python fal_compare.py --ref ref/character.jpg` | Có, `FAL_KEY` |
 
-`fal_compare.py` cần một ảnh nhân vật tham chiếu tại `ref/character.jpg` (không đưa vào repo). Tên endpoint Fal cần kiểm tra lại trước khi chạy.
+`fal_compare.py` cần một ảnh nhân vật tham chiếu tại `ref/character.jpg` (không đưa vào repo). Endpoint Fal đã kiểm tra ngày 2026-10-20.
 
 ## File
 
@@ -29,4 +30,5 @@ Thư mục `out/` chứa output khi chạy, đã được gitignore.
 - `jitter_check.py`: đo độ đều của dịch chuyển ngang giữa các frame
 - `subtitle_test.ass`, `subtitle_burn_test.sh`: kiểm tra dấu tiếng Việt khi burn
 - `tts_wordboundary.py`, `samples/`: đo WordBoundary cho 2 giọng vi-VN, báo từ mất và drift thời lượng
+- `align_compare.py`: căn văn bản bằng stable-ts, so start từng từ với WordBoundary
 - `fal_compare.py`: so sánh 3 model chỉnh ảnh tham chiếu, xuất bảng chấm
