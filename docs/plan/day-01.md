@@ -25,8 +25,8 @@ Trả lời bằng thử nghiệm thật 4 câu hỏi media trước khi viết 
 
 - [ ] Viết script gọi 2–3 model ảnh tham chiếu trên Fal (FLUX.1 Kontext, Qwen-Image-Edit, Seedream hoặc Gemini image) với cùng 1 ảnh nhân vật + 4 prompt cảnh.
 - [ ] Chấm nhanh: độ giống nhân vật, chất lượng 9:16, thời gian, giá mỗi ảnh. Ghi vào bảng so sánh.
-- [ ] Thử 2 cách Ken Burns: `zoompan` thuần và scale lên 2× rồi `crop` theo biểu thức thời gian. Xuất 720×1280@30fps, xem có rung (jitter) không.
-- [ ] Burn thử file `.ass` có tiếng Việt qua `subtitles=...:fontsdir=fonts/`, kiểm tra dấu (ạ, ỗ, ữ) hiển thị đúng.
+- [x] Thử 2 cách Ken Burns: `zoompan` thuần và scale lên 2× rồi `crop` theo biểu thức thời gian. Xuất 720×1280@30fps, xem có rung (jitter) không.
+- [x] Burn thử file `.ass` có tiếng Việt qua `subtitles=...:fontsdir=fonts/`, kiểm tra dấu (ạ, ỗ, ữ) hiển thị đúng.
 
 ## Đầu ra
 
@@ -37,9 +37,9 @@ Trả lời bằng thử nghiệm thật 4 câu hỏi media trước khi viết 
 ## Tiêu chí hoàn thành
 
 - [ ] Đã chốt model ảnh tham chiếu (ghi lý do và giá)
-- [ ] Đã chốt cách Ken Burns không rung
+- [x] Đã chốt cách Ken Burns không rung
 - [ ] Đã chốt nguồn word timing chính và phương án dự phòng
-- [ ] Burn phụ đề tiếng Việt hiển thị đúng dấu
+- [x] Burn phụ đề tiếng Việt hiển thị đúng dấu
 
 ## Ghi chú
 
