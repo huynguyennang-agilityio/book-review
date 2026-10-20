@@ -24,3 +24,6 @@ output/
 *.wav
 
 .DS_Store
+
+# Spike outputs
+spikes/media/out/
