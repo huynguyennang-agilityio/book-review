@@ -16,22 +16,22 @@ Chứng minh toàn bộ đường đi kỹ thuật chạy được end-to-end �
 
 ### Hạ tầng local
 
-- [ ] Viết `docker-compose.yml` với Postgres có `pgvector` và Redis.
-- [ ] Kiểm tra `CREATE EXTENSION vector;` chạy được.
+- [x] Viết `docker-compose.yml` với Postgres có `pgvector` và Redis.
+- [x] Kiểm tra `CREATE EXTENSION vector;` chạy được.
 
 ### LangGraph
 
-- [ ] Graph 2 node: `hello` → `ask_user` (gọi `interrupt()`), dùng `PostgresSaver` (`langgraph-checkpoint-postgres`).
-- [ ] Tắt process giữa chừng, chạy lại với cùng `thread_id`, xác nhận graph tiếp tục từ interrupt.
+- [x] Graph 2 node: `hello` → `ask_user` (gọi `interrupt()`), dùng `PostgresSaver` (`langgraph-checkpoint-postgres`).
+- [x] Tắt process giữa chừng, chạy lại với cùng `thread_id`, xác nhận graph tiếp tục từ interrupt.
 
 ### AG-UI + CopilotKit
 
-- [ ] FastAPI expose endpoint `/agent` bằng adapter LangGraph ↔ AG-UI.
-- [ ] Trang Next.js tối thiểu dùng CopilotKit, hiển thị interrupt bằng `renderAndWaitForResponse`, gửi câu trả lời về graph.
+- [x] FastAPI expose endpoint `/agent` bằng adapter LangGraph ↔ AG-UI.
+- [x] Trang Next.js tối thiểu dùng CopilotKit, hiển thị interrupt bằng `renderAndWaitForResponse` (thực tế dùng `useInterrupt` của CopilotKit v2, xem docs/spikes/day-02-stack.md), gửi câu trả lời về graph.
 
 ### Observability
 
-- [ ] Bật `LANGSMITH_TRACING=true`, kiểm tra trace có đủ 2 node và gom theo `thread_id`.
+- [x] Bật `LANGSMITH_TRACING=true`, kiểm tra trace có đủ 2 node và gom theo `thread_id`.
 
 ## Đầu ra
 
@@ -41,9 +41,9 @@ Chứng minh toàn bộ đường đi kỹ thuật chạy được end-to-end �
 
 ## Tiêu chí hoàn thành
 
-- [ ] Một interrupt đi từ graph lên UI và quay lại thành công
-- [ ] Resume sau khi restart server
-- [ ] Có trace trên LangSmith
+- [x] Một interrupt đi từ graph lên UI và quay lại thành công
+- [x] Resume sau khi restart server
+- [x] Có trace trên LangSmith
 
 ## Ghi chú
 
