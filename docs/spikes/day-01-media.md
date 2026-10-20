@@ -10,9 +10,9 @@
 | Phụ đề tiếng Việt burn bằng libass | ✅ Đã kiểm tra | Dấu hiển thị đúng với DejaVu Sans; font sản phẩm chưa chọn |
 | Word timing edge-tts (WordBoundary) | ✅ Đã đo | Đủ 206/206 từ trên 2 giọng; đuôi lặng cố định ~840 ms, không có drift |
 | Forced alignment (whisperX / stable-ts) | ✅ Đã đo | stable-ts khớp WordBoundary, lệch start trung bình 39–60 ms |
-| So sánh model ảnh tham chiếu trên Fal | ⏳ Chưa chạy | Thiếu `FAL_KEY` và ảnh `ref/character.jpg`; endpoint đã kiểm tra |
+| So sánh model ảnh tham chiếu trên Fal | ⏳ Chưa chạy | Đã có key và ảnh tham chiếu; tài khoản Fal hết số dư (403) |
 
-Mục ⏳ cần `FAL_KEY` và một ảnh nhân vật tham chiếu. Hướng dẫn chạy nằm ở [spikes/media/README.md](../../spikes/media/README.md).
+Mục ⏳ cần nạp tiền vào tài khoản Fal rồi chạy lại. Hướng dẫn chạy nằm ở [spikes/media/README.md](../../spikes/media/README.md).
 
 ## 1. Ken Burns: zoompan thuần so với phóng 2× rồi crop
 
@@ -93,4 +93,4 @@ Bảng chấm (điền sau khi chạy):
 
 Endpoint đã đối chiếu OpenAPI của Fal ngày 2026-10-20: cả 3 ID còn tồn tại. Kontext nhận `aspect_ratio: "9:16"`, còn Qwen-Image-Edit và Seedream v4 edit nhận `image_size` (Seedream cần tối thiểu 921 600 px), nên `fal_compare.py` đã sửa để gửi đúng tham số cho từng model.
 
-Chưa chạy vì máy thiếu `FAL_KEY` và ảnh `spikes/media/ref/character.jpg`.
+Lần chạy ngày 2026-10-20 (ảnh tham chiếu 1170×2080, 9:16, đặt ở `spikes/media/ref/`, không đưa vào repo) dừng ngay ở bước upload: Fal trả 403 "User is locked. Reason: Exhausted balance" cho cả storage lẫn queue. Cần nạp tiền ở fal.ai/dashboard/billing rồi chạy lại.
