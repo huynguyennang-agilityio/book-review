@@ -16,15 +16,15 @@ Trả lời bằng thử nghiệm thật 4 câu hỏi media trước khi viết 
 
 ### Sáng: TTS và word timing
 
-- [ ] Chạy `edge-tts` với `vi-VN-HoaiMyNeural` và `vi-VN-NamMinhNeural`, bật `boundary="WordBoundary"`, lưu mp3 + danh sách từ kèm offset.
+- [x] Chạy `edge-tts` với `vi-VN-HoaiMyNeural` và `vi-VN-NamMinhNeural`, bật `boundary="WordBoundary"`, lưu mp3 + danh sách từ kèm offset.
 - [ ] Kiểm tra WordBoundary có trả đủ từ tiếng Việt có dấu không, đo độ lệch so với nghe thực tế trên 3 đoạn 30 giây.
-- [ ] Chạy `whisperX` (hoặc `stable-ts`) forced alignment trên cùng audio, so sánh timing với WordBoundary.
-- [ ] Đo thời lượng bằng `ffprobe`, so với tổng offset từ WordBoundary.
+- [x] Chạy `whisperX` (hoặc `stable-ts`) forced alignment trên cùng audio, so sánh timing với WordBoundary.
+- [x] Đo thời lượng bằng `ffprobe`, so với tổng offset từ WordBoundary.
 
 ### Chiều: ảnh và motion
 
-- [ ] Viết script gọi 2–3 model ảnh tham chiếu trên Fal (FLUX.1 Kontext, Qwen-Image-Edit, Seedream hoặc Gemini image) với cùng 1 ảnh nhân vật + 4 prompt cảnh.
-- [ ] Chấm nhanh: độ giống nhân vật, chất lượng 9:16, thời gian, giá mỗi ảnh. Ghi vào bảng so sánh.
+- [x] Viết script gọi 2–3 model ảnh tham chiếu trên Fal (FLUX.1 Kontext, Qwen-Image-Edit, Seedream hoặc Gemini image) với cùng 1 ảnh nhân vật + 4 prompt cảnh.
+- [x] Chấm nhanh: độ giống nhân vật, chất lượng 9:16, thời gian, giá mỗi ảnh. Ghi vào bảng so sánh.
 - [x] Thử 2 cách Ken Burns: `zoompan` thuần và scale lên 2× rồi `crop` theo biểu thức thời gian. Xuất 720×1280@30fps, xem có rung (jitter) không.
 - [x] Burn thử file `.ass` có tiếng Việt qua `subtitles=...:fontsdir=fonts/`, kiểm tra dấu (ạ, ỗ, ữ) hiển thị đúng.
 
@@ -36,9 +36,9 @@ Trả lời bằng thử nghiệm thật 4 câu hỏi media trước khi viết 
 
 ## Tiêu chí hoàn thành
 
-- [ ] Đã chốt model ảnh tham chiếu (ghi lý do và giá)
+- [x] Đã chốt model ảnh tham chiếu (ghi lý do và giá)
 - [x] Đã chốt cách Ken Burns không rung
-- [ ] Đã chốt nguồn word timing chính và phương án dự phòng
+- [x] Đã chốt nguồn word timing chính và phương án dự phòng
 - [x] Burn phụ đề tiếng Việt hiển thị đúng dấu
 
 ## Ghi chú

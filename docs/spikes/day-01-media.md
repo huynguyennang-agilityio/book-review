@@ -8,11 +8,11 @@
 | --- | --- | --- |
 | Ken Burns không rung | ✅ Đã đo | Scale 2× + crop theo thời gian mượt hơn zoompan thuần (bảng dưới) |
 | Phụ đề tiếng Việt burn bằng libass | ✅ Đã kiểm tra | Dấu hiển thị đúng với DejaVu Sans; font sản phẩm chưa chọn |
-| Word timing edge-tts (WordBoundary) | ⏳ Chưa chạy | Môi trường cloud không resolve được `speech.platform.bing.com` |
-| Forced alignment (whisperX / stable-ts) | ⏳ Chưa chạy | Chưa cài; cần mẫu audio từ bước trên |
-| So sánh model ảnh tham chiếu trên Fal | ⏳ Chưa chạy | Cần `FAL_KEY`; môi trường cloud bị chặn `queue.fal.run` |
+| Word timing edge-tts (WordBoundary) | ✅ Đã đo | Đủ 206/206 từ trên 2 giọng; đuôi lặng cố định ~840 ms, không có drift |
+| Forced alignment (whisperX / stable-ts) | ✅ Đã đo | stable-ts khớp WordBoundary, lệch start trung bình 39–60 ms |
+| So sánh model ảnh tham chiếu trên Fal | ✅ Đã chạy | Chọn Seedream v4 edit; Qwen-Image-Edit làm phương án rẻ hơn |
 
-Hai mục ⏳ cần chạy trên máy có mạng và có API key. Hướng dẫn chạy nằm ở [spikes/media/README.md](../../spikes/media/README.md).
+Hướng dẫn chạy lại nằm ở [spikes/media/README.md](../../spikes/media/README.md).
 
 ## 1. Ken Burns: zoompan thuần so với phóng 2× rồi crop
 
@@ -34,24 +34,68 @@ Quyết định: dùng cách B. Chi tiết trong [ADR 0001](../decisions/0001-ke
 - Kết quả: dòng "Ạ Ỗ Ữ ấ ế ộ ự ậ" hiển thị đúng dấu, không bị thiếu glyph.
 - Chưa làm: kiểm tra trên font khác (ví dụ Be Vietnam Pro, Inter) và bản đóng gói trong Docker image. Font thật sẽ chọn ở ngày 13 khi làm phụ đề.
 
-## 3. Word timing (chưa có số liệu)
+## 3. Word timing: WordBoundary và forced alignment
 
-Việc cần làm trên máy có mạng:
+Chạy ngày 2026-10-20 trên macOS (M1), edge-tts 7.3.1, 3 đoạn mẫu trong `spikes/media/samples/` (dài 17–20 giây, ngắn hơn mốc 30 giây trong kế hoạch). Script: `tts_wordboundary.py`, `align_compare.py`.
 
-1. `pip install edge-tts`, chạy `python spikes/media/tts_wordboundary.py spikes/media/samples/*.txt`.
-2. Đọc `spikes/media/out/tts/summary.json`: số từ mất (`words_missing`) và `drift_ms` (thời lượng ffprobe trừ offset cuối).
-3. Nếu WordBoundary thiếu từ có dấu hoặc drift vượt vài trăm ms, dùng forced alignment làm nguồn chính (theo ghi chú trong [Ngày 1](../plan/day-01.md)).
+### WordBoundary
 
-## 4. Model ảnh tham chiếu (chưa có số liệu)
+| Giọng | Mẫu | Từ trả về / từ gốc | Từ mất | ffprobe (ms) | Từ cuối kết thúc (ms) | `drift_ms` |
+| --- | --- | --- | --- | --- | --- | --- |
+| HoaiMy | sample_01 | 67 / 67 | 0 | 17640 | 16800 | 840 |
+| HoaiMy | sample_02 | 67 / 67 | 0 | 18936 | 18100 | 836 |
+| HoaiMy | sample_03 | 72 / 72 | 0 | 19752 | 18912 | 840 |
+| NamMinh | sample_01 | 67 / 67 | 0 | 17256 | 16412 | 844 |
+| NamMinh | sample_02 | 67 / 67 | 0 | 19056 | 18212 | 844 |
+| NamMinh | sample_03 | 72 / 72 | 0 | 19896 | 19050 | 846 |
+
+- Không mất từ nào, kể cả từ có dấu.
+- `drift_ms` gần như không đổi (836–846 ms) dù độ dài file khác nhau, nên đây không phải lệch tích luỹ. `silencedetect` (−40 dB) trên HoaiMy/sample_01 cho thấy khoảng lặng bắt đầu ở 16 793 ms, trùng với lúc từ cuối kết thúc (16 800 ms): edge-tts chèn khoảng 840 ms lặng ở cuối file.
+- Từ đầu tiên bắt đầu ở 100–137 ms (lặng đầu file).
+- Hệ quả cho pipeline: dùng thời lượng ffprobe làm độ dài clip, và có thể cắt khoảng 0,8 s đuôi lặng khi ghép cảnh.
+
+### Forced alignment (stable-ts, model whisper `base`)
+
+So sánh thời điểm bắt đầu của từng từ giữa stable-ts và WordBoundary (mọi từ đều ghép được 1–1):
+
+| Giọng | Mẫu | Lệch TB (ms) | P90 (ms) | Lớn nhất (ms) |
+| --- | --- | --- | --- | --- |
+| HoaiMy | sample_01 | 39 | 78 | 162 |
+| HoaiMy | sample_02 | 40 | 85 | 182 |
+| HoaiMy | sample_03 | 44 | 86 | 250 |
+| NamMinh | sample_01 | 51 | 130 | 232 |
+| NamMinh | sample_02 | 53 | 173 | 285 |
+| NamMinh | sample_03 | 60 | 161 | 242 |
+
+- Hai nguồn lệch nhau khoảng 1–2 frame ở 30 fps, đủ cho phụ đề từng từ. Chưa nghe bằng tai để biết nguồn nào chuẩn hơn; WordBoundary do chính bộ tổng hợp trả nên mặc định coi là chuẩn.
+- stable-ts cài bằng `pip install stable-ts` (kéo theo torch, khoảng vài trăm MB, cộng model `base` 139 MB). Không thử whisperX.
+
+### Quyết định
+
+- Dùng WordBoundary làm nguồn word timing chính cho edge-tts. Không cần forced alignment ở bước này.
+- Giữ stable-ts làm phương án dự phòng cho nhà cung cấp TTS không trả timestamp.
+- Chi tiết trong [ADR 0002](../decisions/0002-word-timing-source.md).
+
+### Ghi chú môi trường
+
+Máy chạy chưa có FFmpeg (brew phải build từ source, quá chậm), nên lần đo này dùng FFmpeg 7.1 đóng gói trong `imageio-ffmpeg` và một shim `ffprobe` đọc thời lượng qua PyAV. Shim nằm ngoài repo. Thời lượng mp3 vì thế là ước lượng của libav, cùng cách `ffprobe -show_entries format=duration` làm.
+
+## 4. Model ảnh tham chiếu
 
 Script `spikes/media/fal_compare.py` chạy 3 model (FLUX.1 Kontext, Qwen-Image-Edit, Seedream v4 edit) với cùng ảnh nhân vật và 4 prompt cảnh, rồi ghi `out/fal/scores.csv` để chấm tay.
 
-Bảng chấm (điền sau khi chạy):
+Chạy ngày 2026-10-20 với 1 ảnh tham chiếu (cô gái tóc dài, áo sẫm màu cài khuy, 1170×2080, đặt ở `spikes/media/ref/`, không đưa vào repo), mỗi model chạy 1 lần cho mỗi cảnh. Chấm bằng mắt trên contact sheet `out/fal/contact_sheet.jpg`; với 4 ảnh mỗi model thì điểm chỉ mang tính định hướng. Giá lấy từ API pricing của Fal (`api.fal.ai/v1/models/pricing`).
 
-| Model | Giống nhân vật (1–5) | Đúng 9:16 | Lỗi | Thời gian (s) | Giá / ảnh | Ghi chú |
+| Model | Giống nhân vật (1–5) | Đúng 9:16 | Lỗi | Thời gian TB (s) | Giá / ảnh | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- |
-| FLUX.1 Kontext | | | | | | |
-| Qwen-Image-Edit | | | | | | |
-| Seedream v4 edit | | | | | | |
+| FLUX.1 Kontext | 3 | Không (752×1392, tỉ lệ 1,85, phải crop) | Cảnh đồi đổi áo thành váy có thắt lưng; cảnh bàn đọc sách thành đang viết; chép cả watermark của ảnh gốc ở cảnh phố | 7,6 | 0,04 USD | Nhanh nhất, bố cục cảnh đa dạng, nhưng mặt trông già hơn và khác ảnh gốc |
+| Qwen-Image-Edit | 4 | Có (720×1280) | Tư thế chống cằm của ảnh gốc lặp lại ở cả 4 cảnh (kể cả lúc nấu ăn); cảnh bàn giữ nguyên nền ảnh gốc kèm watermark | 9,9 | ~0,028 USD (0,03 USD/MP) | Mặt khá giống, rẻ nhất |
+| Seedream v4 edit | 4 | Có (1080×1920) | Cảnh bàn giữ nguyên nền ảnh gốc kèm watermark | 11,2 | 0,03 USD | Mặt và độ tuổi giống nhất, tư thế tự nhiên theo cảnh, độ phân giải cao nhất |
 
-ID endpoint và tên tham số trên Fal cần kiểm tra lại trước khi chạy.
+Tổng chi phí lần chạy: khoảng 0,39 USD cho 12 ảnh.
+
+Quyết định:
+
+- Chọn Seedream v4 edit làm model ảnh nhân vật chính. Qwen-Image-Edit là phương án dự phòng rẻ hơn. Chi tiết trong [ADR 0003](../decisions/0003-reference-image-model.md).
+- Ảnh tham chiếu phải sạch: không watermark, nền trung tính, tư thế đứng thẳng. Cả 3 model đều chép một phần nền, tư thế hoặc watermark của ảnh gốc khi prompt cảnh gần giống ảnh gốc (cảnh bàn gỗ). Đây là lý do kế hoạch cần sheet nhân vật nhiều góc ở ngày 16–18.
+- Ở ngày 16–18 cần chạy lại với sheet nhân vật thật và nhiều cảnh hơn trước khi chốt hẳn mốc "nhận ra nhân vật ở ≥ 80% cảnh".
