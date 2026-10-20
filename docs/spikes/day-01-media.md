@@ -10,7 +10,7 @@
 | Phụ đề tiếng Việt burn bằng libass | ✅ Đã kiểm tra | Dấu hiển thị đúng với DejaVu Sans; font sản phẩm chưa chọn |
 | Word timing edge-tts (WordBoundary) | ✅ Đã đo | Đủ 206/206 từ trên 2 giọng; đuôi lặng cố định ~840 ms, không có drift |
 | Forced alignment (whisperX / stable-ts) | ✅ Đã đo | stable-ts khớp WordBoundary, lệch start trung bình 39–60 ms |
-| So sánh model ảnh tham chiếu trên Fal | ⏳ Chưa chạy | Đã có key và ảnh tham chiếu; tài khoản Fal hết số dư (403) |
+| So sánh model ảnh tham chiếu trên Fal | ✅ Đã chạy | Chọn Seedream v4 edit; Qwen-Image-Edit làm phương án rẻ hơn |
 
 Mục ⏳ cần nạp tiền vào tài khoản Fal rồi chạy lại. Hướng dẫn chạy nằm ở [spikes/media/README.md](../../spikes/media/README.md).
 
@@ -83,14 +83,18 @@ Máy chạy chưa có FFmpeg (brew phải build từ source, quá chậm), nên 
 
 Script `spikes/media/fal_compare.py` chạy 3 model (FLUX.1 Kontext, Qwen-Image-Edit, Seedream v4 edit) với cùng ảnh nhân vật và 4 prompt cảnh, rồi ghi `out/fal/scores.csv` để chấm tay.
 
-Bảng chấm (điền sau khi chạy):
+Chạy ngày 2026-10-20 với 1 ảnh tham chiếu (cô gái tóc dài, áo sẫm màu cài khuy, 1170×2080, đặt ở `spikes/media/ref/`, không đưa vào repo), mỗi model chạy 1 lần cho mỗi cảnh. Chấm bằng mắt trên contact sheet `out/fal/contact_sheet.jpg`; với 4 ảnh mỗi model thì điểm chỉ mang tính định hướng. Giá lấy từ API pricing của Fal (`api.fal.ai/v1/models/pricing`).
 
-| Model | Giống nhân vật (1–5) | Đúng 9:16 | Lỗi | Thời gian (s) | Giá / ảnh | Ghi chú |
+| Model | Giống nhân vật (1–5) | Đúng 9:16 | Lỗi | Thời gian TB (s) | Giá / ảnh | Ghi chú |
 | --- | --- | --- | --- | --- | --- | --- |
-| FLUX.1 Kontext | | | | | | |
-| Qwen-Image-Edit | | | | | | |
-| Seedream v4 edit | | | | | | |
+| FLUX.1 Kontext | 3 | Không (752×1392, tỉ lệ 1,85, phải crop) | Cảnh đồi đổi áo thành váy có thắt lưng; cảnh bàn đọc sách thành đang viết; chép cả watermark của ảnh gốc ở cảnh phố | 7,6 | 0,04 USD | Nhanh nhất, bố cục cảnh đa dạng, nhưng mặt trông già hơn và khác ảnh gốc |
+| Qwen-Image-Edit | 4 | Có (720×1280) | Tư thế chống cằm của ảnh gốc lặp lại ở cả 4 cảnh (kể cả lúc nấu ăn); cảnh bàn giữ nguyên nền ảnh gốc kèm watermark | 9,9 | ~0,028 USD (0,03 USD/MP) | Mặt khá giống, rẻ nhất |
+| Seedream v4 edit | 4 | Có (1080×1920) | Cảnh bàn giữ nguyên nền ảnh gốc kèm watermark | 11,2 | 0,03 USD | Mặt và độ tuổi giống nhất, tư thế tự nhiên theo cảnh, độ phân giải cao nhất |
 
-Endpoint đã đối chiếu OpenAPI của Fal ngày 2026-10-20: cả 3 ID còn tồn tại. Kontext nhận `aspect_ratio: "9:16"`, còn Qwen-Image-Edit và Seedream v4 edit nhận `image_size` (Seedream cần tối thiểu 921 600 px), nên `fal_compare.py` đã sửa để gửi đúng tham số cho từng model.
+Tổng chi phí lần chạy: khoảng 0,39 USD cho 12 ảnh.
 
-Lần chạy ngày 2026-10-20 (ảnh tham chiếu 1170×2080, 9:16, đặt ở `spikes/media/ref/`, không đưa vào repo) dừng ngay ở bước upload: Fal trả 403 "User is locked. Reason: Exhausted balance" cho cả storage lẫn queue. Cần nạp tiền ở fal.ai/dashboard/billing rồi chạy lại.
+Quyết định:
+
+- Chọn Seedream v4 edit làm model ảnh nhân vật chính. Qwen-Image-Edit là phương án dự phòng rẻ hơn.
+- Ảnh tham chiếu phải sạch: không watermark, nền trung tính, tư thế đứng thẳng. Cả 3 model đều chép một phần nền, tư thế hoặc watermark của ảnh gốc khi prompt cảnh gần giống ảnh gốc (cảnh bàn gỗ). Đây là lý do kế hoạch cần sheet nhân vật nhiều góc ở ngày 16–18.
+- Ở ngày 16–18 cần chạy lại với sheet nhân vật thật và nhiều cảnh hơn trước khi chốt hẳn mốc "nhận ra nhân vật ở ≥ 80% cảnh".

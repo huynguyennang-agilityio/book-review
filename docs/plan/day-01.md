@@ -23,8 +23,8 @@ Trả lời bằng thử nghiệm thật 4 câu hỏi media trước khi viết 
 
 ### Chiều: ảnh và motion
 
-- [ ] Viết script gọi 2–3 model ảnh tham chiếu trên Fal (FLUX.1 Kontext, Qwen-Image-Edit, Seedream hoặc Gemini image) với cùng 1 ảnh nhân vật + 4 prompt cảnh.
-- [ ] Chấm nhanh: độ giống nhân vật, chất lượng 9:16, thời gian, giá mỗi ảnh. Ghi vào bảng so sánh.
+- [x] Viết script gọi 2–3 model ảnh tham chiếu trên Fal (FLUX.1 Kontext, Qwen-Image-Edit, Seedream hoặc Gemini image) với cùng 1 ảnh nhân vật + 4 prompt cảnh.
+- [x] Chấm nhanh: độ giống nhân vật, chất lượng 9:16, thời gian, giá mỗi ảnh. Ghi vào bảng so sánh.
 - [x] Thử 2 cách Ken Burns: `zoompan` thuần và scale lên 2× rồi `crop` theo biểu thức thời gian. Xuất 720×1280@30fps, xem có rung (jitter) không.
 - [x] Burn thử file `.ass` có tiếng Việt qua `subtitles=...:fontsdir=fonts/`, kiểm tra dấu (ạ, ỗ, ữ) hiển thị đúng.
 
