@@ -41,7 +41,9 @@ def make_agent(graph: CompiledStateGraph[Any]) -> LangGraphAgent:
 async def _set_status(request: Request, user: CurrentUser, thread_id: str, status: str) -> None:
     async with user_transaction(request.app.state.app_pool, user) as conn:
         await conn.execute(
-            "update public.projects set status = %s, updated_at = now() where thread_id = %s",
+            # Huỷ là trạng thái cuối: stream còn chạy dở không được ghi đè lại.
+            "update public.projects set status = %s, updated_at = now()"
+            " where thread_id = %s and status <> 'cancelled'",
             [status, thread_id],
         )
 
@@ -63,10 +65,13 @@ async def agent_endpoint(
     await ensure_local_user(request.app.state.app_pool, user)
     async with user_transaction(request.app.state.app_pool, user) as conn:
         cur = await conn.execute(
-            "select 1 from public.projects where thread_id = %s", [input_data.thread_id]
+            "select status from public.projects where thread_id = %s", [input_data.thread_id]
         )
-        if await cur.fetchone() is None:
+        row = await cur.fetchone()
+        if row is None:
             raise AppError(ErrorCode.NOT_FOUND)
+        if row["status"] == "cancelled":
+            raise AppError(ErrorCode.CANCELLED)
     await _set_status(request, user, input_data.thread_id, "running")
     encoder = EventEncoder(accept=request.headers.get("accept", "text/event-stream"))
     # Mỗi request một bản sao: LangGraphAgent giữ state của run hiện tại trong self.active_run.

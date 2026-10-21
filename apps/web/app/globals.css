@@ -305,3 +305,136 @@ button.link {
   color: var(--foreground);
   border: 1px solid var(--line);
 }
+
+/* Ngày 15: màn duyệt kịch bản, nút huỷ */
+.review {
+  margin-bottom: 16px;
+}
+
+.review .stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  font-size: 14px;
+}
+
+.review-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  gap: 16px;
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .review-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.scenes {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.scene {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scene.selected {
+  border-color: var(--accent);
+}
+
+.scene-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  align-items: center;
+  background: none;
+  border: 0;
+  color: inherit;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.chips {
+  display: flex;
+  gap: 6px;
+}
+
+.chip {
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 1px 8px;
+}
+
+.chip.bad,
+.bad {
+  color: var(--err);
+}
+
+.good {
+  color: var(--ok);
+}
+
+.narration {
+  line-height: 1.5;
+}
+
+.no-source {
+  background: color-mix(in srgb, var(--warn) 28%, transparent);
+  border-radius: 3px;
+}
+
+.no-source-note {
+  color: var(--warn);
+}
+
+.edit,
+.ask {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ask {
+  flex-direction: row;
+}
+
+.ask input {
+  flex: 1;
+  min-width: 0;
+}
+
+.citations ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 6px 0;
+}
+
+.citations blockquote {
+  border-left: 3px solid var(--line);
+  padding-left: 8px;
+  font-size: 14px;
+}
+
+.actions {
+  align-items: center;
+}
+
+button.danger {
+  border-color: var(--err);
+  color: var(--err);
+  background: transparent;
+}

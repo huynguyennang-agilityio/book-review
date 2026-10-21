@@ -26,6 +26,8 @@ class WorkerSettings:
     redis_settings = RedisSettings.from_dsn(WorkerConfig().redis_url)
     # Render nặng: mỗi worker một job một lúc, job TTS cả video tối đa 10 phút.
     max_jobs = 2
+    # API huỷ job đang chạy khi người dùng bấm Huỷ (`ArqJobRunner`).
+    allow_abort_jobs = True
     job_timeout = 600
     max_tries = 2
     keep_result = 3600

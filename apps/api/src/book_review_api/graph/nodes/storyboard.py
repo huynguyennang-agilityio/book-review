@@ -12,6 +12,7 @@ def make_storyboard_node(runner: StoryboardRunner) -> NodeFn:
         research = state.get("research")
         if not research:
             return {"status": "failed", "error_code": ErrorCode.INTERNAL_ERROR.value}
-        return runner(research)
+        # Tuỳ chọn của người dùng (độ dài, no_spoiler) đi kèm để runner thật đọc.
+        return runner({**research, "options": dict(state.get("options") or {})})
 
     return storyboard

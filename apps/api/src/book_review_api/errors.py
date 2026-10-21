@@ -18,6 +18,7 @@ class ErrorCode(StrEnum):
     LOW_FAITHFULNESS = "LOW_FAITHFULNESS"
     RENDER_FAILED = "RENDER_FAILED"
     CANCELLED = "CANCELLED"
+    INVALID_STATE = "INVALID_STATE"
     # Chung
     UNAUTHORIZED = "UNAUTHORIZED"
     TOKEN_EXPIRED = "TOKEN_EXPIRED"
@@ -68,6 +69,11 @@ ERROR_SPECS: dict[ErrorCode, ErrorSpec] = {
     ErrorCode.CANCELLED: ErrorSpec(
         status_code=409,
         message_vi="Yêu cầu đã bị huỷ.",
+        retryable=False,
+    ),
+    ErrorCode.INVALID_STATE: ErrorSpec(
+        status_code=409,
+        message_vi="Project không ở trạng thái cho phép thao tác này.",
         retryable=False,
     ),
     ErrorCode.UNAUTHORIZED: ErrorSpec(

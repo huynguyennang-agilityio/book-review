@@ -1,7 +1,7 @@
-"""Graph chạy thật cho API: gắn research agent với Gemini, tìm web, kho pgvector (ngày 14).
+"""Graph chạy thật cho API: research agent (ngày 14), storyboard, faithfulness và media qua worker
+(ngày 15). Các node sau `review_script` chỉ chạy khi người dùng duyệt.
 
-Các node sau `identify_confirm` vẫn là node rỗng cho tới khi các ngày sau nối vào (storyboard cần
-retriever theo sách, media cần worker).
+Node `character_sheets`, `review_characters`, `motion` ảnh thật còn là phần của các ngày sau.
 """
 
 import uuid
@@ -21,10 +21,16 @@ from book_review_api.agents.tools import (
     TavilySearchProvider,
     ToolContext,
 )
+from book_review_api.cancel import CancelFlags
 from book_review_api.config import Settings
 from book_review_api.graph.build import build_graph
 from book_review_api.graph.state import BookInput, BookReviewState
-from book_review_api.providers.llm_gemini import make_chat_model, make_embeddings
+from book_review_api.providers.llm_gemini import (
+    make_chat_model,
+    make_embeddings,
+    make_judge_model,
+)
+from book_review_api.queue import ArqJobRunner
 from book_review_api.rag.index import (
     index_chunks,
     make_record_engine,
@@ -32,7 +38,10 @@ from book_review_api.rag.index import (
     make_vector_engine,
     make_vector_store,
 )
-from book_review_api.rag.retrieve import retrieve
+from book_review_api.rag.retrieve import Chunk, chunks_by_id, retrieve
+from book_review_api.storyboard.faithfulness import make_faithfulness_runner
+from book_review_api.storyboard.rewrite import SceneRewriter, make_scene_rewriter
+from book_review_api.storyboard.runner import StoryboardRunner, make_storyboard_runner
 
 SOURCE_EVENT = "source"
 
@@ -91,11 +100,68 @@ def make_live_research_runner(settings: Settings) -> ResearchRunner:
     return run
 
 
+def make_live_storyboard_runner(settings: Settings) -> StoryboardRunner:
+    """Storyboard cho sách vừa nghiên cứu: truy xuất đúng kho của `research["book_id"]`."""
+    model = make_chat_model(settings)
+    embeddings = make_embeddings(settings)
+    engine = make_vector_engine(settings.database_url)
+
+    def run(research: dict[str, Any]) -> dict[str, Any]:
+        options = research.get("options") or {}
+        cfg = settings
+        if isinstance(options.get("minutes"), int):
+            cfg = settings.model_copy(update={"storyboard_minutes": options["minutes"]})
+        book_id = str(research["book_id"])
+        runner = make_storyboard_runner(
+            model,
+            lambda q: retrieve(book_id, q, engine=engine, embeddings=embeddings, settings=cfg),
+            cfg,
+            spoiler_free=bool(options.get("no_spoiler", True)),
+        )
+        return runner(research)
+
+    return run
+
+
+def make_live_scene_rewriter(settings: Settings) -> SceneRewriter:
+    engine = make_vector_engine(settings.database_url)
+    return make_scene_rewriter(
+        make_chat_model(settings),
+        make_judge_model(settings),
+        lambda ids: chunks_by_id(engine, list(ids)),
+        settings,
+    )
+
+
+def source_info(chunks: dict[str, Chunk]) -> dict[str, dict[str, Any]]:
+    """`source_id` -> url và tiêu đề, lấy từ metadata của các chunk được trích."""
+    out: dict[str, dict[str, Any]] = {}
+    for c in chunks.values():
+        sid = c.metadata.get("source_id")
+        if sid and sid not in out:
+            out[sid] = {"url": c.metadata.get("url"), "title": c.metadata.get("title")}
+    return out
+
+
 def build_live_graph(
-    settings: Settings, checkpointer: BaseCheckpointSaver[str], store: BaseStore
+    settings: Settings,
+    checkpointer: BaseCheckpointSaver[str],
+    store: BaseStore,
+    cancel_flags: CancelFlags | None = None,
 ) -> CompiledStateGraph[BookReviewState]:
+    engine = make_vector_engine(settings.database_url)
     return build_graph(
         checkpointer=checkpointer,
         store=store,
         research_runner=make_live_research_runner(settings),
+        storyboard_runner=make_live_storyboard_runner(settings),
+        faithfulness_runner=make_faithfulness_runner(
+            make_judge_model(settings),
+            make_chat_model(settings),
+            lambda ids: chunks_by_id(engine, list(ids)),
+            settings,
+        ),
+        source_lookup=lambda chunk_ids: source_info(chunks_by_id(engine, list(chunk_ids))),
+        job_runner=ArqJobRunner(settings.redis_url, settings.job_timeout_s, cancel_flags),
+        cancel_flags=cancel_flags,
     )
