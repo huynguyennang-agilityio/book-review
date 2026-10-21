@@ -45,8 +45,8 @@ class Settings(BaseSettings):
     # Số lần nhắc agent tìm thêm khi dừng mà chưa đủ nguồn.
     research_nudges: int = 2
     research_budget_usd: float = 0.3
-    research_model_call_limit: int = 20
-    research_tool_call_limit: int = 30
+    research_model_call_limit: int = 40
+    research_tool_call_limit: int = 60
     price_input_per_mtok: float = 0.30
     price_output_per_mtok: float = 2.50
 
