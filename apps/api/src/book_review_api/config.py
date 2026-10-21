@@ -26,6 +26,16 @@ class Settings(BaseSettings):
     embedding_model: str = "gemini-embedding-001"
     embedding_dim: int = 768
 
+    # LLM chat (rerank ở ngày 7, agent ở các ngày sau).
+    gemini_model: str = "gemini-3.5-flash"
+
+    # Retrieval: gộp vector + full-text lấy `retrieve_top_k`, rerank xuống `rerank_top_n`.
+    # `rerank_provider`: "none" (giữ thứ tự RRF) hoặc "llm" (Gemini chấm lại). Cross-encoder cắm
+    # thêm bằng cách hiện thực `Reranker` trong `rag/retrieve.py`.
+    retrieve_top_k: int = 8
+    rerank_top_n: int = 4
+    rerank_provider: str = "none"
+
     @property
     def supabase_jwks_url(self) -> str:
         return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"

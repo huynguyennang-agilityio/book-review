@@ -19,3 +19,4 @@ Lệnh này chạy các file ở đây rồi tạo bảng checkpoint/store của
 | `0002_app_tables.sql` | `projects`, `assets`, `documents`, `chunks` + RLS `user_id = auth.uid()` |
 | `0003_langgraph_schema.sql` | Schema `langgraph` cho checkpointer và store |
 | `0004_vector_store.sql` | pgvector: `langchain_pg_embedding` + HNSW, RLS theo `user_id`, `app_private.upsertion_record` cho Indexing API |
+| `0005_chunk_fulltext.sql` | Cột `fts` (tsvector, cấu hình `simple`) + GIN index cho full-text search của hybrid retrieval |
