@@ -14,23 +14,23 @@ Nạp một nguồn (URL, PDF, TXT, DOCX) thành các chunk sạch, có metadata
 
 ### Làm sạch
 
-- [ ] `rag/ingest.py`: lấy nội dung chính bằng `trafilatura`, bỏ menu, quảng cáo.
-- [ ] Đọc PDF, DOCX, TXT người dùng tải lên.
-- [ ] Chuẩn hóa Unicode NFC, gom khoảng trắng.
+- [x] `rag/ingest.py`: lấy nội dung chính bằng `trafilatura`, bỏ menu, quảng cáo.
+- [x] Đọc PDF, DOCX, TXT người dùng tải lên.
+- [x] Chuẩn hóa Unicode NFC, gom khoảng trắng.
 
 ### Chunking
 
-- [ ] Chia 500–800 token, overlap ~80 token, giữ tiêu đề mục làm metadata `section`.
-- [ ] Metadata mỗi chunk: `book_id`, `source_id`, `url`, `title`, `section`, `content_hash`, `ingested_at`, `user_id` (nếu riêng tư).
+- [x] Chia 500–800 token, overlap ~80 token, giữ tiêu đề mục làm metadata `section`.
+- [x] Metadata mỗi chunk: `book_id`, `source_id`, `url`, `title`, `section`, `content_hash`, `ingested_at`, `user_id` (nếu riêng tư).
 
 ### Snapshot & PII
 
-- [ ] Lưu `sources/<source_id>.txt` lên storage.
-- [ ] `rag/pii.py`: quét và che email, số điện thoại, số thẻ trong tài liệu tải lên trước khi chunk.
+- [x] Lưu `sources/<source_id>.txt` lên storage.
+- [x] `rag/pii.py`: quét và che email, số điện thoại, số thẻ trong tài liệu tải lên trước khi chunk.
 
 ### Test
 
-- [ ] Test với 3 trang mẫu tiếng Việt (lưu HTML cố định trong `tests/fixtures`), 1 PDF, 1 DOCX.
+- [x] Test với 3 trang mẫu tiếng Việt (lưu HTML cố định trong `tests/fixtures`), 1 PDF, 1 DOCX.
 
 ## Đầu ra
 
@@ -39,8 +39,8 @@ Nạp một nguồn (URL, PDF, TXT, DOCX) thành các chunk sạch, có metadata
 
 ## Tiêu chí hoàn thành
 
-- [ ] Văn bản sạch, đúng NFC, chunk có đủ metadata
-- [ ] PII trong tài liệu mẫu đã bị che
+- [x] Văn bản sạch, đúng NFC, chunk có đủ metadata
+- [x] PII trong tài liệu mẫu đã bị che
 
 ---
 
