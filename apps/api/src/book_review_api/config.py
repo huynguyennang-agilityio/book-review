@@ -36,6 +36,14 @@ class Settings(BaseSettings):
     rerank_top_n: int = 4
     rerank_provider: str = "none"
 
+    # Research agent (ngày 9). Giá USD trên 1 triệu token, chỉnh theo bảng giá model đang dùng.
+    research_min_sources: int = 4
+    research_budget_usd: float = 0.3
+    research_model_call_limit: int = 20
+    research_tool_call_limit: int = 30
+    price_input_per_mtok: float = 0.30
+    price_output_per_mtok: float = 2.50
+
     @property
     def supabase_jwks_url(self) -> str:
         return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
