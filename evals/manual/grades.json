@@ -1,0 +1,82 @@
+[
+ {
+  "slug": "1984",
+  "scene_id": 2,
+  "section": "context",
+  "narration_vi": "Cuốn tiểu thuyết phản địa đàng 1984 của George Orwell ra mắt vào năm 1949.",
+  "manual": 1.0,
+  "note": "Tên, thể loại, tác giả, năm đều có trong nguồn."
+ },
+ {
+  "slug": "1984",
+  "scene_id": 4,
+  "section": "body",
+  "narration_vi": "Winston thầm chán ghét chế độ, viết nhật ký bí mật và bắt đầu yêu Julia, một đồng nghiệp.",
+  "manual": 1.0,
+  "note": "Chán ghét chế độ, nhật ký bí mật, yêu Julia đồng nghiệp: đủ trong nguồn."
+ },
+ {
+  "slug": "atomic-habits",
+  "scene_id": 6,
+  "section": "body",
+  "narration_vi": "Bạn cần tập trung vào bản sắc, nghĩa là trở thành kiểu người mình muốn thay vì chỉ đặt mục tiêu kết quả.",
+  "manual": 1.0,
+  "note": "Diễn đạt lại sát câu về bản sắc."
+ },
+ {
+  "slug": "cha-giau-cha-ngheo",
+  "scene_id": 3,
+  "section": "context",
+  "narration_vi": "Tác phẩm khắc họa hai người cha có quan điểm hoàn toàn trái ngược nhau về tiền bạc.",
+  "manual": 1.0,
+  "note": "Hai người cha quan điểm trái ngược có trong nguồn; 'hoàn toàn' chỉ là nhấn giọng."
+ },
+ {
+  "slug": "dac-nhan-tam",
+  "scene_id": 4,
+  "section": "body",
+  "narration_vi": "Bên cạnh đó, việc mỉm cười, nhớ tên và biết lắng nghe sẽ giúp bạn kết nối tốt hơn.",
+  "manual": 0.75,
+  "note": "Mỉm cười, nhớ tên, lắng nghe có; 'giúp kết nối tốt hơn' là suy diễn, nguồn không nói."
+ },
+ {
+  "slug": "de-men-phieu-luu-ky",
+  "scene_id": 5,
+  "section": "body",
+  "narration_vi": "Sau cái chết của người hàng xóm yếu ớt Dế Choắt, Mèn vô cùng hối hận và quyết định rời hang đi phiêu lưu.",
+  "manual": 1.0,
+  "note": "Cái chết của Dế Choắt, hối hận, rời hang: có trong nguồn."
+ },
+ {
+  "slug": "de-men-phieu-luu-ky",
+  "scene_id": 7,
+  "section": "body",
+  "narration_vi": "Câu chuyện mang đến cho chúng ta những bài học quý giá về sự khiêm tốn, tình bạn và lòng dũng cảm.",
+  "manual": 1.0,
+  "note": "Ba bài học khớp nguồn; 'quý giá' là nhấn giọng."
+ },
+ {
+  "slug": "hoang-tu-be",
+  "scene_id": 3,
+  "section": "context",
+  "narration_vi": "Cuốn sách được xuất bản lần đầu năm 1943 tại New York và trở thành một trong những tác phẩm được dịch nhiều nhất thế giới.",
+  "manual": 0.67,
+  "note": "1943 và New York đúng; nguồn nói 'tác phẩm văn học Pháp được dịch nhiều nhất', lời đọc nới thành 'nhiều nhất thế giới'."
+ },
+ {
+  "slug": "nha-gia-kim",
+  "scene_id": 5,
+  "section": "body",
+  "narration_vi": "Trên đường đi, cậu phải vượt qua muôn vàn thử thách từ việc bị lừa tiền ở Tangier cho đến việc làm việc cho một người bán pha lê.",
+  "manual": 0.67,
+  "note": "Tangier và người bán pha lê đúng; 'muôn vàn thử thách' là thêm thắt."
+ },
+ {
+  "slug": "nha-gia-kim",
+  "scene_id": 7,
+  "section": "body",
+  "narration_vi": "Cuốn sách gửi gắm thông điệp sâu sắc về khái niệm huyền thoại cá nhân, chính là sứ mệnh riêng mà mỗi người sinh ra đều cần phải theo đuổi.",
+  "manual": 1.0,
+  "note": "Huyền thoại cá nhân là sứ mệnh riêng mỗi người cần theo đuổi: khớp nguồn."
+ }
+]

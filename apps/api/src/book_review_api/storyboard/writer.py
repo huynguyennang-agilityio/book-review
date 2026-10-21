@@ -10,17 +10,23 @@ import re
 import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
-from typing import Any, Literal, TypeVar, cast
+from typing import Literal, TypeVar
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
 from pydantic import BaseModel, Field
 
 from book_review_api.config import Settings, get_settings
+from book_review_api.providers.structured import (
+    StructuredOutputError,
+    Usage,
+    call_structured,
+)
 from book_review_api.rag.retrieve import Chunk
 from book_review_api.storyboard.schema import (
     CITED_SECTIONS,
     MAX_QUOTE_CHARS,
+    SECTION_MAX_SCENES,
     SECTION_ORDER,
     BookIdentity,
     Character,
@@ -37,8 +43,6 @@ log = logging.getLogger(__name__)
 PROMPT_VERSION = "storyboard_v1"
 _PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / f"{PROMPT_VERSION}.md"
 
-# Gói free của Gemini chỉ 5 RPM: chờ cửa sổ phút trôi qua rồi thử lại.
-RETRY_DELAYS_S: tuple[float, ...] = (15.0, 30.0, 60.0)
 # Số đoạn tối đa đưa cho model viết một phần.
 MAX_PASSAGES = 12
 
@@ -92,21 +96,6 @@ class SectionDraft(BaseModel):
     scenes: list[SceneDraft] = Field(min_length=1, max_length=6)
 
 
-# --- Gọi model ------------------------------------------------------------------
-
-
-class Usage:
-    def __init__(self) -> None:
-        self.input_tokens = 0
-        self.output_tokens = 0
-
-    def add(self, message: BaseMessage | None) -> None:
-        meta = message.usage_metadata if isinstance(message, AIMessage) else None
-        if meta:
-            self.input_tokens += int(meta.get("input_tokens", 0))
-            self.output_tokens += int(meta.get("output_tokens", 0))
-
-
 _MARKER_RE = re.compile(r"\s*\[\d+\]")
 
 
@@ -149,26 +138,10 @@ class StoryboardWriter:
         self._system = load_prompt()
 
     def _call(self, schema: type[T], messages: list[BaseMessage]) -> T:
-        structured = self.model.with_structured_output(schema, include_raw=True)
-        for attempt in range(len(RETRY_DELAYS_S) + 1):
-            try:
-                out = cast(dict[str, Any], structured.invoke(messages))
-            except Exception:
-                if attempt == len(RETRY_DELAYS_S):
-                    raise
-                log.warning("gọi model thất bại, thử lại sau %ss", RETRY_DELAYS_S[attempt])
-                self.sleep(RETRY_DELAYS_S[attempt])
-                continue
-            self.usage.add(out.get("raw"))
-            parsed = out.get("parsed")
-            if isinstance(parsed, schema):
-                return parsed
-            if isinstance(parsed, dict):
-                return schema.model_validate(parsed)
-            raise StoryboardError(
-                f"Model không trả về {schema.__name__} hợp lệ: {out.get('parsing_error')}"
-            )
-        raise AssertionError("unreachable")
+        try:
+            return call_structured(self.model, schema, messages, self.usage, self.sleep)
+        except StructuredOutputError as e:
+            raise StoryboardError(str(e)) from e
 
     # --- Các bước ---------------------------------------------------------------
 
@@ -262,6 +235,7 @@ class StoryboardWriter:
             # Cảnh dữ kiện không dẫn nguồn thì bỏ (không đoán nguồn thay model); còn cảnh có
             # citation thì phần vẫn dùng được.
             drafts = [d for d in drafts if d.citations]
+        drafts = drafts[: SECTION_MAX_SCENES[section]]
         for offset, d in enumerate(drafts):
             sid = next_id + offset
             citations: list[Citation] = []
