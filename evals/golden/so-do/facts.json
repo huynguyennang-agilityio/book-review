@@ -1,0 +1,22 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Vũ Trọng Phụng",
+    "needle": "Vũ Trọng Phụng"
+  },
+  {
+    "id": "f2",
+    "fact": "Số đỏ đăng báo năm 1936",
+    "needle": "năm 1936"
+  },
+  {
+    "id": "f3",
+    "fact": "Nhân vật chính là Xuân Tóc Đỏ",
+    "needle": "Xuân Tóc Đỏ"
+  },
+  {
+    "id": "f4",
+    "fact": "Tác phẩm châm biếm lối sống Âu hóa lố lăng thời Pháp thuộc",
+    "needle": "Âu hóa"
+  }
+]

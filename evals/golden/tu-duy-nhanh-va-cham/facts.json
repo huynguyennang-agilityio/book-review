@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Daniel Kahneman",
+    "needle": "Daniel Kahneman"
+  },
+  {
+    "id": "f2",
+    "fact": "Tên gốc là Thinking, Fast and Slow",
+    "needle": "Thinking, Fast and Slow"
+  },
+  {
+    "id": "f3",
+    "fact": "Kahneman đoạt giải Nobel Kinh tế năm 2002",
+    "needle": "2002"
+  },
+  {
+    "id": "f4",
+    "fact": "Hệ thống 1 nhanh và theo trực giác",
+    "needle": "Hệ thống 1"
+  },
+  {
+    "id": "f5",
+    "fact": "Hệ thống 2 chậm và cần nỗ lực",
+    "needle": "Hệ thống 2"
+  }
+]

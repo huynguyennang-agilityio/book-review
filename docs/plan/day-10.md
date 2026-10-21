@@ -14,14 +14,14 @@ Kịch bản được viết từ các đoạn truy xuất, mỗi cảnh dữ ki
 
 ### Storyboard
 
-- [ ] Schema Pydantic `Citation`, `Scene`, `Storyboard` (mục 10 plan).
-- [ ] Node `storyboard`: sinh dàn ý, sinh query theo từng phần, retrieve, viết từng phần bằng structured output, gắn `citations`.
-- [ ] Validator: cảnh `context`/`body` bắt buộc có citation, `quote` ≤ 200 ký tự và phải có trong chunk.
-- [ ] Prompt trong `prompts/storyboard_v1.md`.
+- [x] Schema Pydantic `Citation`, `Scene`, `Storyboard` (mục 10 plan).
+- [x] Node `storyboard`: sinh dàn ý, sinh query theo từng phần, retrieve, viết từng phần bằng structured output, gắn `citations`.
+- [x] Validator: cảnh `context`/`body` bắt buộc có citation, `quote` ≤ 200 ký tự và phải có trong chunk.
+- [x] Prompt trong `prompts/storyboard_v1.md`.
 
 ### Dataset golden
 
-- [ ] `evals/golden/`: 10 sách (5 fiction, 5 non-fiction), mỗi sách có bộ nguồn cố định và vài dữ kiện "phải đúng".
+- [x] `evals/golden/`: 10 sách (5 fiction, 5 non-fiction), mỗi sách có bộ nguồn cố định và vài dữ kiện "phải đúng".
 
 ## Đầu ra
 

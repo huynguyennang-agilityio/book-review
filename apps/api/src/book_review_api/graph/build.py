@@ -19,8 +19,10 @@ from book_review_api.graph.nodes.common import NodeFn
 from book_review_api.graph.nodes.precheck import precheck
 from book_review_api.graph.nodes.research import identify_confirm, make_research_node
 from book_review_api.graph.nodes.review import review_characters, review_script
+from book_review_api.graph.nodes.storyboard import make_storyboard_node
 from book_review_api.graph.nodes.stubs import save_memory, stub
 from book_review_api.graph.state import TERMINAL_STATUSES, BookReviewState
+from book_review_api.storyboard.runner import StoryboardRunner
 
 GRAPH_NAME = "book_review"
 
@@ -72,11 +74,14 @@ def build_graph(
     checkpointer: BaseCheckpointSaver[str] | None = None,
     store: BaseStore | None = None,
     research_runner: ResearchRunner | None = None,
+    storyboard_runner: StoryboardRunner | None = None,
 ) -> CompiledStateGraph[BookReviewState]:
-    """`research_runner` thiếu thì `research_agent` là node rỗng (test khung, không gọi LLM)."""
+    """Runner thiếu thì node tương ứng là node rỗng (test khung, không gọi LLM)."""
     nodes = dict(NODES)
     if research_runner is not None:
         nodes["research_agent"] = make_research_node(research_runner)
+    if storyboard_runner is not None:
+        nodes["storyboard"] = make_storyboard_node(storyboard_runner)
     builder = StateGraph(BookReviewState)
     for name, fn in nodes.items():
         builder.add_node(name, fn)

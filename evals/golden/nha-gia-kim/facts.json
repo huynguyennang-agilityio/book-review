@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả của Nhà giả kim là Paulo Coelho",
+    "needle": "Paulo Coelho"
+  },
+  {
+    "id": "f2",
+    "fact": "Sách xuất bản lần đầu năm 1988",
+    "needle": "năm 1988"
+  },
+  {
+    "id": "f3",
+    "fact": "Nhân vật chính Santiago là cậu bé chăn cừu người Andalusia",
+    "needle": "Santiago"
+  },
+  {
+    "id": "f4",
+    "fact": "Santiago mơ thấy kho báu gần các kim tự tháp Ai Cập",
+    "needle": "kim tự tháp"
+  },
+  {
+    "id": "f5",
+    "fact": "Santiago gặp Fatima ở ốc đảo",
+    "needle": "Fatima"
+  }
+]

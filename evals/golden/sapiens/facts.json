@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Yuval Noah Harari",
+    "needle": "Yuval Noah Harari"
+  },
+  {
+    "id": "f2",
+    "fact": "Sách xuất bản lần đầu bằng tiếng Do Thái năm 2011",
+    "needle": "năm 2011"
+  },
+  {
+    "id": "f3",
+    "fact": "Harari chia lịch sử thành ba cuộc cách mạng",
+    "needle": "ba cuộc cách mạng"
+  },
+  {
+    "id": "f4",
+    "fact": "Cách mạng Nhận thức giúp con người kể chuyện hư cấu",
+    "needle": "Cách mạng Nhận thức"
+  },
+  {
+    "id": "f5",
+    "fact": "Sức mạnh của Sapiens đến từ việc tin vào những câu chuyện chung",
+    "needle": "câu chuyện chung"
+  }
+]

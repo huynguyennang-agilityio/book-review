@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Antoine de Saint-Exupéry",
+    "needle": "Saint-Exupéry"
+  },
+  {
+    "id": "f2",
+    "fact": "Sách xuất bản lần đầu năm 1943",
+    "needle": "năm 1943"
+  },
+  {
+    "id": "f3",
+    "fact": "Cậu bé đến từ tiểu hành tinh B-612",
+    "needle": "B-612"
+  },
+  {
+    "id": "f4",
+    "fact": "Người kể chuyện là phi công rơi xuống sa mạc Sahara",
+    "needle": "Sahara"
+  },
+  {
+    "id": "f5",
+    "fact": "Con cáo dạy cậu bé về sự thuần hóa",
+    "needle": "thuần hóa"
+  }
+]

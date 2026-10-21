@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Dale Carnegie",
+    "needle": "Dale Carnegie"
+  },
+  {
+    "id": "f2",
+    "fact": "Tên gốc là How to Win Friends and Influence People",
+    "needle": "How to Win Friends and Influence People"
+  },
+  {
+    "id": "f3",
+    "fact": "Sách xuất bản năm 1936",
+    "needle": "năm 1936"
+  },
+  {
+    "id": "f4",
+    "fact": "Một nguyên tắc là không chỉ trích, oán trách người khác",
+    "needle": "Đừng chỉ trích"
+  },
+  {
+    "id": "f5",
+    "fact": "Một nguyên tắc là mỉm cười và nhớ tên người đối diện",
+    "needle": "nhớ tên"
+  }
+]
