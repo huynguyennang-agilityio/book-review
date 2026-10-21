@@ -21,6 +21,11 @@ class Settings(BaseSettings):
     supabase_jwt_secret: str = ""
     supabase_jwt_audience: str = "authenticated"
 
+    # Embeddings (Gemini). `embedding_dim` phải khớp cột `vector(N)` trong migration 0004.
+    google_api_key: str = ""
+    embedding_model: str = "gemini-embedding-001"
+    embedding_dim: int = 768
+
     @property
     def supabase_jwks_url(self) -> str:
         return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
