@@ -15,7 +15,7 @@ Lưu chunk vào pgvector với index HNSW, nạp lại cùng nguồn không tạ
 ### Embeddings
 
 - [x] `providers/llm_gemini.py`: embedding model đa ngôn ngữ đặt trong config.
-- [ ] Đo chi phí và độ trễ embed cho 100 chunk: script `scripts/measure_embeddings.py` đã có, chờ chạy với key thật.
+- [x] Đo chi phí và độ trễ embed cho 100 chunk (`scripts/measure_embeddings.py`, `gemini-embedding-001`, 768 chiều): 100 chunk, ~9.066 token (ước lượng), 4,21 s tổng (~42 ms/chunk). Chi phí ≈ $0,0014 (9.066 / 1.000.000 × $0,15 mỗi 1M token input; giá lấy từ các trang tổng hợp bên thứ ba, cần đối chiếu với trang giá chính thức của Google).
 
 ### Vector store
 
