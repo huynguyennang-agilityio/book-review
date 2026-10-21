@@ -67,6 +67,12 @@ class Settings(BaseSettings):
     price_image_usd: float = 0.03
     images_per_scene: int = 1
     character_sheet_images: int = 4
+    # Số nhân vật chính tối đa được tạo sheet (ngày 16) và kích thước sheet (ngang, nhiều góc).
+    character_max: int = 3
+    character_sheet_width: int = 1920
+    character_sheet_height: int = 1080
+    fal_key: str = ""
+    fal_concurrency: int = 4
     price_tts_per_mchar: float = 0.0
     price_i2v_per_clip: float = 0.35
     i2v_clips: int = 0

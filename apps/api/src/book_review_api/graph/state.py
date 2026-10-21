@@ -15,6 +15,8 @@ TERMINAL_STATUSES: frozenset[str] = frozenset({"done", "failed", "cancelled", "r
 class BookInput(TypedDict):
     title: str
     author: NotRequired[str | None]
+    # Tên series (vd "Harry Potter") để tái dùng nhân vật đã duyệt giữa các tập.
+    series: NotRequired[str | None]
 
 
 class RunOptions(TypedDict, total=False):
@@ -53,6 +55,8 @@ class BookReviewState(TypedDict, total=False):
     # Chỉ lưu đường dẫn object storage, không lưu binary.
     asset_refs: Annotated[dict[str, str], merge_dicts]
     fal_job_ids: Annotated[dict[str, str], merge_dicts]
+    # Ứng viên sheet nhân vật (ngày 16): {slug: {name, images: [đường dẫn], reused}}.
+    character_candidates: Annotated[dict[str, Any], merge_dicts]
     # usd, input_tokens, output_tokens... cộng dồn.
     cost: Annotated[dict[str, float], add_costs]
     eval_scores: Annotated[dict[str, float], merge_dicts]

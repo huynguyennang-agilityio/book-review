@@ -20,6 +20,7 @@ from langgraph.store.base import BaseStore
 from book_review_api.agents.research import ResearchRunner
 from book_review_api.cancel import CancelFlags
 from book_review_api.errors import ErrorCode
+from book_review_api.graph.nodes.characters import make_character_sheets_node
 from book_review_api.graph.nodes.common import NodeFn, NodeUpdate
 from book_review_api.graph.nodes.faithfulness import (
     make_estimate_cost_node,
@@ -44,6 +45,7 @@ from book_review_api.graph.nodes.review import (
 from book_review_api.graph.nodes.storyboard import make_storyboard_node
 from book_review_api.graph.nodes.stubs import save_memory, stub
 from book_review_api.graph.state import TERMINAL_STATUSES, BookReviewState
+from book_review_api.providers.image_fal import ImageProvider
 from book_review_api.queue import JobRunner
 from book_review_api.storyboard.faithfulness import FaithfulnessRunner
 from book_review_api.storyboard.runner import StoryboardRunner
@@ -133,6 +135,7 @@ def build_graph(
     job_runner: JobRunner | None = None,
     cancel_flags: CancelFlags | None = None,
     source_lookup: SourceLookup | None = None,
+    image_provider: ImageProvider | None = None,
 ) -> CompiledStateGraph[BookReviewState]:
     """Runner (LLM, job worker) thiếu thì node tương ứng là node rỗng (test khung)."""
     nodes = dict(NODES)
@@ -144,6 +147,10 @@ def build_graph(
         nodes["faithfulness_eval"] = make_faithfulness_node(faithfulness_runner)
     if source_lookup is not None:
         nodes["review_script"] = make_review_script(source_lookup)
+    if image_provider is not None:
+        nodes["character_sheets"] = make_character_sheets_node(
+            image_provider, cancel_flags=cancel_flags
+        )
     if job_runner is not None:
         nodes["tts_align"] = make_tts_align_node(job_runner)
         nodes["build_timeline"] = make_build_timeline_node(job_runner)

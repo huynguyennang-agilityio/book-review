@@ -25,6 +25,7 @@ from book_review_api.cancel import CancelFlags
 from book_review_api.config import Settings
 from book_review_api.graph.build import build_graph
 from book_review_api.graph.state import BookInput, BookReviewState
+from book_review_api.providers.image_fal import FalImageProvider
 from book_review_api.providers.llm_gemini import (
     make_chat_model,
     make_embeddings,
@@ -164,4 +165,9 @@ def build_live_graph(
         source_lookup=lambda chunk_ids: source_info(chunks_by_id(engine, list(chunk_ids))),
         job_runner=ArqJobRunner(settings.redis_url, settings.job_timeout_s, cancel_flags),
         cancel_flags=cancel_flags,
+        image_provider=(
+            FalImageProvider(settings.fal_key, concurrency=settings.fal_concurrency)
+            if settings.fal_key
+            else None
+        ),
     )
