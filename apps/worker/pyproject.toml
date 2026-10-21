@@ -3,8 +3,12 @@ name = "book-review-worker"
 version = "0.1.0"
 description = "Render worker: TTS, images, motion, compose"
 requires-python = ">=3.12"
-# arq, edge-tts, ... sẽ thêm ở ngày 12.
-dependencies = []
+dependencies = [
+    "arq>=0.28.0",
+    "edge-tts>=7.3.1",
+    "pydantic>=2.14.1",
+    "pydantic-settings>=2.16.1",
+]
 
 [build-system]
 requires = ["hatchling"]

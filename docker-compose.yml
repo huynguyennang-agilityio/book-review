@@ -15,5 +15,18 @@ services:
     ports:
       - "6379:6379"
 
+  worker:
+    build:
+      context: .
+      dockerfile: infra/docker/worker.Dockerfile
+    environment:
+      REDIS_URL: redis://redis:6379
+      MEDIA_DIR: /app/var/media
+    volumes:
+      # API chạy trên máy đọc cùng thư mục media.
+      - ./var/media:/app/var/media
+    depends_on:
+      - redis
+
 volumes:
   pgdata:
