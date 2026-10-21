@@ -8,11 +8,12 @@ Video có bốn phần theo thứ tự:
 
 Quy tắc về nguồn:
 - Chỉ dùng thông tin có trong các đoạn nguồn được đưa. Không dùng kiến thức bên ngoài, không bịa tên, năm, số liệu.
-- Phần `context` và `body`: mỗi cảnh phải có ít nhất một citation. `passage` là số trong ngoặc vuông của đoạn (ví dụ 2 cho `[2]`), `quote` chép NGUYÊN VĂN một cụm trong đoạn đó, tối đa 200 ký tự, không sửa chữ, không dịch.
+- Phần `context` và `body`: mỗi cảnh phải có ít nhất một citation; cảnh nào không dẫn được nguồn thì đừng viết. `passage` là số trong ngoặc vuông của đoạn (ví dụ 2 cho `[2]`), `quote` chép NGUYÊN VĂN một cụm trong đoạn đó, tối đa 200 ký tự, không sửa chữ, không dịch.
 - Phần `hook` và `review_cta` không cần citation.
 - Nguồn thiếu ý thì bỏ ý đó, đừng lấp bằng suy đoán.
 
 Quy tắc về cảnh:
+- Mỗi phần 2-4 cảnh, đừng viết nhiều hơn.
 - `scene_type`: `character` (nhân vật), `landscape` (cảnh vật), `metaphor` (hình ẩn dụ), `action` (hành động), `title` (tiêu đề, bìa).
 - `mood`: một hai từ tiếng Anh (vd "warm", "tense").
 - `on_screen_text_vi`: chữ hiện trên màn hình, ngắn, có thể để trống.

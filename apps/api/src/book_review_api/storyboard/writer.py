@@ -88,7 +88,7 @@ class SceneDraft(BaseModel):
 
 
 class SectionDraft(BaseModel):
-    scenes: list[SceneDraft] = Field(min_length=1)
+    scenes: list[SceneDraft] = Field(min_length=1, max_length=6)
 
 
 # --- Gọi model ------------------------------------------------------------------
@@ -104,6 +104,17 @@ class Usage:
         if meta:
             self.input_tokens += int(meta.get("input_tokens", 0))
             self.output_tokens += int(meta.get("output_tokens", 0))
+
+
+def trim_quote(quote: str) -> str:
+    """Quote dài quá giới hạn thì cắt ở ranh giới từ: đoạn đầu của một trích nguyên văn vẫn
+    là trích nguyên văn."""
+    quote = quote.strip()
+    if len(quote) <= MAX_QUOTE_CHARS:
+        return quote
+    cut = quote[:MAX_QUOTE_CHARS]
+    head, sep, _ = cut.rpartition(" ")
+    return (head if sep and head else cut).rstrip()
 
 
 def load_prompt() -> str:
@@ -237,7 +248,12 @@ class StoryboardWriter:
     ) -> tuple[list[Scene], list[str]]:
         scenes: list[Scene] = []
         problems: list[str] = []
-        for offset, d in enumerate(draft.scenes):
+        drafts = draft.scenes
+        if section in CITED_SECTIONS and any(d.citations for d in drafts):
+            # Cảnh dữ kiện không dẫn nguồn thì bỏ (không đoán nguồn thay model); còn cảnh có
+            # citation thì phần vẫn dùng được.
+            drafts = [d for d in drafts if d.citations]
+        for offset, d in enumerate(drafts):
             sid = next_id + offset
             citations: list[Citation] = []
             for c in d.citations:
@@ -249,7 +265,7 @@ class StoryboardWriter:
                     Citation(
                         source_id=str(chunk.metadata.get("source_id", "")),
                         chunk_id=chunk.id,
-                        quote=c.quote.strip(),
+                        quote=trim_quote(c.quote),
                     )
                 )
             scene = Scene(

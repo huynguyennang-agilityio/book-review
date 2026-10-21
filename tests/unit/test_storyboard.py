@@ -293,3 +293,32 @@ def test_graph_runs_storyboard_node_after_research() -> None:
     config: RunnableConfig = {"configurable": {"thread_id": "t"}}
     state = graph.invoke({"book": {"title": "Nhà giả kim"}}, config)
     assert state["storyboard"]["book"]["title"] == "Nhà giả kim"
+
+
+def test_trim_quote_cuts_at_word_boundary_and_stays_a_substring() -> None:
+    from book_review_api.storyboard.writer import trim_quote
+
+    text = " ".join(f"từ{i}" for i in range(80))
+    out = trim_quote(text)
+    assert len(out) <= 200
+    assert text.startswith(out)
+    assert not out.endswith(" ")
+    assert trim_quote("  ngắn  ") == "ngắn"
+
+
+def test_writer_drops_uncited_scenes_in_cited_sections() -> None:
+    mixed = SectionDraft(
+        scenes=[
+            SceneDraft(narration_vi="không nguồn", scene_type="title", mood="m"),
+            SceneDraft(
+                narration_vi="có nguồn",
+                scene_type="title",
+                mood="m",
+                citations=[CitationDraft(passage=1, quote="Paulo Coelho")],
+            ),
+        ]
+    )
+    w, _ = make_writer([outline(), draft(cited=False), mixed, draft(), draft(cited=False)])
+    sb = w.write(w_book(), "fiction")
+    assert [s.narration_vi for s in sb.scenes if s.section == "context"] == ["có nguồn"]
+    assert [s.id for s in sb.scenes] == [1, 2, 3, 4]
