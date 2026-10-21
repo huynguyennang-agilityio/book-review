@@ -1,16 +1,21 @@
 """REST cho project. Truy vấn qua `UserDB` nên RLS lọc theo người dùng; project của người khác
 trả 404 như không tồn tại."""
 
+import asyncio
+import logging
 from datetime import datetime
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field, StringConstraints
 
 from book_review_api.db import UserDB
 from book_review_api.errors import AppError, ErrorCode
 from book_review_api.graph.nodes.precheck import find_excluded_keyword
+from book_review_api.storyboard.rewrite import SceneNotFound
+
+log = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/projects", tags=["projects"])
 
@@ -59,3 +64,106 @@ async def get_project(project_id: UUID, db: UserDB) -> Project:
     if row is None:
         raise AppError(ErrorCode.NOT_FOUND)
     return Project.model_validate(row)
+
+
+class CancelResult(Project):
+    # Chi phí đã tiêu tới lúc huỷ (cộng dồn trong state của graph, không mất khi huỷ).
+    cost: dict[str, float] = Field(default_factory=dict)
+
+
+FINISHED = {"done", "failed", "rejected"}
+
+
+async def _load(project_id: UUID, db: UserDB) -> Project:
+    cur = await db.execute(f"select {_COLUMNS} from public.projects where id = %s", [project_id])
+    row = await cur.fetchone()
+    if row is None:
+        raise AppError(ErrorCode.NOT_FOUND)
+    return Project.model_validate(row)
+
+
+@router.post("/{project_id}/cancel")
+async def cancel_project(project_id: UUID, request: Request, db: UserDB) -> CancelResult:
+    """Huỷ project (idempotent). Đặt cờ huỷ ở Redis để node tiếp theo và job của worker dừng, nếu
+    graph đang chờ duyệt thì ghi luôn trạng thái `cancelled` vào state. Chi phí đã tiêu vẫn còn."""
+    project = await _load(project_id, db)
+    if project.status in FINISHED:
+        raise AppError(ErrorCode.INVALID_STATE, "Project đã kết thúc, không huỷ được.")
+    config: Any = {"configurable": {"thread_id": project.thread_id}}
+    graph = request.app.state.graph
+    flags = request.app.state.cancel_flags
+    try:
+        await asyncio.to_thread(flags.set, project.thread_id)
+    except Exception:  # noqa: BLE001
+        log.exception("không đặt được cờ huỷ ở Redis")
+    cost: dict[str, float] = {}
+    if project.status != "created":
+        snap = await graph.aget_state(config)
+        cost = dict(snap.values.get("cost") or {})
+        waiting = [t for t in snap.tasks if t.interrupts]
+        if project.status == "awaiting_review" and len(waiting) == 1:
+            # Graph đang dừng ở điểm duyệt, không có run nào giữ checkpoint: ghi thẳng `cancelled`.
+            await graph.aupdate_state(
+                config,
+                {
+                    "cancel_requested": True,
+                    "status": "cancelled",
+                    "error_code": ErrorCode.CANCELLED.value,
+                },
+                as_node=waiting[0].name,
+            )
+    cur = await db.execute(
+        "update public.projects set status = 'cancelled', updated_at = now() where id = %s"
+        f" returning {_COLUMNS}",
+        [project_id],
+    )
+    row = await cur.fetchone()
+    assert row is not None
+    return CancelResult(**Project.model_validate(row).model_dump(), cost=cost)
+
+
+class RewriteRequest(BaseModel):
+    instruction: Annotated[
+        str, StringConstraints(strip_whitespace=True, min_length=1, max_length=500)
+    ]
+    # Lời đọc đang nằm trong ô sửa (chưa lưu), để yêu cầu như "ngắn hơn" áp lên bản đang sửa.
+    narration_vi: Annotated[str, StringConstraints(max_length=2000)] | None = None
+
+
+class RewriteResult(BaseModel):
+    scene_id: int
+    narration_vi: str
+    on_screen_text_vi: str | None
+    faithfulness: float | None
+    unsupported: list[dict[str, str]] = Field(default_factory=list)
+    cost_usd: float
+
+
+@router.post("/{project_id}/scenes/{scene_id}/rewrite")
+async def rewrite_scene(
+    project_id: UUID, scene_id: int, body: RewriteRequest, request: Request, db: UserDB
+) -> RewriteResult:
+    """Viết lại một cảnh theo yêu cầu bằng lời. Chỉ trả bản đề xuất; kịch bản chỉ đổi khi người
+    dùng bấm Duyệt kèm bản sửa."""
+    project = await _load(project_id, db)
+    if project.status != "awaiting_review":
+        raise AppError(ErrorCode.INVALID_STATE, "Chỉ viết lại được khi đang chờ duyệt kịch bản.")
+    rewriter = getattr(request.app.state, "scene_rewriter", None)
+    if rewriter is None:
+        raise AppError(ErrorCode.PROVIDER_UNAVAILABLE)
+    snap = await request.app.state.graph.aget_state(
+        {"configurable": {"thread_id": project.thread_id}}
+    )
+    storyboard = snap.values.get("storyboard")
+    if not storyboard:
+        raise AppError(ErrorCode.INVALID_STATE, "Chưa có kịch bản để viết lại.")
+    try:
+        result = await asyncio.to_thread(
+            rewriter, storyboard, scene_id, body.instruction, body.narration_vi
+        )
+    except SceneNotFound:
+        raise AppError(ErrorCode.NOT_FOUND, "Không có cảnh này trong kịch bản.") from None
+    except Exception:
+        log.exception("viết lại cảnh thất bại")
+        raise AppError(ErrorCode.PROVIDER_UNAVAILABLE) from None
+    return RewriteResult(**result)

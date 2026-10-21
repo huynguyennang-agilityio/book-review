@@ -89,6 +89,27 @@ def _rows_to_chunks(rows: Sequence[Any]) -> list[Chunk]:
     return [Chunk(id=r[0], content=r[1] or "", metadata=dict(r[2] or {})) for r in rows]
 
 
+_BY_ID_SQL = text(
+    """
+    select e.id, e.document, e.cmetadata
+    from public.langchain_pg_embedding e
+    join public.langchain_pg_collection c on c.uuid = e.collection_id
+    where c.name = :collection and e.id = any(:ids)
+    """
+)
+
+
+def chunks_by_id(engine: Engine, ids: Sequence[str]) -> dict[str, Chunk]:
+    """Chunk theo id (citation của storyboard trỏ vào `langchain_pg_embedding.id`)."""
+    if not ids:
+        return {}
+    with engine.begin() as conn:
+        rows = conn.execute(
+            _BY_ID_SQL, {"collection": COLLECTION_NAME, "ids": list(dict.fromkeys(ids))}
+        ).fetchall()
+    return {c.id: c for c in _rows_to_chunks(rows)}
+
+
 def vector_search(
     engine: Engine, embeddings: Embeddings, book_id: str, query: str, limit: int
 ) -> list[Chunk]:

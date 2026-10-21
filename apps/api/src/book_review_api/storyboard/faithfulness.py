@@ -23,7 +23,12 @@ from book_review_api.config import Settings, get_settings
 from book_review_api.errors import ErrorCode
 from book_review_api.providers.structured import Usage, call_structured
 from book_review_api.rag.retrieve import Chunk
-from book_review_api.storyboard.schema import CITED_SECTIONS, Scene, Storyboard
+from book_review_api.storyboard.schema import (
+    CITED_SECTIONS,
+    Scene,
+    Storyboard,
+    UnsupportedClaim,
+)
 from book_review_api.storyboard.writer import clean_narration
 
 log = logging.getLogger(__name__)
@@ -135,13 +140,18 @@ class FaithfulnessChecker:
         while judgement.score < self.settings.faithfulness_threshold:
             if rounds == self.settings.faithfulness_rounds:
                 flags = list(dict.fromkeys([*scene.flags, LOW_FAITHFULNESS]))
-                update = {"faithfulness": judgement.score, "flags": flags}
+                update = {
+                    "faithfulness": judgement.score,
+                    "flags": flags,
+                    "unsupported": unsupported_claims(judgement),
+                }
                 return scene.model_copy(update=update), history
             scene = self.rewrite(scene, contexts, judgement)
             rounds += 1
             judgement = self.judge(scene.narration_vi, contexts)
             history.append(judgement)
-        return scene.model_copy(update={"faithfulness": judgement.score}), history
+        update = {"faithfulness": judgement.score, "unsupported": unsupported_claims(judgement)}
+        return scene.model_copy(update=update), history
 
     def check(
         self, storyboard: Storyboard, chunks: Mapping[str, Chunk]
@@ -180,6 +190,10 @@ class FaithfulnessChecker:
             "input_tokens": float(j.input_tokens + w.input_tokens),
             "output_tokens": float(j.output_tokens + w.output_tokens),
         }
+
+
+def unsupported_claims(judgement: Judgement) -> list[UnsupportedClaim]:
+    return [UnsupportedClaim(claim=c.claim, reason=c.reason) for c in judgement.unsupported]
 
 
 def scene_contexts(scene: Scene, chunks: Mapping[str, Chunk]) -> list[str]:
