@@ -3,13 +3,18 @@ name = "book-review-api"
 version = "0.1.0"
 description = "FastAPI + LangGraph backend"
 requires-python = ">=3.12"
-# Version thư viện LangChain/LangGraph/AG-UI sẽ được pin sau spike ngày 2.
+# LangGraph / psycopg pin theo spike ngày 2 (docs/spikes/day-02-stack.md).
 dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.30",
     "pydantic>=2.8",
     "pydantic-settings>=2.4",
     "pyjwt[crypto]>=2.10",
+    "langgraph==1.2.16",
+    "langgraph-checkpoint==4.3.0",
+    "langgraph-checkpoint-postgres==3.2.0",
+    "psycopg[binary,pool]==3.3.6",
+    "psycopg-pool==3.3.3",
 ]
 
 [build-system]
