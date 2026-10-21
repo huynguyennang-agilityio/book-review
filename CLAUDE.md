@@ -17,6 +17,7 @@ Script gọi Gemini/Tavily cần key. Cloud sandbox không có key và bị ch�
 - Repo: `/Users/nanghuy/Desktop/Projects/Review book/resource/book-review`
 - Key nằm trong `.env` ở thư mục đó (đã gitignore). Chỉ đọc tên biến; không in, không log, không commit giá trị.
 - Cấu hình hiện tại: `GEMINI_MODEL=gemini-3.5-flash-lite`, `SEARCH_PROVIDER=tavily` (cần `GOOGLE_API_KEY`, `TAVILY_API_KEY`).
+- Giám khảo faithfulness mặc định `gemini-3.1-flash-lite`. Gói free của `gemini-3.5-flash` chỉ 20 request/ngày, không đủ chạy eval.
 
 ## Lệnh chuẩn
 
@@ -26,6 +27,7 @@ uv run pytest
 uv run ruff check . && uv run ruff format --check . && uv run mypy
 uv run python scripts/run_research.py "Đắc nhân tâm"
 uv run python scripts/run_storyboard.py nha-gia-kim sapiens   # slug trong evals/golden
+uv run --group eval python evals/run_ragas.py                # eval faithfulness, báo cáo ở docs/evals/
 docker compose up -d                                          # Postgres + pgvector, Redis
 uv run python -m book_review_api.migrate                      # chạy lại được
 ```
