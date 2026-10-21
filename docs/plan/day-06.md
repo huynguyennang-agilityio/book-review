@@ -14,22 +14,22 @@ Lưu chunk vào pgvector với index HNSW, nạp lại cùng nguồn không tạ
 
 ### Embeddings
 
-- [ ] `providers/llm_gemini.py`: embedding model đa ngôn ngữ đặt trong config.
-- [ ] Đo chi phí và độ trễ embed cho 100 chunk.
+- [x] `providers/llm_gemini.py`: embedding model đa ngôn ngữ đặt trong config.
+- [ ] Đo chi phí và độ trễ embed cho 100 chunk: script `scripts/measure_embeddings.py` đã có, chờ chạy với key thật.
 
 ### Vector store
 
-- [ ] `langchain-postgres` `PGVector`, migration tạo index HNSW.
-- [ ] RLS cho chunk riêng tư theo `user_id`, chunk công khai dùng chung theo `book_id`.
+- [x] `langchain-postgres` `PGVector`, migration tạo index HNSW.
+- [x] RLS cho chunk riêng tư theo `user_id`, chunk công khai dùng chung theo `book_id`.
 
 ### Incremental
 
-- [ ] LangChain Indexing API: `index()` + `SQLRecordManager`, chế độ `incremental`.
-- [ ] Hash không đổi thì bỏ qua, hash đổi thì xóa chunk cũ của nguồn đó rồi nạp lại.
+- [x] LangChain Indexing API: `index()` + `SQLRecordManager`, chế độ `incremental`.
+- [x] Hash không đổi thì bỏ qua, hash đổi thì xóa chunk cũ của nguồn đó rồi nạp lại.
 
 ### Test
 
-- [ ] Nạp cùng nguồn 2 lần: số chunk không đổi. Đổi nội dung: chunk cũ bị thay.
+- [x] Nạp cùng nguồn 2 lần: số chunk không đổi. Đổi nội dung: chunk cũ bị thay.
 
 ## Đầu ra
 
@@ -38,8 +38,8 @@ Lưu chunk vào pgvector với index HNSW, nạp lại cùng nguồn không tạ
 
 ## Tiêu chí hoàn thành
 
-- [ ] Nạp lại cùng nguồn không tạo chunk trùng
-- [ ] Kho tri thức theo sách dùng lại được giữa các lần chạy
+- [x] Nạp lại cùng nguồn không tạo chunk trùng
+- [x] Kho tri thức theo sách dùng lại được giữa các lần chạy
 
 ---
 

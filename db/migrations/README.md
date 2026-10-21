@@ -18,3 +18,4 @@ Lệnh này chạy các file ở đây rồi tạo bảng checkpoint/store của
 | `0001_supabase_compat.sql` | Role `anon`/`authenticated`, `auth.users`, `auth.uid()` khi chạy trên Postgres thuần |
 | `0002_app_tables.sql` | `projects`, `assets`, `documents`, `chunks` + RLS `user_id = auth.uid()` |
 | `0003_langgraph_schema.sql` | Schema `langgraph` cho checkpointer và store |
+| `0004_vector_store.sql` | pgvector: `langchain_pg_embedding` + HNSW, RLS theo `user_id`, `app_private.upsertion_record` cho Indexing API |
