@@ -1,5 +1,17 @@
 {
   "name": "book-review",
   "private": true,
-  "packageManager": "pnpm@9.15.0"
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "web:dev": "pnpm --filter @book-review/web dev",
+    "web:build": "pnpm --filter @book-review/web build",
+    "web:lint": "pnpm --filter @book-review/web lint",
+    "web:typecheck": "pnpm --filter @book-review/web typecheck"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
 }
