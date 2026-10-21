@@ -56,7 +56,7 @@ class Settings(BaseSettings):
 
     # Faithfulness (ngày 11): giám khảo dùng model khác model viết kịch bản. Cảnh context/body
     # dưới ngưỡng được viết lại tối đa `faithfulness_rounds` vòng rồi gắn cờ LOW_FAITHFULNESS.
-    judge_model: str = "gemini-3.5-flash"
+    judge_model: str = "gemini-3.1-flash-lite"
     faithfulness_threshold: float = 0.9
     faithfulness_rounds: int = 2
     # Giới hạn request/phút cho chat model (0 = không giới hạn). Gói free Gemini ~5-10 RPM.

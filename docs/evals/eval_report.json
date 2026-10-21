@@ -1,0 +1,538 @@
+{
+ "generated_at": "2026-10-21T09:41:26+00:00",
+ "writer_model": "gemini-3.5-flash-lite",
+ "judge_model": "gemini-3.1-flash-lite",
+ "threshold": 0.9,
+ "rewrite_rounds": 2,
+ "prompts": [
+  "faithfulness_judge_v1",
+  "faithfulness_rewrite_v1"
+ ],
+ "ragas_version": "0.4.3",
+ "scope": "Ngưỡng tính trên context/body (nguồn = chunk cảnh trích dẫn). hook và review_cta đo riêng, đối chiếu với toàn bộ nguồn của sách, không tính vào ngưỡng.",
+ "books_failed": [],
+ "summary": {
+  "hook": {
+   "n": 6,
+   "vi": 1.0,
+   "ragas": 0.6111
+  },
+  "context": {
+   "n": 2,
+   "vi": 1.0,
+   "ragas": 1.0
+  },
+  "body": {
+   "n": 5,
+   "vi": 0.85,
+   "ragas": 0.8333
+  },
+  "review_cta": {
+   "n": 2,
+   "vi": 0.5,
+   "ragas": 0.3333
+  },
+  "context_body": {
+   "n": 7,
+   "vi": 0.8929,
+   "ragas": 0.881,
+   "vi_final": 1.0,
+   "ragas_final": 1.0,
+   "rewritten": 2,
+   "low_faithfulness": 0
+  }
+ },
+ "manual": null,
+ "judge_cost": {
+  "usd": 0.0102377,
+  "input_tokens": 10484.0,
+  "output_tokens": 2837.0
+ },
+ "books": [
+  {
+   "slug": "nha-gia-kim",
+   "title": "Nhà giả kim",
+   "kind": "fiction",
+   "storyboard_cost": {
+    "usd": 0.0076198,
+    "input_tokens": 4891.0,
+    "output_tokens": 2461.0
+   },
+   "sections": {
+    "hook": {
+     "n": 6,
+     "vi": 1.0,
+     "ragas": 0.6111
+    },
+    "context": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 5,
+     "vi": 0.85,
+     "ragas": 0.8333
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 0.5,
+     "ragas": 0.3333
+    },
+    "context_body": {
+     "n": 7,
+     "vi": 0.8929,
+     "ragas": 0.881,
+     "vi_final": 1.0,
+     "ragas_final": 1.0,
+     "rewritten": 2,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Liệu bạn có dám từ bỏ tất cả để lên đường thực hiện giấc mơ từ những điềm báo kỳ lạ?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhân vật chính trong Nhà giả kim thực hiện giấc mơ từ những điềm báo kỳ lạ.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Santiago mơ thấy kho báu và được nhà giả kim dạy cách đọc các điềm báo."
+      },
+      {
+       "claim": "Nhân vật chính trong Nhà giả kim từ bỏ tất cả để lên đường thực hiện giấc mơ.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Santiago bán đàn cừu và vượt eo biển sang châu Phi để theo đuổi giấc mơ."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 2,
+     "section": "hook",
+     "narration_vi": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho, xuất bản lần đầu năm 1988 bằng tiếng Bồ Đào Nha.",
+     "chunk_ids": [
+      "nha-gia-kim/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho."
+      },
+      {
+       "claim": "Nhà giả kim xuất bản lần đầu năm 1988.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi Nhà giả kim xuất bản lần đầu năm 1988."
+      },
+      {
+       "claim": "Nhà giả kim xuất bản lần đầu bằng tiếng Bồ Đào Nha.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi Nhà giả kim xuất bản lần đầu bằng tiếng Bồ Đào Nha."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 3,
+     "section": "hook",
+     "narration_vi": "Nhân vật chính là Santiago, một cậu bé chăn cừu người Andalusia ở Tây Ban Nha, người hai lần mơ thấy kho báu ở kim tự tháp Ai Cập.",
+     "chunk_ids": [
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhân vật chính của cuốn sách Nhà giả kim là Santiago.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận nhân vật chính là Santiago."
+      },
+      {
+       "claim": "Santiago là một cậu bé chăn cừu người Andalusia ở Tây Ban Nha.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi rõ Santiago là cậu bé chăn cừu người Andalusia ở Tây Ban Nha."
+      },
+      {
+       "claim": "Santiago hai lần mơ thấy kho báu ở kim tự tháp Ai Cập.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi rõ cậu hai lần mơ thấy một kho báu nằm gần các kim tự tháp Ai Cập."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 4,
+     "section": "hook",
+     "narration_vi": "Cậu bán đàn cừu để vượt eo biển sang châu Phi và học cách lắng nghe trái tim cùng các điềm báo trên sa mạc.",
+     "chunk_ids": [
+      "nha-gia-kim/02-noi-dung.txt:0",
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Santiago bán đàn cừu để vượt eo biển sang châu Phi.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Santiago bán đàn cừu và vượt eo biển sang châu Phi."
+      },
+      {
+       "claim": "Santiago học cách lắng nghe trái tim trên sa mạc.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu nhà giả kim dạy Santiago lắng nghe trái tim trên sa mạc."
+      },
+      {
+       "claim": "Santiago học cách đọc các điềm báo trên sa mạc.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu nhà giả kim dạy Santiago đọc các điềm báo trên sa mạc."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 5,
+     "section": "hook",
+     "narration_vi": "Cuốn sách là một ngụ ngôn tuyệt vời nhấn mạnh khái niệm huyền thoại cá nhân, sứ mệnh mà mỗi người cần theo đuổi.",
+     "chunk_ids": [
+      "nha-gia-kim/01-tong-quan.txt:0",
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách Nhà giả kim là một ngụ ngôn.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu tác phẩm thường được xếp vào dòng văn học ngụ ngôn."
+      },
+      {
+       "claim": "Cuốn sách Nhà giả kim nhấn mạnh khái niệm huyền thoại cá nhân.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu sách nhấn mạnh khái niệm huyền thoại cá nhân."
+      },
+      {
+       "claim": "Huyền thoại cá nhân là sứ mệnh mà mỗi người cần theo đuổi.",
+       "supported": true,
+       "reason": "Nguồn [2] định nghĩa huyền thoại cá nhân là sứ mệnh riêng mà mỗi người cần theo đuổi."
+      }
+     ],
+     "ragas": 0.6666666666666666
+    },
+    {
+     "id": 6,
+     "section": "hook",
+     "narration_vi": "Hãy đọc thử ngay để tìm kiếm ý nghĩa cuộc đời bạn nhé!",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [],
+     "ragas": 0.0
+    },
+    {
+     "id": 7,
+     "section": "context",
+     "narration_vi": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho, xuất bản lần đầu năm 1988 bằng tiếng Bồ Đào Nha.",
+     "chunk_ids": [
+      "nha-gia-kim/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho."
+      },
+      {
+       "claim": "Nhà giả kim xuất bản lần đầu năm 1988.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản lần đầu năm 1988."
+      },
+      {
+       "claim": "Nhà giả kim xuất bản lần đầu bằng tiếng Bồ Đào Nha.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản lần đầu bằng tiếng Bồ Đào Nha."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 8,
+     "section": "context",
+     "narration_vi": "Tác phẩm kể một hành trình đi tìm ý nghĩa cuộc đời bằng giọng văn giản dị, nhiều câu triết lý ngắn gọn dễ nhớ.",
+     "chunk_ids": [
+      "nha-gia-kim/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tác phẩm Nhà giả kim kể một hành trình đi tìm ý nghĩa cuộc đời.",
+       "supported": true,
+       "reason": "Nguồn ghi tác phẩm kể một hành trình đi tìm ý nghĩa cuộc đời."
+      },
+      {
+       "claim": "Tác phẩm Nhà giả kim có giọng văn giản dị.",
+       "supported": true,
+       "reason": "Nguồn ghi tác phẩm kể bằng giọng văn giản dị."
+      },
+      {
+       "claim": "Tác phẩm Nhà giả kim có nhiều câu triết lý ngắn gọn dễ nhớ.",
+       "supported": true,
+       "reason": "Nguồn ghi tác phẩm có nhiều câu triết lý ngắn gọn dễ nhớ."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 9,
+     "section": "body",
+     "narration_vi": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho, xuất bản lần đầu năm 1988 bằng tiếng Bồ Đào Nha.",
+     "chunk_ids": [
+      "nha-gia-kim/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho."
+      },
+      {
+       "claim": "Nhà giả kim xuất bản lần đầu năm 1988.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản lần đầu năm 1988."
+      },
+      {
+       "claim": "Nhà giả kim xuất bản lần đầu bằng tiếng Bồ Đào Nha.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản lần đầu bằng tiếng Bồ Đào Nha."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 10,
+     "section": "body",
+     "narration_vi": "Nhân vật chính là Santiago, một cậu bé chăn cừu ở Tây Ban Nha đã bán đàn cừu để vượt eo biển sang châu Phi tìm kho báu.",
+     "chunk_ids": [
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhân vật chính của cuốn sách là Santiago.",
+       "supported": true,
+       "reason": "Nguồn xác nhận nhân vật chính là Santiago."
+      },
+      {
+       "claim": "Santiago là một cậu bé chăn cừu ở Tây Ban Nha.",
+       "supported": true,
+       "reason": "Nguồn ghi Santiago là cậu bé chăn cừu người Andalusia ở Tây Ban Nha."
+      },
+      {
+       "claim": "Santiago đã bán đàn cừu để vượt eo biển sang châu Phi.",
+       "supported": true,
+       "reason": "Nguồn ghi cậu bán đàn cừu và vượt eo biển sang châu Phi."
+      },
+      {
+       "claim": "Santiago sang châu Phi để tìm kho báu.",
+       "supported": true,
+       "reason": "Nguồn ghi cậu sang châu Phi để theo đuổi giấc mơ về kho báu."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 11,
+     "section": "body",
+     "narration_vi": "Trên đường đi, cậu bị lừa mất tiền, làm việc cho tiệm pha lê rồi cùng đoàn lữ hành băng qua sa mạc Sahara khắc nghiệt.",
+     "chunk_ids": [
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 0.75,
+     "vi_claims": [
+      {
+       "claim": "Santiago bị lừa mất tiền trên đường đi.",
+       "supported": true,
+       "reason": "Nguồn ghi Santiago bị lừa mất tiền ở Tangier."
+      },
+      {
+       "claim": "Santiago làm việc cho tiệm pha lê.",
+       "supported": true,
+       "reason": "Nguồn ghi Santiago làm việc cho một người bán pha lê."
+      },
+      {
+       "claim": "Santiago cùng đoàn lữ hành băng qua sa mạc Sahara.",
+       "supported": true,
+       "reason": "Nguồn ghi Santiago cùng một đoàn lữ hành băng qua sa mạc Sahara."
+      },
+      {
+       "claim": "Sa mạc Sahara khắc nghiệt.",
+       "supported": false,
+       "reason": "Nguồn không đề cập đến tính từ khắc nghiệt của sa mạc."
+      }
+     ],
+     "ragas": 0.6666666666666666,
+     "rounds": 1,
+     "vi_final": 1.0,
+     "flags": [],
+     "final_narration_vi": "Trên đường đi, cậu bị lừa mất tiền, làm việc cho người bán pha lê rồi cùng một đoàn lữ hành băng qua sa mạc Sahara.",
+     "final_vi_claims": [
+      {
+       "claim": "Santiago bị lừa mất tiền trên đường đi.",
+       "supported": true,
+       "reason": "Nguồn ghi Santiago bị lừa mất tiền ở Tangier."
+      },
+      {
+       "claim": "Santiago làm việc cho một người bán pha lê.",
+       "supported": true,
+       "reason": "Nguồn ghi Santiago làm việc cho một người bán pha lê."
+      },
+      {
+       "claim": "Santiago cùng một đoàn lữ hành băng qua sa mạc Sahara.",
+       "supported": true,
+       "reason": "Nguồn ghi Santiago cùng một đoàn lữ hành băng qua sa mạc Sahara."
+      }
+     ],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 12,
+     "section": "body",
+     "narration_vi": "Tại ốc đảo, cậu gặp tình yêu đời mình và gặp nhà giả kim, người dạy cậu cách lắng nghe trái tim.",
+     "chunk_ids": [
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Santiago gặp tình yêu đời mình tại ốc đảo.",
+       "supported": true,
+       "reason": "Nguồn ghi tại ốc đảo cậu gặp Fatima, cô gái sa mạc mà cậu yêu."
+      },
+      {
+       "claim": "Santiago gặp nhà giả kim tại ốc đảo.",
+       "supported": true,
+       "reason": "Nguồn ghi tại ốc đảo cậu gặp nhà giả kim."
+      },
+      {
+       "claim": "Nhà giả kim dạy Santiago cách lắng nghe trái tim.",
+       "supported": true,
+       "reason": "Nguồn ghi nhà giả kim là người dạy cậu lắng nghe trái tim."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 13,
+     "section": "body",
+     "narration_vi": "Cuốn sách mang đến giọng văn giản dị nhưng chứa đựng thông điệp sâu sắc về việc theo đuổi sứ mệnh cá nhân.",
+     "chunk_ids": [
+      "nha-gia-kim/01-tong-quan.txt:0"
+     ],
+     "vi": 0.5,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách Nhà giả kim mang đến giọng văn giản dị.",
+       "supported": true,
+       "reason": "Nguồn ghi tác phẩm kể bằng giọng văn giản dị."
+      },
+      {
+       "claim": "Cuốn sách Nhà giả kim chứa đựng thông điệp sâu sắc về việc theo đuổi sứ mệnh cá nhân.",
+       "supported": false,
+       "reason": "Nguồn chỉ nhắc đến hành trình tìm ý nghĩa cuộc đời và các câu triết lý, không đề cập cụ thể đến thông điệp về sứ mệnh cá nhân."
+      }
+     ],
+     "ragas": 0.5,
+     "rounds": 1,
+     "vi_final": 1.0,
+     "flags": [],
+     "final_narration_vi": "Tác phẩm kể hành trình đi tìm ý nghĩa cuộc đời bằng giọng văn giản dị và nhiều câu triết lý.",
+     "final_vi_claims": [
+      {
+       "claim": "Nhà giả kim kể hành trình đi tìm ý nghĩa cuộc đời.",
+       "supported": true,
+       "reason": "Nguồn ghi tác phẩm kể một hành trình đi tìm ý nghĩa cuộc đời."
+      },
+      {
+       "claim": "Nhà giả kim có giọng văn giản dị.",
+       "supported": true,
+       "reason": "Nguồn ghi tác phẩm kể bằng giọng văn giản dị."
+      },
+      {
+       "claim": "Nhà giả kim có nhiều câu triết lý.",
+       "supported": true,
+       "reason": "Nguồn ghi tác phẩm có nhiều câu triết lý ngắn gọn dễ nhớ."
+      }
+     ],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 14,
+     "section": "review_cta",
+     "narration_vi": "Đây là một cuốn sách ngụ ngôn tuyệt vời giúp bạn suy ngẫm về hành trình tìm kiếm ý nghĩa cuộc đời và theo đuổi ước mơ riêng của mình.",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhà giả kim là một cuốn sách ngụ ngôn.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu tác phẩm thường được xếp vào dòng văn học ngụ ngôn."
+      },
+      {
+       "claim": "Nhà giả kim giúp người đọc suy ngẫm về hành trình tìm kiếm ý nghĩa cuộc đời.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu tác phẩm kể một hành trình đi tìm ý nghĩa cuộc đời."
+      },
+      {
+       "claim": "Nhà giả kim giúp người đọc suy ngẫm về việc theo đuổi ước mơ riêng.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu sách nhấn mạnh khái niệm huyền thoại cá nhân là sứ mệnh riêng mỗi người cần theo đuổi."
+      }
+     ],
+     "ragas": 0.6666666666666666
+    },
+    {
+     "id": 15,
+     "section": "review_cta",
+     "narration_vi": "Hãy tìm đọc tác phẩm này để cùng trải nghiệm chuyến hành trình đầy thú vị và rút ra nhiều bài học sâu sắc nhé.",
+     "chunk_ids": [],
+     "vi": 0.0,
+     "vi_claims": [
+      {
+       "claim": "Tác phẩm Nhà giả kim là một chuyến hành trình đầy thú vị.",
+       "supported": false,
+       "reason": "Nguồn mô tả hành trình của nhân vật nhưng không đưa ra nhận xét chủ quan là thú vị."
+      },
+      {
+       "claim": "Tác phẩm Nhà giả kim chứa đựng nhiều bài học sâu sắc.",
+       "supported": false,
+       "reason": "Nguồn chỉ nhắc đến các câu triết lý và khái niệm huyền thoại cá nhân chứ không khẳng định là bài học sâu sắc."
+      }
+     ],
+     "ragas": 0.0
+    }
+   ]
+  }
+ ]
+}

@@ -328,3 +328,13 @@ def test_clean_narration_removes_passage_markers() -> None:
     from book_review_api.storyboard.writer import clean_narration
 
     assert clean_narration(" Cậu bán cừu [1]. Rồi đi [2] tiếp ") == "Cậu bán cừu. Rồi đi tiếp"
+
+
+def test_writer_caps_scenes_per_section() -> None:
+    many = SectionDraft(
+        scenes=[SceneDraft(narration_vi=f"mở {i}", scene_type="title", mood="m") for i in range(6)]
+    )
+    w, _ = make_writer([outline(), many, draft(), draft(), draft(cited=False)])
+    sb = w.write(w_book(), "fiction")
+    assert [s.narration_vi for s in sb.scenes if s.section == "hook"] == ["mở 0"]
+    assert [s.id for s in sb.scenes] == [1, 2, 3, 4]

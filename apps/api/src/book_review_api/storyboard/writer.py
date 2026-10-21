@@ -26,6 +26,7 @@ from book_review_api.rag.retrieve import Chunk
 from book_review_api.storyboard.schema import (
     CITED_SECTIONS,
     MAX_QUOTE_CHARS,
+    SECTION_MAX_SCENES,
     SECTION_ORDER,
     BookIdentity,
     Character,
@@ -234,6 +235,7 @@ class StoryboardWriter:
             # Cảnh dữ kiện không dẫn nguồn thì bỏ (không đoán nguồn thay model); còn cảnh có
             # citation thì phần vẫn dùng được.
             drafts = [d for d in drafts if d.citations]
+        drafts = drafts[: SECTION_MAX_SCENES[section]]
         for offset, d in enumerate(drafts):
             sid = next_id + offset
             citations: list[Citation] = []
