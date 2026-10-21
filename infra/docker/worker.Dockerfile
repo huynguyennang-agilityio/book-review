@@ -1,6 +1,6 @@
 # Worker render: arq + edge-tts + ffmpeg. Image đầy đủ cho api/web làm ở ngày 23.
 FROM python:3.12-slim
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg fonts-noto-core \
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg fonts-noto-core fonts-dejavu-core \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=ghcr.io/astral-sh/uv:0.8 /uv /usr/local/bin/uv
 WORKDIR /app

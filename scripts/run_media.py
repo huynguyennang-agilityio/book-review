@@ -1,4 +1,5 @@
-"""Chạy thật tts_align → build_timeline qua worker arq + Redis + edge-tts.
+"""Chạy thật tts_align → build_timeline → subtitles → scene_images → motion → compose_render
+qua worker arq + Redis + edge-tts + ffmpeg, ra video mp4.
 
     docker compose up -d redis
     uv run arq book_review_worker.main.WorkerSettings     # terminal khác (hoặc service worker)
@@ -14,7 +15,14 @@ from pathlib import Path
 from typing import Any
 
 from book_review_api.config import get_settings
-from book_review_api.graph.nodes.media import make_build_timeline_node, make_tts_align_node
+from book_review_api.graph.nodes.media import (
+    make_build_timeline_node,
+    make_compose_render_node,
+    make_motion_node,
+    make_scene_images_node,
+    make_subtitles_node,
+    make_tts_align_node,
+)
 from book_review_api.graph.state import BookReviewState
 from book_review_api.queue import ArqJobRunner
 from book_review_worker.media.ffmpeg import probe_duration
@@ -67,6 +75,24 @@ def main(args: list[str]) -> None:
             f"shot {shots}"
         )
     print(f"tổng {tl['total_duration_s']:.2f}s, {out['cost']['tts_chars']:.0f} ký tự TTS")
+
+    state = {**state, **out, "timeline": tl, "asset_refs": {**out["asset_refs"]}}  # type: ignore[typeddict-item]
+    for name, make in (
+        ("subtitles", make_subtitles_node),
+        ("scene_images", make_scene_images_node),
+        ("motion", make_motion_node),
+        ("compose_render", make_compose_render_node),
+    ):
+        upd = make(runner)(state)  # type: ignore[arg-type]
+        if upd.get("status") == "failed":
+            sys.exit(f"{name} lỗi: {upd.get('error_code')}")
+        if "asset_refs" in upd:
+            state["asset_refs"] = {**state["asset_refs"], **upd["asset_refs"]}
+        if "timeline" in upd:
+            state["timeline"] = upd["timeline"]
+        print(f"{name}: xong")
+    video = (Path(settings.media_dir) / state["asset_refs"]["video:raw"]).resolve()
+    print(f"video {probe_duration(video):.2f}s (timeline {tl['total_duration_s']:.2f}s): {video}")
 
 
 if __name__ == "__main__":

@@ -20,7 +20,14 @@ from book_review_api.graph.nodes.faithfulness import (
     make_estimate_cost_node,
     make_faithfulness_node,
 )
-from book_review_api.graph.nodes.media import make_build_timeline_node, make_tts_align_node
+from book_review_api.graph.nodes.media import (
+    make_build_timeline_node,
+    make_compose_render_node,
+    make_motion_node,
+    make_scene_images_node,
+    make_subtitles_node,
+    make_tts_align_node,
+)
 from book_review_api.graph.nodes.precheck import precheck
 from book_review_api.graph.nodes.research import identify_confirm, make_research_node
 from book_review_api.graph.nodes.review import review_characters, review_script
@@ -96,6 +103,10 @@ def build_graph(
     if job_runner is not None:
         nodes["tts_align"] = make_tts_align_node(job_runner)
         nodes["build_timeline"] = make_build_timeline_node(job_runner)
+        nodes["subtitles"] = make_subtitles_node(job_runner)
+        nodes["scene_images"] = make_scene_images_node(job_runner)
+        nodes["motion"] = make_motion_node(job_runner)
+        nodes["compose_render"] = make_compose_render_node(job_runner)
     builder = StateGraph(BookReviewState)
     for name, fn in nodes.items():
         builder.add_node(name, fn)

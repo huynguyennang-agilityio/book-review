@@ -28,7 +28,7 @@ class EdgeTTS:
         self,
         voice: str = DEFAULT_VOICE,
         concurrency: int = 2,
-        attempts: int = 3,
+        attempts: int = 6,
         fallback_aligner: Aligner | None = None,
     ) -> None:
         self.voice = voice
@@ -54,7 +54,7 @@ class EdgeTTS:
             except Exception as exc:  # edge-tts ném nhiều loại lỗi mạng/websocket
                 last = exc
                 log.warning("edge-tts lần %d/%d lỗi: %s", attempt, self._attempts, exc)
-                await asyncio.sleep(2**attempt)
+                await asyncio.sleep(1.5 * attempt)
         raise EdgeTTSError(str(last)) from last
 
     async def _stream(self, text: str, out_path: Path) -> list[Word]:
