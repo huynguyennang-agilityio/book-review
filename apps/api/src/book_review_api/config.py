@@ -54,6 +54,23 @@ class Settings(BaseSettings):
     storyboard_minutes: int = 3
     storyboard_retries: int = 2
 
+    # Faithfulness (ngày 11): giám khảo dùng model khác model viết kịch bản. Cảnh context/body
+    # dưới ngưỡng được viết lại tối đa `faithfulness_rounds` vòng rồi gắn cờ LOW_FAITHFULNESS.
+    judge_model: str = "gemini-3.5-flash"
+    faithfulness_threshold: float = 0.9
+    faithfulness_rounds: int = 2
+    # Giới hạn request/phút cho chat model (0 = không giới hạn). Gói free Gemini ~5-10 RPM.
+    llm_rpm: float = 0.0
+
+    # Ước tính chi phí media (ngày 11). Seedream v4 edit 0,03 USD/ảnh (ADR 0003); edge-tts miễn
+    # phí; I2V (Phase 2) tính theo clip, `i2v_clips` = 0 khi chưa bật.
+    price_image_usd: float = 0.03
+    images_per_scene: int = 1
+    character_sheet_images: int = 4
+    price_tts_per_mchar: float = 0.0
+    price_i2v_per_clip: float = 0.35
+    i2v_clips: int = 0
+
     @property
     def supabase_jwks_url(self) -> str:
         return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"

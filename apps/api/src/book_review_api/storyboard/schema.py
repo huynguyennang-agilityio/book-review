@@ -52,6 +52,8 @@ class Scene(BaseModel):
     on_screen_text_vi: str | None = None
     mood: str
     faithfulness: float | None = None
+    # Cờ cho người duyệt, vd "LOW_FAITHFULNESS" khi viết lại 2 vòng vẫn dưới ngưỡng.
+    flags: list[str] = Field(default_factory=list)
 
 
 class Storyboard(BaseModel):

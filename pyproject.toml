@@ -20,6 +20,9 @@ dev = [
     "httpx2>=2.15",
     "reportlab>=4.0",
 ]
+eval = [
+    "ragas>=0.4.3",
+]
 
 [tool.ruff]
 line-length = 100

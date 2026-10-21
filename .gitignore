@@ -30,3 +30,6 @@ output/
 spikes/media/out/
 spikes/media/ref/
 *.tsbuildinfo
+
+# Eval: cache storyboard và điểm từng cảnh
+evals/out/

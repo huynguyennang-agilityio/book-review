@@ -46,6 +46,8 @@ class BookReviewState(TypedDict, total=False):
     # usd, input_tokens, output_tokens... cộng dồn.
     cost: Annotated[dict[str, float], add_costs]
     eval_scores: Annotated[dict[str, float], merge_dicts]
+    # Ước tính chi phí media trước checkpoint duyệt kịch bản (`storyboard.cost`).
+    cost_estimate: dict[str, float] | None
     status: Annotated[Status | None, merge_status]
     # Mã lỗi trong `errors.ErrorCode` khi status là failed/rejected/cancelled.
     error_code: str | None
