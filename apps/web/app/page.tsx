@@ -3,6 +3,7 @@
 import type { Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BookForm } from "./_components/BookForm";
+import { CharacterReview } from "./_components/CharacterReview";
 import { IdentifyConfirm } from "./_components/IdentifyConfirm";
 import { LoginForm } from "./_components/LoginForm";
 import { Progress } from "./_components/Progress";
@@ -10,6 +11,9 @@ import { ScriptReview } from "./_components/ScriptReview";
 import { Sources } from "./_components/Sources";
 import { useReviewRun } from "./_lib/run";
 import { supabase } from "./_lib/supabase";
+
+// Giá ước tính một ảnh Seedream (khớp `price_image_usd` của API), chỉ để hiện trên nút.
+const PRICE_IMAGE_USD = 0.03;
 
 function ReviewApp({ session }: { session: Session }) {
   // Luôn lấy token mới nhất từ Supabase (tự làm mới khi sắp hết hạn).
@@ -68,15 +72,15 @@ function ReviewApp({ session }: { session: Session }) {
             />
           )}
           {run.pending?.type === "review_characters" && (
-            <section className="card" data-testid="review-characters">
-              <h3>Chọn ảnh nhân vật</h3>
-              <p className="muted">
-                Màn chọn ảnh nhân vật làm ở ngày 17. Tiếp tục để dựng video bằng ảnh tạm.
-              </p>
-              <button type="button" onClick={() => run.resume({ approved: true })}>
-                Tiếp tục với ảnh tạm
-              </button>
-            </section>
+            <CharacterReview
+              key={run.pending.interruptId}
+              pending={run.pending}
+              busy={busy || run.cancelling}
+              priceImage={PRICE_IMAGE_USD}
+              loadImage={run.loadImage}
+              onSubmit={run.approveCharacters}
+              onCancel={run.cancel}
+            />
           )}
         </div>
         <div className="col">

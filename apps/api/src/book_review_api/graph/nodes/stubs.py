@@ -16,3 +16,9 @@ def stub(name: str) -> NodeFn:
 def save_memory(state: BookReviewState) -> NodeUpdate:
     # Node cuối: bản thật ghi Store ở ngày 20.
     return {"status": "done"}
+
+
+@node
+def regen_characters_stub(state: BookReviewState) -> NodeUpdate:
+    # Không có provider ảnh: bỏ yêu cầu tạo lại để graph không lặp mãi ở màn duyệt.
+    return {"character_regen": None}

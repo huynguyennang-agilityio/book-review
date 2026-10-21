@@ -7,14 +7,19 @@ luôn project từ màn hình duyệt. Huỷ bằng
 "Ambiguous update"), nên đường huỷ khi đang chờ duyệt đi qua giá trị resume.
 """
 
+import logging
 from collections.abc import Callable, Sequence
 from typing import Any
 
+from langgraph.config import get_store
 from langgraph.types import interrupt
 
 from book_review_api.errors import ErrorCode
+from book_review_api.graph.nodes.characters import MAX_REGEN_ROUNDS, slugify
 from book_review_api.graph.nodes.common import NodeFn, NodeUpdate, node
 from book_review_api.graph.state import BookReviewState
+
+log = logging.getLogger(__name__)
 
 # Cảnh người dùng đã sửa tay: điểm bám nguồn cũ không còn đúng với lời đọc mới.
 EDITED_FLAG = "EDITED"
@@ -112,9 +117,75 @@ def _sources(storyboard: dict[str, Any], lookup: SourceLookup | None) -> list[di
     return [{"source_id": k, "scene_ids": v, **info.get(k, {})} for k, v in by_source.items()]
 
 
+def _valid_picks(picks: Any, candidates: dict[str, Any]) -> dict[str, int]:
+    if not isinstance(picks, dict):
+        return {}
+    out: dict[str, int] = {}
+    for slug, idx in picks.items():
+        images = (candidates.get(slug) or {}).get("images") or []
+        if isinstance(idx, int) and not isinstance(idx, bool) and 0 <= idx < len(images):
+            out[slug] = idx
+    return out
+
+
+def _save_approved(series: str | None, approved: dict[str, dict[str, Any]]) -> None:
+    """Ghi nhân vật đã duyệt vào Store để các tập cùng series dùng lại (xem `character_sheets`)."""
+    if not series:
+        return
+    try:
+        store = get_store()
+    except RuntimeError:  # chạy không có Store (test khung, script)
+        return
+    for slug, value in approved.items():
+        try:
+            store.put(("characters", slugify(series)), slug, value)
+        except Exception:  # noqa: BLE001
+            log.warning("không ghi được nhân vật %s vào Store", slug, exc_info=True)
+
+
 @node
 def review_characters(state: BookReviewState) -> NodeUpdate:
-    update, _ = _wait_for_user(
-        {"type": "review_characters", "message": "Chọn ảnh cho từng nhân vật."}
+    """Mỗi nhân vật có lưới ứng viên: chọn 1 ảnh hoặc yêu cầu tạo lại (kèm ghi chú). Resume:
+    `{"selections": {slug: chỉ số ảnh}, "regenerate": {slug: ghi chú}}`. Có `regenerate` thì
+    graph quay về `regen_characters` rồi hỏi lại; không thì mọi nhân vật phải có lựa chọn
+    (nhân vật tái dùng từ series đã duyệt thì tự chọn)."""
+    candidates = state.get("character_candidates") or {}
+    update, decision = _wait_for_user(
+        {
+            "type": "review_characters",
+            "message": "Chọn ảnh cho từng nhân vật.",
+            "characters": {
+                slug: {**c, "regen_left": max(MAX_REGEN_ROUNDS - int(c.get("round", 0)), 0)}
+                for slug, c in candidates.items()
+            },
+            "picks": state.get("character_picks") or {},
+            "cost": state.get("cost") or {},
+        }
     )
-    return update
+    if update:
+        return update
+    picks = _valid_picks(decision.get("selections"), candidates)
+    regen = decision.get("regenerate")
+    if isinstance(regen, dict) and regen:
+        notes = {
+            slug: note if isinstance(note, str) else ""
+            for slug, note in regen.items()
+            if slug in candidates and not candidates[slug].get("reused")
+        }
+        if notes:
+            return {"character_regen": notes, "character_picks": picks}
+    approved: dict[str, dict[str, Any]] = {}
+    for slug, c in candidates.items():
+        idx = 0 if c.get("reused") else picks.get(slug)
+        if idx is None or idx >= len(c.get("images") or []):
+            return {"status": "failed", "error_code": ErrorCode.VALIDATION_ERROR.value}
+        approved[slug] = {"name": c.get("name", slug), "sheet_path": c["images"][idx]}
+    series = state["book"].get("series") if "book" in state else None
+    _save_approved(series, {k: v for k, v in approved.items() if not candidates[k].get("reused")})
+    return {
+        "characters_approved": approved,
+        "character_regen": None,
+        "asset_refs": {
+            f"character:{slug}:approved": v["sheet_path"] for slug, v in approved.items()
+        },
+    }

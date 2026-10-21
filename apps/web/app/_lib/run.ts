@@ -240,10 +240,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
               else if (p.type === "review_script") {
                 say("assistant", "Kịch bản đã sẵn sàng, xem lại và duyệt trước khi dựng video.");
               } else if (p.type === "review_characters") {
-                say(
-                  "assistant",
-                  "Giọng đọc, timeline và phụ đề đã xong. Chọn ảnh nhân vật làm ở ngày 17; tiếp tục sẽ dựng bằng ảnh tạm.",
-                );
+                say("assistant", "Ảnh nhân vật đã sẵn sàng, chọn ảnh cho từng nhân vật.");
               } else say("assistant", p.message || "Đã tới bước duyệt.");
               return;
             }
@@ -368,6 +365,27 @@ export function useReviewRun(getToken: () => Promise<string>) {
     [getToken],
   );
 
+  const approveCharacters = useCallback(
+    (selections: Record<string, number>, regenerate: Record<string, string>) =>
+      resume(Object.keys(regenerate).length ? { selections, regenerate } : { selections }),
+    [resume],
+  );
+
+  // Ảnh nhân vật nằm sau JWT nên không dùng thẳng được trong <img src>: tải về rồi tạo object URL.
+  const loadImage = useCallback(
+    async (path: string) => {
+      const project = projectRef.current;
+      if (!project) throw new ApiError("NOT_FOUND", ERROR_TEXT.NOT_FOUND);
+      const resp = await fetch(
+        `/api/backend/projects/${project.id}/media?path=${encodeURIComponent(path)}`,
+        { headers: { authorization: `Bearer ${await getToken()}` } },
+      );
+      if (!resp.ok) throw new ApiError(`HTTP_${resp.status}`, "Không tải được ảnh.");
+      return URL.createObjectURL(await resp.blob());
+    },
+    [getToken],
+  );
+
   return {
     status,
     messages,
@@ -382,5 +400,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
     cancel,
     approveScript,
     rewriteScene,
+    approveCharacters,
+    loadImage,
   };
 }

@@ -4,12 +4,15 @@ trả 404 như không tồn tại."""
 import asyncio
 import logging
 from datetime import datetime
+from pathlib import Path
 from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Request
+from fastapi import APIRouter, Depends, Request
+from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, StringConstraints
 
+from book_review_api.config import Settings, get_settings
 from book_review_api.db import UserDB
 from book_review_api.errors import AppError, ErrorCode
 from book_review_api.graph.nodes.precheck import find_excluded_keyword
@@ -167,3 +170,26 @@ async def rewrite_scene(
         log.exception("viết lại cảnh thất bại")
         raise AppError(ErrorCode.PROVIDER_UNAVAILABLE) from None
     return RewriteResult(**result)
+
+
+@router.get("/{project_id}/media")
+async def get_media(
+    project_id: UUID,
+    path: str,
+    request: Request,
+    db: UserDB,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> FileResponse:
+    """Ảnh ứng viên nhân vật của project (cho `<img>` trên màn duyệt). Chỉ phục vụ file mà graph
+    của chính project này đã tạo (nằm trong `character_candidates`), không đọc đường dẫn tuỳ ý."""
+    project = await _load(project_id, db)
+    snap = await request.app.state.graph.aget_state(
+        {"configurable": {"thread_id": project.thread_id}}
+    )
+    candidates = snap.values.get("character_candidates") or {}
+    allowed = {p for c in candidates.values() for p in c.get("images", [])}
+    media_dir = Path(settings.media_dir).resolve()
+    file = (media_dir / path).resolve()
+    if path not in allowed or not file.is_relative_to(media_dir) or not file.is_file():
+        raise AppError(ErrorCode.NOT_FOUND)
+    return FileResponse(file, media_type="image/jpeg", headers={"cache-control": "private"})

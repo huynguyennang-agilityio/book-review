@@ -32,6 +32,11 @@ def merge_dicts(left: dict[str, Any] | None, right: dict[str, Any] | None) -> di
     return {**(left or {}), **(right or {})}
 
 
+def replace_picks(left: dict[str, int] | None, right: dict[str, int] | None) -> dict[str, int]:
+    # Khác merge_dicts: ghi đè hẳn để xoá lựa chọn của nhân vật vừa tạo lại.
+    return dict(right) if right is not None else dict(left or {})
+
+
 def add_costs(left: dict[str, float] | None, right: dict[str, float] | None) -> dict[str, float]:
     total = dict(left or {})
     for key, value in (right or {}).items():
@@ -57,6 +62,11 @@ class BookReviewState(TypedDict, total=False):
     fal_job_ids: Annotated[dict[str, str], merge_dicts]
     # Ứng viên sheet nhân vật (ngày 16): {slug: {name, images: [đường dẫn], reused}}.
     character_candidates: Annotated[dict[str, Any], merge_dicts]
+    # Yêu cầu tạo lại ở màn duyệt nhân vật {slug: ghi chú}, và lựa chọn tạm {slug: chỉ số ảnh}.
+    character_regen: dict[str, str] | None
+    character_picks: Annotated[dict[str, int], replace_picks]
+    # Nhân vật đã duyệt (ngày 17): {slug: {name, sheet_path}}.
+    characters_approved: Annotated[dict[str, Any], merge_dicts]
     # usd, input_tokens, output_tokens... cộng dồn.
     cost: Annotated[dict[str, float], add_costs]
     eval_scores: Annotated[dict[str, float], merge_dicts]

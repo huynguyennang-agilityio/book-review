@@ -5,11 +5,20 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+import pytest
+from langgraph.checkpoint.memory import InMemorySaver
+from langgraph.store.memory import InMemoryStore
+from langgraph.types import Command
+from test_graph import config
+from test_graph import run as run_graph
+
 from book_review_api.config import Settings
 from book_review_api.errors import ErrorCode
+from book_review_api.graph.build import build_graph
 from book_review_api.graph.nodes.characters import (
     base_seed,
     make_character_sheets_node,
+    make_regen_characters_node,
     sheet_prompt,
     slugify,
 )
@@ -177,3 +186,107 @@ def test_helpers() -> None:
     assert base_seed("a") == base_seed("a") != base_seed("b")
     p = sheet_prompt(Character(name="x", description_en="a girl."), "flat style.", 2)
     assert "a girl, " not in p and "no text" in p and "flat style." in p
+
+
+# --- Ngày 17: duyệt nhân vật, tạo lại ---
+
+
+def candidates_state(tmp_path: Path, n_chars: int = 2) -> dict[str, Any]:
+    node = make_character_sheets_node(FakeImages(), cfg(tmp_path), approved_lookup=no_store)
+    out = run(node, {"storyboard": storyboard(n_chars)})
+    return {"storyboard": storyboard(n_chars), "character_candidates": out["character_candidates"]}
+
+
+def test_regen_makes_new_images_with_note(tmp_path: Path) -> None:
+    state = candidates_state(tmp_path)
+    old = state["character_candidates"]["nhan-vat-0"]["images"]
+    fake = FakeImages()
+    node = make_regen_characters_node(fake, cfg(tmp_path))
+    out = run(node, {**state, "character_regen": {"nhan-vat-0": "tóc ngắn hơn"}})
+    new = out["character_candidates"]["nhan-vat-0"]
+    assert set(out["character_candidates"]) == {"nhan-vat-0"}
+    assert len(new["images"]) == 4 and new["round"] == 1 and not set(new["images"]) & set(old)
+    assert len(fake.calls) == 4 and all("tóc ngắn hơn" in c["prompt"] for c in fake.calls)
+    assert all("no text" in c["prompt"] for c in fake.calls)
+    assert out["cost"]["usd"] == 4 * 0.03
+    assert out["character_regen"] is None
+
+
+def test_regen_respects_budget_and_round_limit(tmp_path: Path) -> None:
+    state = candidates_state(tmp_path, 1)
+    fake = FakeImages()
+    node = make_regen_characters_node(fake, cfg(tmp_path))
+    out = run(
+        node,
+        {**state, "character_regen": {"nhan-vat-0": ""}, "options": {"budget_usd": 0.05}},
+    )
+    assert out["status"] == "failed" and out["error_code"] == ErrorCode.BUDGET_EXCEEDED.value
+    assert fake.calls == [] and out["character_candidates"] == {}
+
+    state["character_candidates"]["nhan-vat-0"]["round"] = 3
+    out = run(node, {**state, "character_regen": {"nhan-vat-0": ""}})
+    assert fake.calls == [] and out["character_candidates"] == {}
+
+
+@pytest.fixture(autouse=True)
+def tmp_media(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "book_review_api.graph.nodes.characters.get_settings", lambda: cfg(tmp_path)
+    )
+
+
+def test_select_characters_and_continue_to_scene_images(tmp_path: Path) -> None:
+    store = InMemoryStore()
+    graph = build_graph(InMemorySaver(), store=store)
+    state = candidates_state(tmp_path)
+    run_graph(graph, {"book": {"title": "Nhà giả kim", "series": "Bộ thử"}})
+    graph.update_state(config(), state, as_node="review_script")
+    run_graph(graph, Command(resume={"approved": True}))
+    paused = graph.get_state(config())
+    assert paused.next == ("review_characters",)
+    payload = paused.interrupts[0].value
+    assert payload["type"] == "review_characters"
+    assert payload["characters"]["nhan-vat-0"]["regen_left"] == 3
+
+    visited = run_graph(graph, Command(resume={"selections": {"nhan-vat-0": 2, "nhan-vat-1": 0}}))
+    assert "scene_images" in visited
+    values = graph.get_state(config()).values
+    chosen = state["character_candidates"]["nhan-vat-0"]["images"][2]
+    assert values["characters_approved"]["nhan-vat-0"]["sheet_path"] == chosen
+    assert values["asset_refs"]["character:nhan-vat-0:approved"] == chosen
+    saved = store.get(("characters", "bo-thu"), "nhan-vat-0")
+    assert saved is not None and saved.value["sheet_path"] == chosen
+
+
+def test_missing_selection_fails_validation(tmp_path: Path) -> None:
+    graph = build_graph(InMemorySaver())
+    run_graph(graph, {"book": {"title": "Nhà giả kim"}})
+    graph.update_state(config(), candidates_state(tmp_path), as_node="review_script")
+    run_graph(graph, Command(resume={"approved": True}))
+    visited = run_graph(graph, Command(resume={"selections": {"nhan-vat-0": 1}}))
+    assert "scene_images" not in visited
+    values = graph.get_state(config()).values
+    assert values["status"] == "failed"
+    assert values["error_code"] == ErrorCode.VALIDATION_ERROR.value
+
+
+def test_regenerate_loops_back_to_review(tmp_path: Path) -> None:
+    graph = build_graph(InMemorySaver(), image_provider=FakeImages())
+    state = candidates_state(tmp_path)
+    run_graph(graph, {"book": {"title": "Nhà giả kim"}})
+    graph.update_state(config(), state, as_node="review_script")
+    run_graph(graph, Command(resume={"approved": True}))
+    visited = run_graph(
+        graph,
+        Command(resume={"selections": {"nhan-vat-1": 3}, "regenerate": {"nhan-vat-0": "đội mũ"}}),
+    )
+    assert "regen_characters" in visited and "scene_images" not in visited
+    paused = graph.get_state(config())
+    assert paused.next == ("review_characters",)
+    payload = paused.interrupts[0].value
+    assert payload["characters"]["nhan-vat-0"]["round"] == 1
+    assert payload["characters"]["nhan-vat-0"]["regen_left"] == 2
+    assert payload["picks"] == {"nhan-vat-1": 3}
+    assert paused.values["cost"]["usd"] == pytest.approx(4 * 0.03)
+    visited = run_graph(graph, Command(resume={"selections": {"nhan-vat-0": 0, "nhan-vat-1": 3}}))
+    assert "scene_images" in visited
