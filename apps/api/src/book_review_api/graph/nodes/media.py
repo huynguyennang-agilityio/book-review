@@ -1,6 +1,8 @@
-"""Node `tts_align` và `build_timeline` (ngày 12): gửi job sang worker, chờ kết quả."""
+"""Node media: tts_align, build_timeline (ngày 12), subtitles, scene_images, motion,
+compose_render (ngày 13). Mỗi node gửi job sang worker và chờ kết quả."""
 
 import hashlib
+import json
 from typing import Any
 
 from book_review_api.config import Settings, get_settings
@@ -8,7 +10,7 @@ from book_review_api.errors import ErrorCode
 from book_review_api.graph.nodes.common import NodeFn, NodeUpdate, node
 from book_review_api.graph.state import BookReviewState
 from book_review_api.queue import JobFailed, JobRunner
-from book_review_api.storyboard.schema import Storyboard
+from book_review_api.storyboard.schema import SceneImage, Storyboard
 
 
 def tts_job_key(texts: list[str], voice: str) -> str:
@@ -61,3 +63,93 @@ def make_build_timeline_node(runner: JobRunner, settings: Settings | None = None
         return {"timeline": {"audio": audio, **result}}
 
     return build_timeline
+
+
+def timeline_key(timeline: dict[str, Any]) -> str:
+    """Khoá thư mục render theo nội dung timeline."""
+    digest = hashlib.sha1(json.dumps(timeline, sort_keys=True).encode()).hexdigest()
+    return digest[:16]
+
+
+def _timeline_of(state: BookReviewState) -> dict[str, Any] | None:
+    tl = state.get("timeline") or {}
+    return tl if tl.get("scenes") else None
+
+
+def make_subtitles_node(runner: JobRunner) -> NodeFn:
+    @node
+    def subtitles(state: BookReviewState) -> NodeUpdate:
+        tl = _timeline_of(state)
+        if tl is None:
+            return {"status": "failed", "error_code": ErrorCode.INTERNAL_ERROR.value}
+        try:
+            result = runner.run("subtitles", {"job_key": timeline_key(tl), "timeline": tl})
+        except JobFailed:
+            return {"status": "failed", "error_code": ErrorCode.RENDER_FAILED.value}
+        return {"asset_refs": {"subtitles:ass": result["ass"], "subtitles:srt": result["srt"]}}
+
+    return subtitles
+
+
+def make_scene_images_node(runner: JobRunner) -> NodeFn:
+    @node
+    def scene_images(state: BookReviewState) -> NodeUpdate:
+        storyboard = state.get("storyboard")
+        if not storyboard:
+            return {"status": "failed", "error_code": ErrorCode.INTERNAL_ERROR.value}
+        sb = Storyboard.model_validate(storyboard)
+        items = [
+            {
+                "scene_id": s.id,
+                "image_ref": ref,
+                "label": s.on_screen_text_vi or (img.prompt_en if s.images else s.narration_vi),
+                "mood": s.mood,
+            }
+            for s in sb.scenes
+            for ref, img in enumerate(s.images or [SceneImage(prompt_en="")])
+        ]
+        key = hashlib.sha1(json.dumps(items, sort_keys=True).encode()).hexdigest()[:16]
+        try:
+            result = runner.run("images", {"job_key": key, "images": items})
+        except JobFailed:
+            return {"status": "failed", "error_code": ErrorCode.RENDER_FAILED.value}
+        return {"asset_refs": {f"image:{k}": v for k, v in result["images"].items()}}
+
+    return scene_images
+
+
+def make_motion_node(runner: JobRunner) -> NodeFn:
+    @node
+    def motion(state: BookReviewState) -> NodeUpdate:
+        tl = _timeline_of(state)
+        refs = state.get("asset_refs") or {}
+        images = {k.removeprefix("image:"): v for k, v in refs.items() if k.startswith("image:")}
+        if tl is None or not images:
+            return {"status": "failed", "error_code": ErrorCode.INTERNAL_ERROR.value}
+        try:
+            result = runner.run(
+                "motion", {"job_key": timeline_key(tl), "timeline": tl, "images": images}
+            )
+        except JobFailed:
+            return {"status": "failed", "error_code": ErrorCode.RENDER_FAILED.value}
+        return {"timeline": {**tl, "clips": result["clips"]}}
+
+    return motion
+
+
+def make_compose_render_node(runner: JobRunner) -> NodeFn:
+    @node
+    def compose_render(state: BookReviewState) -> NodeUpdate:
+        tl = _timeline_of(state)
+        clips = (tl or {}).get("clips")
+        if tl is None or not clips:
+            return {"status": "failed", "error_code": ErrorCode.INTERNAL_ERROR.value}
+        try:
+            result = runner.run(
+                "compose", {"job_key": timeline_key(tl), "timeline": tl, "clips": clips}
+            )
+        except JobFailed:
+            return {"status": "failed", "error_code": ErrorCode.RENDER_FAILED.value}
+        return {"asset_refs": {"video:raw": result["video"]}}
+
+    return compose_render

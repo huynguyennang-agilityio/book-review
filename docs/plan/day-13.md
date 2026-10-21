@@ -14,21 +14,21 @@ Có video thô từ đầu tới cuối, hình khớp tiếng và phụ đề, t
 
 ### Phụ đề
 
-- [ ] `media/subtitles.py`: `.ass` theo thời gian tuyệt đối, cụm 20–25 ký tự, vị trí 60–70% chiều cao, xuất thêm `.srt`.
+- [x] `media/subtitles.py`: `.ass` theo thời gian tuyệt đối, cụm 20–25 ký tự, vị trí 60–70% chiều cao, xuất thêm `.srt`.
 
 ### Hình
 
-- [ ] Ảnh placeholder (màu + chữ) cho mỗi shot.
-- [ ] `media/kenburns.py` theo cách đã chốt ở ngày 1.
+- [x] Ảnh placeholder (màu + chữ) cho mỗi shot.
+- [x] `media/kenburns.py` theo cách đã chốt ở ngày 1.
 
 ### Compose
 
-- [ ] `media/ffmpeg.py`: ghép `xfade` (bù phần chồng), đặt audio theo offset tuyệt đối, burn phụ đề ở pass cuối.
-- [ ] Node `compose_render` gửi job, chờ kết quả, lưu asset lên storage.
+- [x] `media/ffmpeg.py`: ghép `xfade` (bù phần chồng), đặt audio theo offset tuyệt đối, burn phụ đề ở pass cuối.
+- [x] Node `compose_render` gửi job, chờ kết quả, lưu asset lên storage.
 
 ### Kiểm tra sau render
 
-- [ ] Test: thời lượng hình khớp tiếng (lệch ≤ 50ms), không có frame đen ngoài cảnh `title`.
+- [x] Test: thời lượng hình khớp tiếng (lệch ≤ 50ms), không có frame đen ngoài cảnh `title`.
 
 ## Đầu ra
 
@@ -37,7 +37,7 @@ Có video thô từ đầu tới cuối, hình khớp tiếng và phụ đề, t
 
 ## Tiêu chí hoàn thành
 
-- [ ] Video thô khớp tiếng và phụ đề từ đầu tới cuối, được tạo từ graph
+- [x] Video thô khớp tiếng và phụ đề từ đầu tới cuối, được tạo từ graph
 
 ## Ghi chú
 
