@@ -242,6 +242,59 @@ def ingest_source(
         text, title = extract_html(html, url)
         ref = url
 
+    return _build_documents(
+        text,
+        title=title,
+        url=url,
+        ref=ref,
+        uploaded=uploaded,
+        book_id=book_id,
+        user_id=user_id,
+        source_id=source_id,
+        snapshot_store=snapshot_store,
+        now=now,
+    )
+
+
+def ingest_text(
+    text: str,
+    *,
+    url: str | None = None,
+    title: str | None = None,
+    book_id: str | None = None,
+    user_id: str | None = None,
+    source_id: str | None = None,
+    snapshot_store: SnapshotStore | None = None,
+    now: Callable[[], datetime] = lambda: datetime.now(UTC),
+) -> list[Document]:
+    """Nạp văn bản đã trích sẵn (vd agent vừa đọc trang). Không che PII: dùng cho nguồn web."""
+    return _build_documents(
+        text,
+        title=title,
+        url=url,
+        ref=url or title or "",
+        uploaded=False,
+        book_id=book_id,
+        user_id=user_id,
+        source_id=source_id,
+        snapshot_store=snapshot_store,
+        now=now,
+    )
+
+
+def _build_documents(
+    text: str,
+    *,
+    title: str | None,
+    url: str | None,
+    ref: str,
+    uploaded: bool,
+    book_id: str | None,
+    user_id: str | None,
+    source_id: str | None,
+    snapshot_store: SnapshotStore | None,
+    now: Callable[[], datetime],
+) -> list[Document]:
     text = normalize_text(text)
     pii_masked = 0
     if uploaded:

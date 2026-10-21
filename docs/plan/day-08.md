@@ -14,18 +14,18 @@ Viết đủ 7 tool của research agent, mỗi tool có lỗi dạng cấu trú
 
 ### Tools (`agents/tools.py`)
 
-- [ ] `web_search(query)`: Gemini có Google Search grounding, interface tách riêng để đổi sang Tavily.
-- [ ] `fetch_page(url)`: tải trang, trích nội dung bằng trafilatura.
-- [ ] `ingest_source(url, text)`: gọi pipeline ingestion ngày 5–6.
-- [ ] `search_knowledge(query)`: gọi retrieval ngày 7.
-- [ ] `lookup_book_identity(title, author?)`: trả tác giả, năm, tên gốc, danh sách sách trùng tên.
-- [ ] `check_genre(genre)`: trả cờ bị loại trừ.
-- [ ] `get_user_preferences()`: đọc Store (tạm trả mặc định nếu chưa có dữ liệu).
+- [x] `web_search(query)`: Gemini có Google Search grounding, interface tách riêng để đổi sang Tavily.
+- [x] `fetch_page(url)`: tải trang, trích nội dung bằng trafilatura.
+- [x] `ingest_source(url, text)`: gọi pipeline ingestion ngày 5–6.
+- [x] `search_knowledge(query)`: gọi retrieval ngày 7.
+- [x] `lookup_book_identity(title, author?)`: trả tác giả, năm, tên gốc, danh sách sách trùng tên.
+- [x] `check_genre(genre)`: trả cờ bị loại trừ.
+- [x] `get_user_preferences()`: đọc Store (tạm trả mặc định nếu chưa có dữ liệu).
 
 ### Chuẩn hóa
 
-- [ ] Mọi tool trả `{error_code, message}` khi lỗi, không ném exception ra agent.
-- [ ] Đẩy event tiến độ (nguồn mới, nguồn đã đọc) để UI hiển thị sau này.
+- [x] Mọi tool trả `{error_code, message}` khi lỗi, không ném exception ra agent.
+- [x] Đẩy event tiến độ (nguồn mới, nguồn đã đọc) để UI hiển thị sau này.
 
 ## Đầu ra
 
@@ -33,7 +33,7 @@ Viết đủ 7 tool của research agent, mỗi tool có lỗi dạng cấu trú
 
 ## Tiêu chí hoàn thành
 
-- [ ] Mỗi tool có test cho cả nhánh thành công và lỗi
+- [x] Mỗi tool có test cho cả nhánh thành công và lỗi
 
 ---
 
