@@ -26,6 +26,7 @@ docs/       plan, quyết định kỹ thuật
 cp .env.example .env
 docker compose up -d          # Postgres + pgvector, Redis
 uv sync                       # Python workspace
+uv run python -m book_review_api.migrate   # tạo bảng, RLS, bảng LangGraph (chạy lại được)
 uv run pytest
 uv run uvicorn book_review_api.main:app --reload
 
@@ -40,4 +41,26 @@ uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pyt
 pnpm web:lint && pnpm web:typecheck && pnpm web:build
 ```
 
-API: `GET /health` (không cần đăng nhập), `GET /me` (cần header `Authorization: Bearer <access_token Supabase>`). Lỗi luôn trả `{code, message_vi, retryable}`, danh sách mã ở `apps/api/src/book_review_api/errors.py`.
+## Database và migration
+
+Migration là file SQL trong [`db/migrations/`](db/migrations/README.md), chạy theo thứ tự tên file. Lệnh
+
+```bash
+uv run python -m book_review_api.migrate                       # dùng DATABASE_URL trong .env
+uv run python -m book_review_api.migrate --database-url URL    # DB khác
+```
+
+chạy các file chưa chạy (ghi lại trong `app_private.schema_migrations`), rồi tạo bảng checkpoint và store của LangGraph trong schema `langgraph`. Chạy được từ DB trống và chạy lại nhiều lần không sao.
+
+- Trên **Supabase**: `DATABASE_URL` là chuỗi kết nối trực tiếp hoặc session pooler (cổng 5432) của user `postgres`. Không dùng transaction pooler (6543) vì graph pool cần `search_path` lúc kết nối.
+- Trên **Postgres thuần** (docker compose, CI): migration `0001` tự tạo role `anon`/`authenticated`, `auth.users` và `auth.uid()` giống Supabase để RLS chạy như nhau.
+
+Dữ liệu người dùng (`projects`, `assets`, `documents`, `chunks`) đều có `user_id` và RLS `user_id = auth.uid()`. Backend không dùng `service_role`: mỗi request mở transaction với role `authenticated` và claims JWT của người gửi (`db.user_transaction`), nên Postgres tự lọc dữ liệu theo người dùng.
+
+Test RLS và integration cần `TEST_DATABASE_URL` (xem `.env.example`); thiếu thì các test này bị skip, CI thì bắt buộc có.
+
+```bash
+TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres uv run pytest
+```
+
+API: `GET /health` (không cần đăng nhập), `GET /me` (cần header `Authorization: Bearer <access_token Supabase>`), `POST /projects` (`{"book_title": "..."}`, tạo project và `thread_id` cho graph), `GET /projects/{id}`. Lỗi luôn trả `{code, message_vi, retryable}`, danh sách mã ở `apps/api/src/book_review_api/errors.py`.
