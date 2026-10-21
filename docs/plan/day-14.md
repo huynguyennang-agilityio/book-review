@@ -15,15 +15,22 @@ Người dùng đăng nhập trên web, nhập tên sách, xem agent research v�
 
 ### Web
 
-- [ ] Đăng nhập Supabase Auth, gửi JWT tới API và endpoint AG-UI.
-- [ ] Màn chat: nhập tên sách và tùy chọn (độ dài, no_spoiler, giọng, ngân sách).
-- [ ] Hiển thị danh sách nguồn hiện dần, nguồn đã đọc, nguồn dùng cho kịch bản.
-- [ ] Màn chọn đúng sách khi `identify_confirm` interrupt.
-- [ ] Thanh tiến độ theo node.
+- [x] Đăng nhập Supabase Auth, gửi JWT tới API và endpoint AG-UI. (Đăng nhập thật với Supabase chưa thử; luồng chạy bằng JWT thử ký cho Postgres local.)
+- [x] Màn chat: nhập tên sách và tùy chọn (độ dài, no_spoiler, giọng, ngân sách).
+- [x] Hiển thị danh sách nguồn hiện dần, nguồn đã đọc, nguồn dùng cho kịch bản.
+- [x] Màn chọn đúng sách khi `identify_confirm` interrupt.
+- [x] Thanh tiến độ theo node.
 
 ### API
 
-- [ ] Endpoint `/agent` kiểm tra JWT, stream event tiến độ, tool call, state, interrupt.
+- [x] Endpoint `/agent` kiểm tra JWT, stream event tiến độ, tool call, state, interrupt.
+
+## Ghi chú
+
+- Tuỳ chọn (độ dài, no_spoiler, giọng, ngân sách) đã lưu vào `state.options`; node sau đọc dần, ngày 14 chưa node nào dùng.
+- Từ ngày 14 `/agent` chạy graph thật với research agent (cần `GOOGLE_API_KEY`); các node sau `identify_confirm` vẫn là node rỗng cho tới khi nối ở các ngày sau, nên run dừng ở `review_script`.
+- Tiến độ vẽ từ event tuỳ biến `node` do graph phát, không dùng `STEP_*` của adapter vì lẫn tên bước nội bộ của research agent.
+- Chạy thử qua dòng lệnh: `scripts/run_agent.py`.
 
 ## Đầu ra
 
@@ -31,7 +38,7 @@ Người dùng đăng nhập trên web, nhập tên sách, xem agent research v�
 
 ## Tiêu chí hoàn thành
 
-- [ ] Từ web khởi động được một project và thấy tiến độ thật
+- [x] Từ web khởi động được một project và thấy tiến độ thật
 
 ---
 

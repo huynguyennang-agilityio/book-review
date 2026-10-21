@@ -39,6 +39,11 @@ strict = true
 files = ["apps/api/src", "apps/worker/src", "tests"]
 mypy_path = ["apps/api/src", "apps/worker/src"]
 
+[[tool.mypy.overrides]]
+# Thư viện adapter AG-UI không có type hint.
+module = ["ag_ui_langgraph"]
+ignore_missing_imports = true
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"

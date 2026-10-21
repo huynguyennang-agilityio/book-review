@@ -8,14 +8,16 @@ precheck → research_agent → identify_confirm → storyboard → faithfulness
 """
 
 from collections.abc import Callable, Sequence
+from functools import wraps
 
+from langchain_core.callbacks.manager import dispatch_custom_event
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.store.base import BaseStore
 
 from book_review_api.agents.research import ResearchRunner
-from book_review_api.graph.nodes.common import NodeFn
+from book_review_api.graph.nodes.common import NodeFn, NodeUpdate
 from book_review_api.graph.nodes.faithfulness import (
     make_estimate_cost_node,
     make_faithfulness_node,
@@ -77,6 +79,23 @@ _STEPS: list[tuple[str, Sequence[str]]] = [
 ]
 
 
+NODE_EVENT = "node"
+
+
+def _announce(name: str, fn: NodeFn) -> NodeFn:
+    """Báo tiến độ cho UI bằng event tuỳ biến `node` (phase start/end). Event STEP_* của adapter
+    AG-UI bị lẫn tên bước nội bộ của research agent nên không đủ tin cậy để vẽ thanh tiến độ."""
+
+    @wraps(fn)
+    def wrapper(state: BookReviewState) -> NodeUpdate:
+        dispatch_custom_event(NODE_EVENT, {"node": name, "phase": "start"})
+        update = fn(state)
+        dispatch_custom_event(NODE_EVENT, {"node": name, "phase": "end"})
+        return update
+
+    return wrapper
+
+
 def _route(targets: Sequence[str]) -> Callable[[BookReviewState], list[str]]:
     def route(state: BookReviewState) -> list[str]:
         return [END] if state.get("status") in TERMINAL_STATUSES else list(targets)
@@ -109,7 +128,7 @@ def build_graph(
         nodes["compose_render"] = make_compose_render_node(job_runner)
     builder = StateGraph(BookReviewState)
     for name, fn in nodes.items():
-        builder.add_node(name, fn)
+        builder.add_node(name, _announce(name, fn))
     builder.add_edge(START, "precheck")
     for source, targets in _STEPS:
         builder.add_conditional_edges(source, _route(targets), [*targets, END])
