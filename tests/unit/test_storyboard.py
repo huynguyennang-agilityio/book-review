@@ -322,3 +322,9 @@ def test_writer_drops_uncited_scenes_in_cited_sections() -> None:
     sb = w.write(w_book(), "fiction")
     assert [s.narration_vi for s in sb.scenes if s.section == "context"] == ["có nguồn"]
     assert [s.id for s in sb.scenes] == [1, 2, 3, 4]
+
+
+def test_clean_narration_removes_passage_markers() -> None:
+    from book_review_api.storyboard.writer import clean_narration
+
+    assert clean_narration(" Cậu bán cừu [1]. Rồi đi [2] tiếp ") == "Cậu bán cừu. Rồi đi tiếp"

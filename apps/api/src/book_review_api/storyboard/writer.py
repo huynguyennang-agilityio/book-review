@@ -6,6 +6,7 @@ Phần nào vi phạm validator thì được gửi lại kèm danh sách lỗi,
 """
 
 import logging
+import re
 import time
 from collections.abc import Callable, Sequence
 from pathlib import Path
@@ -104,6 +105,14 @@ class Usage:
         if meta:
             self.input_tokens += int(meta.get("input_tokens", 0))
             self.output_tokens += int(meta.get("output_tokens", 0))
+
+
+_MARKER_RE = re.compile(r"\s*\[\d+\]")
+
+
+def clean_narration(text: str) -> str:
+    """Bỏ dấu tham chiếu `[1]` model hay chép từ đoạn nguồn vào lời đọc."""
+    return _MARKER_RE.sub("", text).strip()
 
 
 def trim_quote(quote: str) -> str:
@@ -271,7 +280,7 @@ class StoryboardWriter:
             scene = Scene(
                 id=sid,
                 section=section,
-                narration_vi=d.narration_vi.strip(),
+                narration_vi=clean_narration(d.narration_vi),
                 citations=citations,
                 scene_type=d.scene_type,
                 on_screen_text_vi=d.on_screen_text_vi,

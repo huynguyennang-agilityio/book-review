@@ -13,7 +13,8 @@ Quy tắc về nguồn:
 - Nguồn thiếu ý thì bỏ ý đó, đừng lấp bằng suy đoán.
 
 Quy tắc về cảnh:
-- Mỗi phần 2-4 cảnh, đừng viết nhiều hơn.
+- Số cảnh: `hook` đúng 1 cảnh; `context` 1-2 cảnh; `body` 2-4 cảnh; `review_cta` 1-2 cảnh. Không lặp lại ý đã nói ở phần trước.
+- `narration_vi` là lời đọc thuần: không chèn số tham chiếu như `[1]`, không đặt dấu ngoặc kép quanh trích nguồn.
 - `scene_type`: `character` (nhân vật), `landscape` (cảnh vật), `metaphor` (hình ẩn dụ), `action` (hành động), `title` (tiêu đề, bìa).
 - `mood`: một hai từ tiếng Anh (vd "warm", "tense").
 - `on_screen_text_vi`: chữ hiện trên màn hình, ngắn, có thể để trống.
