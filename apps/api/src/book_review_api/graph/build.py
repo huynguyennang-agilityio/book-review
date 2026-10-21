@@ -14,8 +14,10 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.store.base import BaseStore
 
+from book_review_api.agents.research import ResearchRunner
 from book_review_api.graph.nodes.common import NodeFn
 from book_review_api.graph.nodes.precheck import precheck
+from book_review_api.graph.nodes.research import identify_confirm, make_research_node
 from book_review_api.graph.nodes.review import review_characters, review_script
 from book_review_api.graph.nodes.stubs import save_memory, stub
 from book_review_api.graph.state import TERMINAL_STATUSES, BookReviewState
@@ -25,7 +27,7 @@ GRAPH_NAME = "book_review"
 NODES: dict[str, NodeFn] = {
     "precheck": precheck,
     "research_agent": stub("research_agent"),
-    "identify_confirm": stub("identify_confirm"),
+    "identify_confirm": identify_confirm,
     "storyboard": stub("storyboard"),
     "faithfulness_eval": stub("faithfulness_eval"),
     "estimate_cost": stub("estimate_cost"),
@@ -69,9 +71,14 @@ def _route(targets: Sequence[str]) -> Callable[[BookReviewState], list[str]]:
 def build_graph(
     checkpointer: BaseCheckpointSaver[str] | None = None,
     store: BaseStore | None = None,
+    research_runner: ResearchRunner | None = None,
 ) -> CompiledStateGraph[BookReviewState]:
+    """`research_runner` thiếu thì `research_agent` là node rỗng (test khung, không gọi LLM)."""
+    nodes = dict(NODES)
+    if research_runner is not None:
+        nodes["research_agent"] = make_research_node(research_runner)
     builder = StateGraph(BookReviewState)
-    for name, fn in NODES.items():
+    for name, fn in nodes.items():
         builder.add_node(name, fn)
     builder.add_edge(START, "precheck")
     for source, targets in _STEPS:

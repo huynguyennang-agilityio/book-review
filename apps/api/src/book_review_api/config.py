@@ -36,6 +36,20 @@ class Settings(BaseSettings):
     rerank_top_n: int = 4
     rerank_provider: str = "none"
 
+    # Tìm web cho research agent: "gemini" (Google Search grounding, cần quota riêng) hoặc "tavily".
+    search_provider: str = "gemini"
+    tavily_api_key: str = ""
+
+    # Research agent (ngày 9). Giá USD trên 1 triệu token, chỉnh theo bảng giá model đang dùng.
+    research_min_sources: int = 4
+    # Số lần nhắc agent tìm thêm khi dừng mà chưa đủ nguồn.
+    research_nudges: int = 2
+    research_budget_usd: float = 0.3
+    research_model_call_limit: int = 40
+    research_tool_call_limit: int = 60
+    price_input_per_mtok: float = 0.30
+    price_output_per_mtok: float = 2.50
+
     @property
     def supabase_jwks_url(self) -> str:
         return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
