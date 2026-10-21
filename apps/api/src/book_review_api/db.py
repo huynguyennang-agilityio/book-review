@@ -18,6 +18,7 @@ from psycopg.rows import DictRow, dict_row
 from psycopg_pool import AsyncConnectionPool
 
 from book_review_api.auth import CurrentUser, current_user
+from book_review_api.config import get_settings
 
 LANGGRAPH_SCHEMA = "langgraph"
 
@@ -48,6 +49,21 @@ def make_graph_pool(database_url: str) -> AppPool:
     )
 
 
+async def ensure_local_user(pool: AppPool, user: CurrentUser) -> None:
+    """Dev local (`ENV=local`): đăng nhập bằng Supabase thật nhưng DB là Postgres local có bảng
+    `auth.users` tối thiểu, nên thêm người dùng vào đó để khoá ngoại của `projects` thoả."""
+    if get_settings().env != "local":
+        return
+    try:
+        async with pool.connection() as conn:
+            await conn.execute(
+                "insert into auth.users (id, email) values (%s, %s) on conflict (id) do nothing",
+                [user.user_id, user.email],
+            )
+    except Exception:  # noqa: BLE001
+        pass  # `auth.users` của Supabase thật có nhiều cột bắt buộc; ở đó người dùng đã tồn tại.
+
+
 @asynccontextmanager
 async def user_transaction(
     pool: AppPool, user: CurrentUser
@@ -68,6 +84,7 @@ async def user_transaction(
 async def user_db(
     request: Request, user: Annotated[CurrentUser, Depends(current_user)]
 ) -> AsyncIterator[AsyncConnection[DictRow]]:
+    await ensure_local_user(request.app.state.app_pool, user)
     async with user_transaction(request.app.state.app_pool, user) as conn:
         yield conn
 

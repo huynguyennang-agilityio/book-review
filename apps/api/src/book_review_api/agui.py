@@ -18,7 +18,7 @@ from fastapi.responses import StreamingResponse
 from langgraph.graph.state import CompiledStateGraph
 
 from book_review_api.auth import CurrentUser, current_user
-from book_review_api.db import user_transaction
+from book_review_api.db import ensure_local_user, user_transaction
 from book_review_api.errors import AppError, ErrorCode
 
 log = logging.getLogger(__name__)
@@ -60,6 +60,7 @@ async def agent_endpoint(
     request: Request,
     user: Annotated[CurrentUser, Depends(current_user)],
 ) -> StreamingResponse:
+    await ensure_local_user(request.app.state.app_pool, user)
     async with user_transaction(request.app.state.app_pool, user) as conn:
         cur = await conn.execute(
             "select 1 from public.projects where thread_id = %s", [input_data.thread_id]
