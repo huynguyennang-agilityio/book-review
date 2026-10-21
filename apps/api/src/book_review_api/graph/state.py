@@ -17,6 +17,15 @@ class BookInput(TypedDict):
     author: NotRequired[str | None]
 
 
+class RunOptions(TypedDict, total=False):
+    """Tuỳ chọn người dùng chọn ở màn nhập sách (ngày 14); các node sau đọc dần."""
+
+    minutes: int
+    no_spoiler: bool
+    voice: str
+    budget_usd: float
+
+
 def merge_dicts(left: dict[str, Any] | None, right: dict[str, Any] | None) -> dict[str, Any]:
     return {**(left or {}), **(right or {})}
 
@@ -37,6 +46,7 @@ def merge_status(left: Status | None, right: Status | None) -> Status | None:
 
 class BookReviewState(TypedDict, total=False):
     book: BookInput
+    options: RunOptions
     research: dict[str, Any] | None
     storyboard: dict[str, Any] | None
     timeline: dict[str, Any] | None

@@ -8,12 +8,13 @@ from fastapi import Depends, FastAPI
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from langgraph.store.postgres.aio import AsyncPostgresStore
 
-from book_review_api import projects
+from book_review_api import agui, projects
 from book_review_api.auth import CurrentUser, current_user
 from book_review_api.config import get_settings
 from book_review_api.db import make_app_pool, make_graph_pool
 from book_review_api.errors import register_error_handlers
 from book_review_api.graph.build import build_graph
+from book_review_api.graph.live import build_live_graph
 
 
 @asynccontextmanager
@@ -27,10 +28,15 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     await graph_pool.open()
     try:
         app.state.app_pool = app_pool
-        app.state.graph = build_graph(
-            checkpointer=AsyncPostgresSaver(graph_pool),
-            store=AsyncPostgresStore(graph_pool),
+        checkpointer = AsyncPostgresSaver(graph_pool)
+        store = AsyncPostgresStore(graph_pool)
+        # Thiếu GOOGLE_API_KEY (CI, test) thì dùng graph khung với node rỗng.
+        app.state.graph = (
+            build_live_graph(settings, checkpointer, store)
+            if settings.google_api_key
+            else build_graph(checkpointer=checkpointer, store=store)
         )
+        app.state.agent = agui.make_agent(app.state.graph)
         yield
     finally:
         await graph_pool.close()
@@ -40,6 +46,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 app = FastAPI(title="Book Review API", lifespan=lifespan)
 register_error_handlers(app)
 app.include_router(projects.router)
+app.include_router(agui.router)
 
 
 @app.get("/health")
