@@ -42,6 +42,8 @@ class Settings(BaseSettings):
 
     # Research agent (ngày 9). Giá USD trên 1 triệu token, chỉnh theo bảng giá model đang dùng.
     research_min_sources: int = 4
+    # Số lần nhắc agent tìm thêm khi dừng mà chưa đủ nguồn.
+    research_nudges: int = 2
     research_budget_usd: float = 0.3
     research_model_call_limit: int = 20
     research_tool_call_limit: int = 30

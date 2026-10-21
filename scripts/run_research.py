@@ -9,6 +9,7 @@ Bật LangSmith để xem trace: LANGSMITH_TRACING=true và LANGSMITH_API_KEY.
 """
 
 import json
+import logging
 import sys
 import uuid
 from collections.abc import Callable
@@ -26,6 +27,7 @@ from book_review_api.providers.llm_gemini import make_chat_model
 
 
 def main(titles: list[str]) -> None:
+    logging.basicConfig(level=logging.WARNING)
     settings = get_settings()
     model = make_chat_model(settings)
     search: SearchProvider

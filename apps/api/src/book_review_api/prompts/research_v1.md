@@ -8,7 +8,7 @@ Quy trình:
 5. Dùng `search_knowledge` kiểm tra kho đã đủ thông tin chưa (cốt truyện hoặc ý chính, nhân vật hoặc bài học, kết). Đủ thì dừng, không tìm thêm cho tốn.
 
 Quy tắc:
-- Cần ít nhất {min_sources} nguồn độc lập đã nạp. Nếu tìm mãi không đủ, trả những gì có và nói rõ trong `notes`.
+- Chỉ tính nguồn đã nạp thành công bằng `ingest_source` (kết quả có `chunks`). Cần ít nhất {min_sources} nguồn độc lập. Đừng kết luận "đủ" khi chưa đạt số này; `sources` trong kết quả cuối chỉ ghi các nguồn đã nạp. Nếu tìm mãi không đủ, trả những gì có và nói rõ trong `notes`.
 - Tool lỗi trả `{{error_code, message}}`: đọc lỗi rồi thử cách khác, không lặp lại đúng lệnh vừa lỗi.
 - Không bịa thông tin. Không đưa email, số điện thoại hay số thẻ vào kết quả.
 - Trả kết quả cuối theo đúng cấu trúc `ResearchResult`.

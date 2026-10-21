@@ -77,6 +77,7 @@ def final(book: str, **kw: Any) -> AIMessage:
 def runner_for(
     script: list[AIMessage], identity: str = '{"candidates": []}', **settings: Any
 ) -> Callable[..., dict[str, Any]]:
+    settings.setdefault("research_nudges", 0)  # không nhắc lại, trừ test nudge
     model = ScriptedModel(messages=iter(script))
     return make_research_runner(
         model,
@@ -176,3 +177,21 @@ def test_cancel_during_confirm() -> None:
 
 
 _ = (BaseMessage, BaseTool, Document)
+
+
+def test_nudge_when_agent_stops_with_too_few_sources() -> None:
+    def ingest(i: int) -> AIMessage:
+        return usage(call("ingest_source", {"url": f"https://s{i}.vn/x", "text": PAGE}, f"c{i}"))
+
+    script = [ingest(0), usage(final("X")), ingest(1), ingest(2), ingest(3), usage(final("X"))]
+    out = runner_for(script, research_nudges=2)({"title": "X"})
+    assert out["research"]["ingested_sources"] == 4
+    assert out["research"]["meets_min_sources"] is True
+    assert len(out["research"]["sources"]) == 4
+
+
+def test_gives_up_after_max_nudges_and_reports_shortfall() -> None:
+    script = [usage(final("X")), usage(final("X")), usage(final("X"))]
+    out = runner_for(script, research_nudges=2)({"title": "X"})
+    assert out["research"]["ingested_sources"] == 0
+    assert out["research"]["meets_min_sources"] is False

@@ -1,5 +1,6 @@
 """Research agent: `create_agent` + tools ngày 8 + middleware, kết quả có cấu trúc."""
 
+import logging
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any, Literal
@@ -14,6 +15,8 @@ from book_review_api.agents.tools import Event, ToolContext, research_tools
 from book_review_api.config import Settings, get_settings
 from book_review_api.errors import ErrorCode
 from book_review_api.graph.state import BookInput
+
+log = logging.getLogger(__name__)
 
 PROMPT_VERSION = "research_v1"
 _PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / f"{PROMPT_VERSION}.md"
@@ -89,7 +92,29 @@ def make_research_runner(
         ask = f"Sách: {book['title']}" + (
             f"\nTác giả: {book['author']}" if book.get("author") else ""
         )
-        out = agent.invoke({"messages": [HumanMessage(ask)]}, config=config)
+        state: dict[str, Any] = {"messages": [HumanMessage(ask)]}
+
+        def ingested() -> set[str]:
+            return {e["url"] for e in events if e.get("type") == "source_ingested"}
+
+        # Agent hay dừng sớm khi tự thấy "đủ": nhắc tối đa `research_nudges` lần nếu thiếu nguồn.
+        for attempt in range(settings.research_nudges + 1):
+            out = agent.invoke(state, config=config)
+            result: ResearchResult | None = out.get("structured_response")
+            if out.get("error_code") or result is None:
+                break
+            have = len(ingested())
+            if have >= settings.research_min_sources or attempt == settings.research_nudges:
+                break
+            nudge = (
+                f"Mới nạp được {have} nguồn bằng ingest_source, cần ít nhất "
+                f"{settings.research_min_sources}. Tìm thêm bằng web_search, đọc bằng fetch_page "
+                "rồi nạp bằng ingest_source, sau đó trả lại kết quả cuối."
+            )
+            state = {
+                "messages": [*out["messages"], HumanMessage(nudge)],
+                "cost_usd": out.get("cost_usd", 0.0),
+            }
         # Cộng từ mọi AIMessage: lần gọi model cuối (trả kết quả cuối) không qua lại `after_model`.
         n_in = n_out = 0
         for m in out.get("messages", []):
@@ -102,14 +127,20 @@ def make_research_runner(
         if code := out.get("error_code"):
             status = "rejected" if code == ErrorCode.GENRE_EXCLUDED.value else "failed"
             return {**update, "status": status, "error_code": code}
-        result: ResearchResult | None = out.get("structured_response")
         if result is None:  # hết vòng gọi mà chưa có kết quả
+            last = out["messages"][-1] if out.get("messages") else None
+            log.warning(
+                "research không có kết quả cuối; tin nhắn cuối: %r", getattr(last, "content", last)
+            )
             return {**update, "status": "failed", "error_code": ErrorCode.INTERNAL_ERROR.value}
-        ingested = {e["url"] for e in events if e.get("type") == "source_ingested"}
+        urls = ingested()
+        titles = {e["url"]: e.get("title", "") for e in events if e.get("title")}
         data = result.model_dump()
-        data["ingested_sources"] = len(ingested)
+        # Nguồn lấy từ sự kiện nạp thật, không tin danh sách agent tự khai.
+        data["sources"] = [{"url": u, "title": titles.get(u, "")} for u in sorted(urls)]
+        data["ingested_sources"] = len(urls)
         data["min_sources"] = settings.research_min_sources
-        data["meets_min_sources"] = len(ingested) >= settings.research_min_sources
+        data["meets_min_sources"] = len(urls) >= settings.research_min_sources
         data["prompt_version"] = PROMPT_VERSION
         return {**update, "research": data}
 
