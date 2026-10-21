@@ -50,6 +50,10 @@ class Settings(BaseSettings):
     price_input_per_mtok: float = 0.30
     price_output_per_mtok: float = 2.50
 
+    # Storyboard (ngày 10): độ dài video đích và số lần viết lại một phần khi citation sai.
+    storyboard_minutes: int = 3
+    storyboard_retries: int = 2
+
     @property
     def supabase_jwks_url(self) -> str:
         return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"

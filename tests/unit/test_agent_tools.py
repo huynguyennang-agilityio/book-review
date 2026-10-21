@@ -217,3 +217,57 @@ def test_tavily_provider_parses_results(monkeypatch: pytest.MonkeyPatch) -> None
     out = TavilySearchProvider("k").search("lão hạc")
     assert out == [SearchResult("https://a.vn", "A", "nd")]
     assert seen["auth"] == "Bearer k" and seen["body"]["query"] == "lão hạc"
+
+
+# --- Chuẩn hoá URL model chép sai -----------------------------------------------
+
+REAL = "https://vi.wikipedia.org/wiki/Nh%C3%A0_gi%E1%BA%A3_kim"
+
+
+def test_canonical_url_repairs_common_corruptions() -> None:
+    from book_review_api.agents.tools import ToolContext, canonical_url
+
+    ctx = ToolContext(known_urls={REAL, "https://example.com/a/b"})
+    assert canonical_url(ctx, REAL) == REAL
+    assert canonical_url(ctx, f" <{REAL}>. ") == REAL
+    assert canonical_url(ctx, REAL.replace("vi.wikipedia", "VI.Wikipedia") + "/") == REAL
+    assert canonical_url(ctx, "https://example.com/a/b#top") == "https://example.com/a/b"
+    # Chép sai ký tự trong URL dài chỉ được sửa khi bật fuzzy (nạp nguồn đã đọc).
+    wrong = REAL.replace("%E1%BA%A3", "%E1%BA%A2")
+    assert canonical_url(ctx, wrong) == wrong
+    assert canonical_url(ctx, wrong, fuzzy=True) == REAL
+
+
+def test_canonical_url_keeps_unknown_and_different_urls() -> None:
+    from book_review_api.agents.tools import ToolContext, canonical_url
+
+    ctx = ToolContext(known_urls={"https://example.com/a/b"})
+    assert canonical_url(ctx, "https://other.org/x") == "https://other.org/x"
+    assert canonical_url(ctx, "https://example.com/a/c") == "https://example.com/a/c"
+    assert canonical_url(ctx, "https://other.org/x", fuzzy=True) == "https://other.org/x"
+
+
+def test_ingest_source_reports_the_real_url() -> None:
+    from book_review_api.agents.tools import SearchResult, ToolContext, ingest_source, web_search
+
+    events: list[dict[str, object]] = []
+
+    class Search:
+        def search(self, query: str) -> list[SearchResult]:
+            return [SearchResult(REAL, "Wiki")]
+
+    ctx = ToolContext(
+        search=Search(), index=lambda docs: len(docs), book_id="b", emit=events.append
+    )
+    web_search(ctx, "nhà giả kim")
+    out = ingest_source(ctx, f"<{REAL.replace('%E1%BA%A3', '%E1%BA%A2')}>", "Nội dung. " * 40)
+    assert out["url"] == REAL
+    assert events[-1]["url"] == REAL
+
+
+def test_canonical_url_keeps_trailing_paren_of_real_url() -> None:
+    from book_review_api.agents.tools import ToolContext, canonical_url
+
+    paren = "https://vi.wikipedia.org/wiki/Foo_(bar)"
+    assert canonical_url(ToolContext(), paren) == paren
+    assert canonical_url(ToolContext(known_urls={paren}), paren) == paren

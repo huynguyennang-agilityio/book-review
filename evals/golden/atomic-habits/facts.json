@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là James Clear",
+    "needle": "James Clear"
+  },
+  {
+    "id": "f2",
+    "fact": "Sách xuất bản năm 2018",
+    "needle": "năm 2018"
+  },
+  {
+    "id": "f3",
+    "fact": "Cải thiện một phần trăm mỗi ngày tạo khác biệt lớn khi cộng dồn",
+    "needle": "một phần trăm"
+  },
+  {
+    "id": "f4",
+    "fact": "Có bốn quy luật tạo thói quen tốt",
+    "needle": "bốn quy luật"
+  },
+  {
+    "id": "f5",
+    "fact": "Quy luật thứ ba là làm cho thói quen dễ dàng",
+    "needle": "dễ dàng"
+  }
+]

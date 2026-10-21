@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là George Orwell",
+    "needle": "George Orwell"
+  },
+  {
+    "id": "f2",
+    "fact": "Sách xuất bản năm 1949",
+    "needle": "năm 1949"
+  },
+  {
+    "id": "f3",
+    "fact": "Nhân vật chính là Winston Smith",
+    "needle": "Winston Smith"
+  },
+  {
+    "id": "f4",
+    "fact": "Winston làm việc ở Bộ Chân lý",
+    "needle": "Bộ Chân lý"
+  },
+  {
+    "id": "f5",
+    "fact": "Nhà nước trong truyện do Big Brother đứng đầu",
+    "needle": "Big Brother"
+  }
+]

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Tô Hoài",
+    "needle": "Tô Hoài"
+  },
+  {
+    "id": "f2",
+    "fact": "Truyện xuất bản lần đầu năm 1941",
+    "needle": "năm 1941"
+  },
+  {
+    "id": "f3",
+    "fact": "Dế Choắt bị chị Cốc mổ chết",
+    "needle": "Dế Choắt"
+  },
+  {
+    "id": "f4",
+    "fact": "Cái chết của Dế Choắt khiến Mèn hối hận",
+    "needle": "hối hận"
+  },
+  {
+    "id": "f5",
+    "fact": "Mèn kết bạn với Dế Trũi trên đường phiêu lưu",
+    "needle": "Dế Trũi"
+  }
+]

@@ -12,9 +12,10 @@ import re
 import socket
 import urllib.request
 from collections.abc import Callable, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from difflib import get_close_matches
 from typing import Any, Protocol
-from urllib.parse import urlparse
+from urllib.parse import urlparse, urlunparse
 
 import trafilatura
 from langchain_core.language_models import BaseChatModel
@@ -147,6 +148,8 @@ class ToolContext:
     book_id: str | None = None
     user_id: str | None = None
     emit: Callable[[Event], None] | None = None
+    # URL đã thấy trong kết quả tìm và trang đã tải; dùng để sửa URL model chép sai.
+    known_urls: set[str] = field(default_factory=set)
 
 
 # --- Tiện ích -------------------------------------------------------------------
@@ -164,6 +167,36 @@ def _emit(ctx: ToolContext, event: Event) -> None:
         ctx.emit(event)
     except Exception:  # noqa: BLE001
         log.exception("emit event thất bại")
+
+
+_URL_NOISE = " \t\r\n\"'<>()[].,;"
+# Ngưỡng giống nhau tối thiểu để coi URL model đưa là bản chép sai của một URL đã biết.
+URL_MATCH_CUTOFF = 0.93
+
+
+def _url_key(url: str) -> str:
+    p = urlparse(url)
+    return urlunparse((p.scheme.lower(), p.netloc.lower(), p.path.rstrip("/"), "", p.query, ""))
+
+
+def canonical_url(ctx: ToolContext, url: str, fuzzy: bool = False) -> str:
+    """Đưa URL model chép lại về URL thật đã biết: bỏ ký tự thừa, khác hoa/thường ở host,
+    dấu `/` cuối, fragment. `fuzzy` thêm so khớp gần đúng cho lỗi chép sai ký tự; chỉ bật khi URL
+    chắc chắn phải là một URL đã biết (nạp nguồn vừa đọc), vì trang khác chỉ lệch một ký tự là
+    trang hợp lệ khác. Không khớp gì thì giữ nguyên."""
+    plain = url.strip()
+    cleaned = plain.strip(_URL_NOISE)
+    if plain in ctx.known_urls:
+        return plain
+    if cleaned in ctx.known_urls:
+        return cleaned
+    by_key = {_url_key(u): u for u in ctx.known_urls}
+    if (hit := by_key.get(_url_key(cleaned))) is not None:
+        return hit
+    if not fuzzy:
+        return plain
+    close = get_close_matches(_url_key(cleaned), list(by_key), n=1, cutoff=URL_MATCH_CUTOFF)
+    return by_key[close[0]] if close else plain
 
 
 def _unavailable(what: str) -> dict[str, Any]:
@@ -188,6 +221,7 @@ def web_search(ctx: ToolContext, query: str) -> dict[str, Any]:
         if r.url in seen:
             continue
         seen.add(r.url)
+        ctx.known_urls.add(r.url)
         results.append({"url": r.url, "title": r.title, "snippet": r.snippet})
         _emit(ctx, {"type": "source_found", "url": r.url, "title": r.title})
         if len(results) >= MAX_SEARCH_RESULTS:
@@ -196,6 +230,7 @@ def web_search(ctx: ToolContext, query: str) -> dict[str, Any]:
 
 
 def fetch_page(ctx: ToolContext, url: str) -> dict[str, Any]:
+    url = canonical_url(ctx, url)
     if not ctx.url_allowed(url):
         return tool_error(ErrorCode.VALIDATION_ERROR, "URL không hợp lệ hoặc không được phép.")
     try:
@@ -209,6 +244,7 @@ def fetch_page(ctx: ToolContext, url: str) -> dict[str, Any]:
         text, title = extract_html(html, url)
     except IngestError as e:
         return tool_error(ErrorCode.NOT_FOUND, str(e))
+    ctx.known_urls.add(url)
     _emit(ctx, {"type": "source_read", "url": url, "title": title})
     return {
         "url": url,
@@ -219,6 +255,7 @@ def fetch_page(ctx: ToolContext, url: str) -> dict[str, Any]:
 
 
 def ingest_source(ctx: ToolContext, url: str, text: str) -> dict[str, Any]:
+    url = canonical_url(ctx, url, fuzzy=True)
     if ctx.index is None or ctx.book_id is None:
         return _unavailable("kho tri thức")
     if not text.strip():

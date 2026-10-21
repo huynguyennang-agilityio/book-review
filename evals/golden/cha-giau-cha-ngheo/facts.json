@@ -1,0 +1,27 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Robert Kiyosaki",
+    "needle": "Robert Kiyosaki"
+  },
+  {
+    "id": "f2",
+    "fact": "Tên gốc là Rich Dad Poor Dad",
+    "needle": "Rich Dad Poor Dad"
+  },
+  {
+    "id": "f3",
+    "fact": "Sách xuất bản năm 1997",
+    "needle": "năm 1997"
+  },
+  {
+    "id": "f4",
+    "fact": "Tài sản là thứ bỏ tiền vào túi bạn",
+    "needle": "bỏ tiền vào túi"
+  },
+  {
+    "id": "f5",
+    "fact": "Người giàu mua tài sản, người nghèo mua thứ tưởng là tài sản",
+    "needle": "mua tài sản"
+  }
+]
