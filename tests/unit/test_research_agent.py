@@ -94,6 +94,7 @@ def test_agent_ingests_sources_and_returns_structured_result() -> None:
     out = runner_for(script)({"title": "Đắc nhân tâm"})
     assert out["research"]["book"]["title"] == "Đắc nhân tâm"
     assert out["research"]["ingested_sources"] == 4
+    assert out["research"]["meets_min_sources"] is True
     assert out["research"]["prompt_version"] == "research_v1"
     assert out["cost"]["input_tokens"] == 5000
     assert out["cost"]["usd"] > 0

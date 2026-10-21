@@ -109,6 +109,7 @@ def make_research_runner(
         data = result.model_dump()
         data["ingested_sources"] = len(ingested)
         data["min_sources"] = settings.research_min_sources
+        data["meets_min_sources"] = len(ingested) >= settings.research_min_sources
         data["prompt_version"] = PROMPT_VERSION
         return {**update, "research": data}
 

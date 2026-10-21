@@ -2,7 +2,9 @@
 
     uv run python scripts/run_research.py "Đắc nhân tâm" "Nhà giả kim" "Truyện tu tiên X"
 
-Cần GOOGLE_API_KEY trong .env. Không cần DB: nguồn nạp được chunk rồi đếm, không ghi pgvector.
+Cần GOOGLE_API_KEY trong .env. Tìm web mặc định qua Gemini grounding; nếu hết quota thì đặt
+SEARCH_PROVIDER=tavily và TAVILY_API_KEY.
+Không cần DB: nguồn nạp được chunk rồi đếm, không ghi pgvector.
 Bật LangSmith để xem trace: LANGSMITH_TRACING=true và LANGSMITH_API_KEY.
 """
 
@@ -12,7 +14,13 @@ import uuid
 from collections.abc import Callable
 
 from book_review_api.agents.research import make_research_runner
-from book_review_api.agents.tools import Event, GeminiSearchProvider, ToolContext
+from book_review_api.agents.tools import (
+    Event,
+    GeminiSearchProvider,
+    SearchProvider,
+    TavilySearchProvider,
+    ToolContext,
+)
 from book_review_api.config import get_settings
 from book_review_api.providers.llm_gemini import make_chat_model
 
@@ -20,10 +28,15 @@ from book_review_api.providers.llm_gemini import make_chat_model
 def main(titles: list[str]) -> None:
     settings = get_settings()
     model = make_chat_model(settings)
+    search: SearchProvider
+    if settings.search_provider == "tavily":
+        search = TavilySearchProvider(settings.tavily_api_key)
+    else:
+        search = GeminiSearchProvider(model)
 
     def make_ctx(emit: Callable[[Event], None]) -> ToolContext:
         return ToolContext(
-            search=GeminiSearchProvider(model),
+            search=search,
             index=lambda docs: len(docs),
             identity_model=model,
             book_id=str(uuid.uuid4()),

@@ -10,6 +10,7 @@ import json
 import logging
 import re
 import socket
+import urllib.request
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol
@@ -88,6 +89,32 @@ class GeminiSearchProvider:
             if web.get("uri"):
                 results.append(SearchResult(web["uri"], web.get("title") or "", snippet[:300]))
         return results
+
+
+class TavilySearchProvider:
+    """Tavily search API: không phụ thuộc quota Google Search grounding của Gemini."""
+
+    def __init__(self, api_key: str, timeout: float = 20.0) -> None:
+        self.api_key = api_key
+        self.timeout = timeout
+
+    def search(self, query: str) -> list[SearchResult]:
+        body = json.dumps({"query": query, "max_results": MAX_SEARCH_RESULTS}).encode()
+        req = urllib.request.Request(
+            "https://api.tavily.com/search",
+            data=body,
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {self.api_key}",
+            },
+        )
+        with urllib.request.urlopen(req, timeout=self.timeout) as resp:  # noqa: S310
+            data = json.load(resp)
+        return [
+            SearchResult(r["url"], r.get("title") or "", (r.get("content") or "")[:300])
+            for r in data.get("results", [])
+            if r.get("url")
+        ]
 
 
 def _is_public_http_url(url: str) -> bool:

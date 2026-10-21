@@ -197,3 +197,23 @@ def test_langchain_tools_expose_seven_and_never_raise() -> None:
     assert by["web_search"].invoke({"query": "x"})["error_code"] == "PROVIDER_UNAVAILABLE"
     assert by["check_genre"].invoke({"genre": "tiên hiệp"})["excluded"] is True
     assert by["get_user_preferences"].invoke({})["source"] == "default"
+
+
+def test_tavily_provider_parses_results(monkeypatch: pytest.MonkeyPatch) -> None:
+    import io
+    import json
+
+    from book_review_api.agents.tools import TavilySearchProvider
+
+    payload = {"results": [{"url": "https://a.vn", "title": "A", "content": "nd"}, {"title": "x"}]}
+    seen: dict[str, Any] = {}
+
+    def fake_urlopen(req: Any, timeout: float) -> io.BytesIO:
+        seen["auth"] = req.get_header("Authorization")
+        seen["body"] = json.loads(req.data)
+        return io.BytesIO(json.dumps(payload).encode())
+
+    monkeypatch.setattr("urllib.request.urlopen", fake_urlopen)
+    out = TavilySearchProvider("k").search("lão hạc")
+    assert out == [SearchResult("https://a.vn", "A", "nd")]
+    assert seen["auth"] == "Bearer k" and seen["body"]["query"] == "lão hạc"
