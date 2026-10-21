@@ -22,13 +22,17 @@ class EdgeTTSError(Exception):
 
 
 class EdgeTTS:
-    """Giới hạn 2 request song song tới edge-tts (plan v5, mục Rate limit)."""
+    """Giới hạn 2 request song song tới edge-tts (plan v5, mục Rate limit).
+
+    edge-tts thỉnh thoảng trả "No audio was received" vài lần liền rồi lại chạy bình thường,
+    nên thử lại 5 lần, chờ 2, 4, 8, 16 s.
+    """
 
     def __init__(
         self,
         voice: str = DEFAULT_VOICE,
         concurrency: int = 2,
-        attempts: int = 6,
+        attempts: int = 5,
         fallback_aligner: Aligner | None = None,
     ) -> None:
         self.voice = voice
@@ -54,7 +58,8 @@ class EdgeTTS:
             except Exception as exc:  # edge-tts ném nhiều loại lỗi mạng/websocket
                 last = exc
                 log.warning("edge-tts lần %d/%d lỗi: %s", attempt, self._attempts, exc)
-                await asyncio.sleep(1.5 * attempt)
+                if attempt < self._attempts:
+                    await asyncio.sleep(2**attempt)
         raise EdgeTTSError(str(last)) from last
 
     async def _stream(self, text: str, out_path: Path) -> list[Word]:
