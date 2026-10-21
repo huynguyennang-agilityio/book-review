@@ -26,3 +26,7 @@ Dùng `WordBoundary` (`vi-VN-HoaiMyNeural`, `vi-VN-NamMinhNeural`) làm nguồn 
 - Khi ghép cảnh cần dùng ffprobe để lấy độ dài và có thể cắt khoảng 0,8 s đuôi lặng.
 - Chưa nghe bằng tai để biết nguồn nào chuẩn hơn, và các mẫu ngắn hơn mốc 30 giây trong kế hoạch. Cần kiểm tra lại trên một đoạn dài khi làm timeline ở ngày 12.
 - `edge-tts` không có cam kết dịch vụ; nếu ngừng hoạt động thì đổi `TTSProvider` và dùng stable-ts.
+
+## Kiểm tra lại ở ngày 12
+
+Đọc liền 3 đoạn mẫu thành một đoạn 56 giây (`vi-VN-HoaiMyNeural`): WordBoundary trả 206/206 từ, đuôi lặng 0,85 s, không lệch tích luỹ theo độ dài. Timeline giữ 0,15 s sau từ cuối của mỗi cảnh và bỏ phần lặng còn lại.

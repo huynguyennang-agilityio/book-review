@@ -33,3 +33,6 @@ spikes/media/ref/
 
 # Eval: cache storyboard và điểm từng cảnh
 evals/out/
+
+# Media của worker (audio, ảnh, video)
+var/

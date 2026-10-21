@@ -1,0 +1,10 @@
+.venv
+.venv-*
+node_modules
+apps/web
+var
+spikes
+evals
+.git
+.env
+.env.*

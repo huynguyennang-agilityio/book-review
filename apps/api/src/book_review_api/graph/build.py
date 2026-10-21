@@ -20,12 +20,14 @@ from book_review_api.graph.nodes.faithfulness import (
     make_estimate_cost_node,
     make_faithfulness_node,
 )
+from book_review_api.graph.nodes.media import make_build_timeline_node, make_tts_align_node
 from book_review_api.graph.nodes.precheck import precheck
 from book_review_api.graph.nodes.research import identify_confirm, make_research_node
 from book_review_api.graph.nodes.review import review_characters, review_script
 from book_review_api.graph.nodes.storyboard import make_storyboard_node
 from book_review_api.graph.nodes.stubs import save_memory, stub
 from book_review_api.graph.state import TERMINAL_STATUSES, BookReviewState
+from book_review_api.queue import JobRunner
 from book_review_api.storyboard.faithfulness import FaithfulnessRunner
 from book_review_api.storyboard.runner import StoryboardRunner
 
@@ -81,8 +83,9 @@ def build_graph(
     research_runner: ResearchRunner | None = None,
     storyboard_runner: StoryboardRunner | None = None,
     faithfulness_runner: FaithfulnessRunner | None = None,
+    job_runner: JobRunner | None = None,
 ) -> CompiledStateGraph[BookReviewState]:
-    """Runner thiếu thì node tương ứng là node rỗng (test khung, không gọi LLM)."""
+    """Runner (LLM, job worker) thiếu thì node tương ứng là node rỗng (test khung)."""
     nodes = dict(NODES)
     if research_runner is not None:
         nodes["research_agent"] = make_research_node(research_runner)
@@ -90,6 +93,9 @@ def build_graph(
         nodes["storyboard"] = make_storyboard_node(storyboard_runner)
     if faithfulness_runner is not None:
         nodes["faithfulness_eval"] = make_faithfulness_node(faithfulness_runner)
+    if job_runner is not None:
+        nodes["tts_align"] = make_tts_align_node(job_runner)
+        nodes["build_timeline"] = make_build_timeline_node(job_runner)
     builder = StateGraph(BookReviewState)
     for name, fn in nodes.items():
         builder.add_node(name, fn)

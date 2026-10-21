@@ -71,6 +71,16 @@ class Settings(BaseSettings):
     price_i2v_per_clip: float = 0.35
     i2v_clips: int = 0
 
+    # Hàng đợi render (ngày 12): arq + Redis. Worker làm TTS/timeline/ảnh/video.
+    redis_url: str = "redis://localhost:6379"
+    tts_voice: str = "vi-VN-HoaiMyNeural"
+    # Thư mục media dùng chung với worker; đường dẫn asset trong state tương đối so với nó.
+    media_dir: str = "var/media"
+    # Thời gian tối đa graph chờ một job của worker.
+    job_timeout_s: float = 600.0
+    # Khoảng nghỉ giữa hai cảnh (0,15–0,3 s).
+    scene_gap_s: float = 0.2
+
     @property
     def supabase_jwks_url(self) -> str:
         return f"{self.supabase_url.rstrip('/')}/auth/v1/.well-known/jwks.json"
