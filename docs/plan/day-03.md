@@ -15,19 +15,19 @@ Dựng khung repo dùng lâu dài (uv workspace cho Python, pnpm cho web), FastA
 
 ### Monorepo
 
-- [ ] Hoàn thiện `pyproject.toml` gốc (uv workspace: `apps/api`, `apps/worker`), `pnpm-workspace.yaml` (`apps/web`).
-- [ ] Cấu hình `ruff`, `mypy`, `pytest` ở gốc. Thêm `pre-commit` nếu muốn.
-- [ ] Scaffold `apps/web` bằng `create-next-app` (TypeScript, App Router), thêm CopilotKit.
+- [x] Hoàn thiện `pyproject.toml` gốc (uv workspace: `apps/api`, `apps/worker`), `pnpm-workspace.yaml` (`apps/web`).
+- [x] Cấu hình `ruff`, `mypy`, `pytest` ở gốc. Thêm `pre-commit` nếu muốn.
+- [x] Scaffold `apps/web` bằng `create-next-app` (TypeScript, App Router), thêm CopilotKit.
 
 ### API
 
-- [ ] `apps/api`: `main.py` (app, `/health`), `config.py` (pydantic-settings, đọc `.env`).
-- [ ] `auth.py`: verify JWT Supabase (JWKS hoặc secret), dependency `current_user` trả `user_id`.
-- [ ] `errors.py`: enum mã lỗi (`BOOK_NOT_FOUND`, `GENRE_EXCLUDED`, `BUDGET_EXCEEDED`, `PROVIDER_UNAVAILABLE`, `LOW_FAITHFULNESS`, `RENDER_FAILED`, `CANCELLED`, ...), exception handler trả `{code, message_vi, retryable}`.
+- [x] `apps/api`: `main.py` (app, `/health`), `config.py` (pydantic-settings, đọc `.env`).
+- [x] `auth.py`: verify JWT Supabase (JWKS hoặc secret), dependency `current_user` trả `user_id`.
+- [x] `errors.py`: enum mã lỗi (`BOOK_NOT_FOUND`, `GENRE_EXCLUDED`, `BUDGET_EXCEEDED`, `PROVIDER_UNAVAILABLE`, `LOW_FAITHFULNESS`, `RENDER_FAILED`, `CANCELLED`, ...), exception handler trả `{code, message_vi, retryable}`.
 
 ### Test
 
-- [ ] Unit test: token hợp lệ, token hết hạn, thiếu token, mã lỗi trả đúng format.
+- [x] Unit test: token hợp lệ, token hết hạn, thiếu token, mã lỗi trả đúng format.
 
 ## Đầu ra
 
@@ -36,12 +36,13 @@ Dựng khung repo dùng lâu dài (uv workspace cho Python, pnpm cho web), FastA
 
 ## Tiêu chí hoàn thành
 
-- [ ] Gọi `/me` không có token trả 401 theo format mã lỗi
-- [ ] Lint và test xanh ở local
+- [x] Gọi `/me` không có token trả 401 theo format mã lỗi
+- [x] Lint và test xanh ở local
 
 ## Ghi chú
 
 - Không dùng service key của Supabase cho dữ liệu người dùng.
+- Đã làm: auth nhận cả JWKS (ES256/RS256, project Supabase mới) lẫn HS256 secret (project cũ), chọn theo `alg` của token; kiểm `aud=authenticated`, `iss={SUPABASE_URL}/auth/v1`, bắt buộc `exp` và `sub`. Unit test dùng khoá tự sinh. Chưa thử với project Supabase thật. Bỏ qua `pre-commit`, thay bằng CI GitHub Actions (`.github/workflows/ci.yml`).
 
 ---
 

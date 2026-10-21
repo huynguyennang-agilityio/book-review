@@ -28,4 +28,16 @@ docker compose up -d          # Postgres + pgvector, Redis
 uv sync                       # Python workspace
 uv run pytest
 uv run uvicorn book_review_api.main:app --reload
+
+pnpm install                  # web
+pnpm web:dev                  # http://localhost:3000
 ```
+
+Kiểm tra trước khi push (CI chạy y hệt):
+
+```bash
+uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest
+pnpm web:lint && pnpm web:typecheck && pnpm web:build
+```
+
+API: `GET /health` (không cần đăng nhập), `GET /me` (cần header `Authorization: Bearer <access_token Supabase>`). Lỗi luôn trả `{code, message_vi, retryable}`, danh sách mã ở `apps/api/src/book_review_api/errors.py`.

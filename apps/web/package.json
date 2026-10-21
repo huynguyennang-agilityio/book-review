@@ -1,5 +1,29 @@
 {
   "name": "@book-review/web",
   "version": "0.1.0",
-  "private": true
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3000",
+    "build": "next build",
+    "start": "next start -p 3000",
+    "lint": "eslint",
+    "typecheck": "next typegen && tsc --noEmit"
+  },
+  "dependencies": {
+    "@ag-ui/client": "1.0.2",
+    "@copilotkit/react-core": "1.79.1",
+    "@copilotkit/react-ui": "1.79.1",
+    "@copilotkit/runtime": "1.79.1",
+    "next": "16.4.2",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "22.15.3",
+    "@types/react": "19.1.2",
+    "@types/react-dom": "19.1.2",
+    "eslint": "9.39.1",
+    "eslint-config-next": "16.4.2",
+    "typescript": "5.8.3"
+  }
 }
