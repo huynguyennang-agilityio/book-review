@@ -12,6 +12,7 @@ from langchain.agents.middleware import (
     AgentMiddleware,
     AgentState,
     ModelCallLimitMiddleware,
+    ModelRetryMiddleware,
     PIIMiddleware,
     SummarizationMiddleware,
     ToolCallLimitMiddleware,
@@ -115,6 +116,8 @@ def research_middleware(
             settings.price_input_per_mtok,
             settings.price_output_per_mtok,
         ),
+        # Gói free của Gemini chỉ 5 RPM: gặp 429 thì chờ cửa sổ phút trôi qua rồi thử lại.
+        ModelRetryMiddleware(max_retries=3, initial_delay=15.0, max_delay=60.0, on_failure="error"),
         ModelCallLimitMiddleware(run_limit=settings.research_model_call_limit),
         ToolCallLimitMiddleware(run_limit=settings.research_tool_call_limit),
     ]
