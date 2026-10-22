@@ -19,6 +19,10 @@ class ErrorCode(StrEnum):
     RENDER_FAILED = "RENDER_FAILED"
     CANCELLED = "CANCELLED"
     INVALID_STATE = "INVALID_STATE"
+    UNSUPPORTED_IMAGE = "UNSUPPORTED_IMAGE"
+    IMAGE_TOO_LARGE = "IMAGE_TOO_LARGE"
+    INVALID_IMAGE = "INVALID_IMAGE"
+    UPLOAD_LIMIT = "UPLOAD_LIMIT"
     # Chung
     UNAUTHORIZED = "UNAUTHORIZED"
     TOKEN_EXPIRED = "TOKEN_EXPIRED"
@@ -74,6 +78,26 @@ ERROR_SPECS: dict[ErrorCode, ErrorSpec] = {
     ErrorCode.INVALID_STATE: ErrorSpec(
         status_code=409,
         message_vi="Project không ở trạng thái cho phép thao tác này.",
+        retryable=False,
+    ),
+    ErrorCode.UNSUPPORTED_IMAGE: ErrorSpec(
+        status_code=415,
+        message_vi="Chỉ nhận ảnh JPEG, PNG hoặc WebP.",
+        retryable=False,
+    ),
+    ErrorCode.IMAGE_TOO_LARGE: ErrorSpec(
+        status_code=413,
+        message_vi="Ảnh quá nặng, tối đa 10 MB.",
+        retryable=False,
+    ),
+    ErrorCode.INVALID_IMAGE: ErrorSpec(
+        status_code=422,
+        message_vi="Không mở được ảnh, file có thể bị hỏng.",
+        retryable=False,
+    ),
+    ErrorCode.UPLOAD_LIMIT: ErrorSpec(
+        status_code=409,
+        message_vi="Project đã có đủ số ảnh tải lên tối đa.",
         retryable=False,
     ),
     ErrorCode.UNAUTHORIZED: ErrorSpec(
