@@ -29,6 +29,7 @@ from book_review_api.providers.image_fal import FalImageProvider
 from book_review_api.providers.llm_gemini import (
     make_chat_model,
     make_embeddings,
+    make_gemini_with_fallback,
     make_judge_model,
 )
 from book_review_api.providers.llm_writer import make_writer_model
@@ -172,5 +173,5 @@ def build_live_graph(
             if settings.fal_key
             else None
         ),
-        prompt_writer=make_prompt_writer(make_chat_model(settings)),
+        prompt_writer=make_prompt_writer(make_gemini_with_fallback(settings)),
     )

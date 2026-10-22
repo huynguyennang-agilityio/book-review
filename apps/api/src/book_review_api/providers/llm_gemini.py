@@ -7,6 +7,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmb
 from pydantic import SecretStr
 
 from book_review_api.config import Settings, get_settings
+from book_review_api.providers.fallback import with_overload_fallback
 
 
 def make_embeddings(settings: Settings | None = None) -> Embeddings:
@@ -24,10 +25,13 @@ def make_embeddings(settings: Settings | None = None) -> Embeddings:
     )
 
 
-def make_chat_model(settings: Settings | None = None, model: str | None = None) -> BaseChatModel:
+def make_chat_model(
+    settings: Settings | None = None, model: str | None = None, max_retries: int = 6
+) -> BaseChatModel:
     """Chat model Gemini (mặc định `gemini_model` trong config), nhiệt độ 0 cho việc chấm/rerank.
 
-    `llm_rpm` > 0 thì giới hạn số request mỗi phút (gói free).
+    `llm_rpm` > 0 thì giới hạn số request mỗi phút (gói free). Model có dự phòng nên đặt
+    `max_retries` thấp để chuyển sang dự phòng sớm thay vì tự thử lại lâu.
     """
     settings = settings or get_settings()
     if not settings.google_api_key:
@@ -42,10 +46,26 @@ def make_chat_model(settings: Settings | None = None, model: str | None = None) 
         api_key=SecretStr(settings.google_api_key),
         temperature=0,
         rate_limiter=limiter,
+        max_retries=max_retries,
+    )
+
+
+def make_gemini_with_fallback(
+    settings: Settings | None = None, model: str | None = None, fallback: str | None = None
+) -> BaseChatModel:
+    """Gemini `model` (mặc định `gemini_model`), quá tải thì chuyển sang `fallback` (mặc định
+    `gemini_fallback_model`). Không dùng cho research agent (cần `BaseChatModel` thật)."""
+    settings = settings or get_settings()
+    name = model or settings.gemini_model
+    backup = settings.gemini_fallback_model if fallback is None else fallback
+    if not backup or backup == name:
+        return make_chat_model(settings, name)
+    return with_overload_fallback(
+        make_chat_model(settings, name, max_retries=1), make_chat_model(settings, backup)
     )
 
 
 def make_judge_model(settings: Settings | None = None) -> BaseChatModel:
     """Giám khảo faithfulness: model khác model viết kịch bản để không tự chấm cho mình."""
     settings = settings or get_settings()
-    return make_chat_model(settings, settings.judge_model)
+    return make_gemini_with_fallback(settings, settings.judge_model, settings.judge_fallback_model)

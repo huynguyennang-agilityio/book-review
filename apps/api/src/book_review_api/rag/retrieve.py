@@ -182,9 +182,9 @@ def make_reranker(settings: Settings | None = None) -> Reranker | None:
     if provider == "none":
         return None
     if provider == "llm":
-        from book_review_api.providers.llm_gemini import make_chat_model
+        from book_review_api.providers.llm_gemini import make_gemini_with_fallback
 
-        return LLMReranker(make_chat_model(settings))
+        return LLMReranker(make_gemini_with_fallback(settings))
     raise ValueError(f"rerank_provider không hợp lệ: {settings.rerank_provider!r}")
 
 
