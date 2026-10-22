@@ -27,7 +27,6 @@ from book_review_api.rag.retrieve import Chunk
 from book_review_api.storyboard.schema import (
     CITED_SECTIONS,
     MAX_QUOTE_CHARS,
-    SECTION_MAX_SCENES,
     SECTION_ORDER,
     BookIdentity,
     Character,
@@ -36,6 +35,10 @@ from book_review_api.storyboard.schema import (
     SceneType,
     Section,
     Storyboard,
+    section_max_scenes,
+)
+from book_review_api.storyboard.schema import (
+    SECTION_MAX_SCENES as SECTION_DEFAULT_MAX,
 )
 from book_review_api.storyboard.validate import scene_problems
 
@@ -158,6 +161,21 @@ class StoryboardWriter:
             + f"\nLoại: {'hư cấu' if kind == 'fiction' else 'phi hư cấu'}\n{spoiler}"
         )
 
+    def _max_scenes(self) -> dict[str, int]:
+        return section_max_scenes(self.settings.storyboard_minutes)
+
+    def _scene_count_hint(self, section: str) -> str:
+        """Ghi đè quy tắc số cảnh mặc định (video ~45 giây) khi người dùng chọn video dài hơn."""
+        limit = self._max_scenes()[section]
+        if limit <= SECTION_DEFAULT_MAX[section]:
+            return ""
+        low = max(1, round(limit * 0.7))
+        return (
+            f"Video dài ~{self.settings.storyboard_minutes} phút nên phần này viết {low}-{limit} "
+            "cảnh (thay cho số cảnh trong hướng dẫn chung), mỗi cảnh vẫn 1-2 câu, "
+            "không lặp ý, không bịa thêm ngoài nguồn.\n"
+        )
+
     def outline(self, book: BookIdentity, kind: str, seed: Sequence[Chunk]) -> Outline:
         passages = "\n\n".join(c.content[:600] for c in seed[:4])
         human = (
@@ -202,6 +220,7 @@ class StoryboardWriter:
                 if needs_cite
                 else "Phần này là lời dẫn, không cần citation, không đưa dữ kiện ngoài nguồn.\n"
             )
+            + self._scene_count_hint(part.section)
             + f"quote tối đa {MAX_QUOTE_CHARS} ký tự, chép nguyên văn từ đoạn.\n\n"
             f"Các đoạn nguồn:\n{numbered or '(không có)'}"
         )
@@ -235,7 +254,7 @@ class StoryboardWriter:
             # Cảnh dữ kiện không dẫn nguồn thì bỏ (không đoán nguồn thay model); còn cảnh có
             # citation thì phần vẫn dùng được.
             drafts = [d for d in drafts if d.citations]
-        drafts = drafts[: SECTION_MAX_SCENES[section]]
+        drafts = drafts[: self._max_scenes()[section]]
         for offset, d in enumerate(drafts):
             sid = next_id + offset
             citations: list[Citation] = []
