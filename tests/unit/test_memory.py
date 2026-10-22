@@ -103,7 +103,7 @@ def test_no_user_id_skips_memory() -> None:
 def test_prompt_loader_versions() -> None:
     for version in ACTIVE_PROMPTS.values():
         assert load_prompt(version).strip()
-    assert "storyboard_v1" in prompt_version_label()
+    assert "storyboard_v2" in prompt_version_label()
     with pytest.raises(FileNotFoundError):
         load_prompt("khong_co_v9")
 

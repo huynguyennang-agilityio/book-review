@@ -63,3 +63,53 @@ Bộ chấm tiếng Việt dễ dãi hơn chấm tay: cho 1.0 ở 3 cảnh có �
 ## Chi phí
 
 Gói free nên không mất tiền. Quy đổi theo giá trong config (0,30 / 2,50 USD mỗi triệu token vào/ra): viết 10 storyboard khoảng 0,07 USD, giám khảo và vòng sửa ở lần chạy cuối khoảng 0,01 USD. Cả lần chạy mất khoảng 1 giờ vì giới hạn 8 request/phút.
+
+# Tối ưu prompt storyboard_v2 (ngày 22)
+
+Chạy `uv run --group eval python evals/run_ragas.py` trên **20 sách golden** với prompt `storyboard_v2` (cùng model viết `gemini-3.5-flash-lite`, giám khảo `gemini-3.1-flash-lite`). Số liệu chi tiết: [`eval_report.json`](eval_report.json); baseline v1 giữ ở [`eval_report_storyboard_v1.json`](eval_report_storyboard_v1.json) (10 sách).
+
+`storyboard_v2` khác v1: hook tối đa 20 từ, rút từ nội dung sách, cấm hứa hẹn/khẳng định ngoài nguồn; `review_cta` chỉ nói lại ý đã nêu; giữ nguyên mức độ câu chữ nguồn, cấm tính từ đánh giá, quan hệ nhân quả, lợi ích thêm.
+
+## Kết quả
+
+| Phần | n (v2, 20 sách) | Tiếng Việt | RAGAS gốc |
+| --- | --- | --- | --- |
+| **context + body (ban đầu)** | 85 | **0.994** | **0.946** |
+| context + body (sau vòng sửa) | 85 | 1.000 | 0.952 |
+| hook (đo riêng) | 20 | 0.808 | 0.492 |
+| review_cta (đo riêng) | 40 | 0.979 | 0.704 |
+
+**Tiêu chí ngày 22 đạt:** faithfulness trung bình trên context/body là 0.946 (RAGAS) và 0.994 (bộ chấm tiếng Việt), đều > 0.9. 1 cảnh được viết lại, 0 cảnh `LOW_FAITHFULNESS`.
+
+So v1 và v2 trên cùng 10 sách baseline:
+
+| | v1 | v2 |
+| --- | --- | --- |
+| context + body, tiếng Việt / RAGAS | 0.993 / 0.961 | 0.988 / 0.946 |
+| hook, tiếng Việt / RAGAS | 0.500 / 0.350 | 0.717 / 0.383 |
+| review_cta, tiếng Việt / RAGAS | 0.632 / 0.430 | 0.983 / 0.650 |
+
+context/body ngang nhau (chênh lệch trong nhiễu, số cảnh khác nhau do model chọn số cảnh); hook và review_cta tăng rõ. Hook vẫn thấp nhất (0.81 tiếng Việt): hook gây tò mò thường có ý nhận định chung mà nguồn không nói, đây là phần cần giằng co giữa hấp dẫn và đúng nội dung, chưa tính vào ngưỡng.
+
+## Chấm tay 20 mẫu
+
+Mỗi sách một cảnh context/body chọn ngẫu nhiên (seed 22), chấm theo cách tách khẳng định ([`evals/manual/grades.json`](../../evals/manual/grades.json)). Người chấm là Claude, cần người kiểm tra lại.
+
+| | Chấm tay | Tiếng Việt | RAGAS |
+| --- | --- | --- | --- |
+| Điểm trung bình | 0.984 | 0.975 | 0.933 |
+| Sai số tuyệt đối trung bình | | 0.009 | 0.050 |
+| Cùng phía ngưỡng 0.9 với chấm tay | | 20/20 | 18/20 |
+
+19/20 cảnh đúng hoàn toàn. Lỗi duy nhất: Số đỏ ("xuất bản từ năm 1936" trong khi nguồn nói đăng báo 1936, in sách 1938); cả hai bộ chấm đều bắt được (0.5). RAGAS chấm thấp oan 2 cảnh (Cha giàu cha nghèo 0.5, Nhà giả kim 0.67).
+
+## Chỉ số khác
+
+- **Từ chối tiên hiệp/kiếm hiệp:** 9/10 tên sách tiên hiệp/kiếm hiệp bị chặn, 0/20 sách golden bị chặn nhầm (khoá từ ở `precheck`). Sót "Vũ Động Càn Khôn" vì tên không chứa từ khoá; cần tra thể loại từ nguồn nếu muốn bắt thêm.
+- **Answer relevancy, độ chính xác phân loại thể loại:** chưa đo. Pipeline nhận `kind` (hư cấu/phi hư cấu) từ dữ liệu golden chứ chưa tự phân loại, và answer relevancy của RAGAS cần embeddings tiếng Việt cho từng cảnh.
+
+## Khoảng cách còn lại (carry-over)
+
+- Chunking chưa chỉnh: nguồn golden ngắn nên chưa đo được; cần đo lại trên nguồn web dài qua `scripts/run_research.py`.
+- Đẩy experiments lên LangSmith (`--langsmith`) chưa chạy.
+- Số ảnh cảnh 11–13 mỗi sách so với mục tiêu 25–35.

@@ -11,7 +11,7 @@ SceneType = Literal["character", "landscape", "metaphor", "action", "title"]
 CITED_SECTIONS: frozenset[str] = frozenset({"context", "body"})
 SECTION_ORDER: tuple[Section, ...] = ("hook", "context", "body", "review_cta")
 MAX_QUOTE_CHARS = 200
-# Số cảnh tối đa mỗi phần (khớp prompt storyboard_v1). Model đôi khi dồn cả kịch bản vào `hook`.
+# Số cảnh tối đa mỗi phần (khớp prompt storyboard). Model đôi khi dồn cả kịch bản vào `hook`.
 SECTION_MAX_SCENES: dict[str, int] = {"hook": 1, "context": 2, "body": 4, "review_cta": 2}
 
 

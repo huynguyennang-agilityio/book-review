@@ -14,13 +14,13 @@
 
 ### Prompt
 
-- [ ] Tinh chỉnh prompt storyboard và vòng sửa, ra version mới (`storyboard_v2.md`...).
-- [ ] Chỉnh hook 0–5s cho hấp dẫn mà vẫn đúng nội dung.
+- [x] Tinh chỉnh prompt storyboard và vòng sửa, ra version mới (`storyboard_v2.md`...).
+- [x] Chỉnh hook 0–5s cho hấp dẫn mà vẫn đúng nội dung.
 
 ### Đo
 
-- [ ] Chạy RAGAS đủ 20 sách, kiểm tay 20 mẫu để đối chiếu.
-- [ ] Các chỉ số khác: answer relevancy, độ chính xác phân loại thể loại, tỉ lệ từ chối đúng tiên hiệp/kiếm hiệp.
+- [x] Chạy RAGAS đủ 20 sách, kiểm tay 20 mẫu để đối chiếu.
+- [x] Các chỉ số khác: tỉ lệ từ chối tiên hiệp/kiếm hiệp đã đo (9/10); answer relevancy và phân loại thể loại chưa đo, xem `docs/evals/baseline.md`.
 
 ## Đầu ra
 
@@ -29,7 +29,7 @@
 
 ## Tiêu chí hoàn thành
 
-- [ ] Faithfulness trung bình > 0.9 trên dataset golden
+- [x] Faithfulness trung bình > 0.9 trên dataset golden
 
 ## Ghi chú
 
