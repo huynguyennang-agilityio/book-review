@@ -1,0 +1,27 @@
+name: SSH deploy
+description: Chép infra/deploy lên VPS và chạy deploy.sh với IMAGE_TAG
+inputs:
+  host: {required: true}
+  user: {required: true}
+  key: {required: true}
+  path: {required: true}
+  image-tag: {required: true}
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        HOST: ${{ inputs.host }}
+        USER_: ${{ inputs.user }}
+        KEY: ${{ inputs.key }}
+        DEPLOY_PATH: ${{ inputs.path }}
+        IMAGE_TAG: ${{ inputs.image-tag }}
+        REGISTRY: ghcr.io/${{ github.repository }}
+      run: |
+        install -m 600 /dev/null key
+        printf '%s\n' "$KEY" > key
+        SSH=(ssh -i key -o StrictHostKeyChecking=accept-new "$USER_@$HOST")
+        "${SSH[@]}" "mkdir -p $DEPLOY_PATH"
+        scp -i key -o StrictHostKeyChecking=accept-new infra/deploy/docker-compose.yml infra/deploy/deploy.sh "$USER_@$HOST:$DEPLOY_PATH/"
+        "${SSH[@]}" "cd $DEPLOY_PATH && REGISTRY=$REGISTRY IMAGE_TAG=$IMAGE_TAG ./deploy.sh"
+        rm -f key
