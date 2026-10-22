@@ -41,6 +41,12 @@ uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pyt
 pnpm web:lint && pnpm web:typecheck && pnpm web:build
 ```
 
+## CI và Docker
+
+- `ci.yml`: ruff, mypy, pytest (Postgres + pgvector), eslint/typecheck/build web, build 3 image Docker.
+- `evals.yml`: khi PR đổi prompt, RAG, storyboard hoặc config, chạy eval 5 sách và chặn merge nếu faithfulness < 0.9. Cần secret `GOOGLE_API_KEY` trong GitHub Environment `eval`.
+- Image: `infra/docker/{api,worker,web}.Dockerfile`, xem [infra/docker/README.md](infra/docker/README.md).
+
 ## Database và migration
 
 Migration là file SQL trong [`db/migrations/`](db/migrations/README.md), chạy theo thứ tự tên file. Lệnh
