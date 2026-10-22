@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Ngô Tất Tố",
+    "needle": "Ngô Tất Tố"
+  },
+  {
+    "id": "f2",
+    "fact": "Tác phẩm in thành sách năm 1939",
+    "needle": "năm 1939"
+  },
+  {
+    "id": "f3",
+    "fact": "Nhân vật chính là chị Dậu",
+    "needle": "chị Dậu"
+  },
+  {
+    "id": "f4",
+    "fact": "Nhà chị Dậu thiếu tiền sưu của chồng",
+    "needle": "thiếu suất sưu"
+  },
+  {
+    "id": "f5",
+    "fact": "Chị Dậu bán con gái là cái Tí cho nhà Nghị Quế",
+    "needle": "cái Tí"
+  },
+  {
+    "id": "f6",
+    "fact": "Chị Dậu đánh lại tên cai lệ",
+    "needle": "cai lệ"
+  }
+]

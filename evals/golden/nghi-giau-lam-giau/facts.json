@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Napoleon Hill",
+    "needle": "Napoleon Hill"
+  },
+  {
+    "id": "f2",
+    "fact": "Xuất bản năm 1937",
+    "needle": "năm 1937"
+  },
+  {
+    "id": "f3",
+    "fact": "Sách viết theo đề nghị của Andrew Carnegie",
+    "needle": "Andrew Carnegie"
+  },
+  {
+    "id": "f4",
+    "fact": "Sách có mười ba nguyên tắc",
+    "needle": "mười ba nguyên tắc"
+  },
+  {
+    "id": "f5",
+    "fact": "Điểm xuất phát là mong muốn cháy bỏng",
+    "needle": "mong muốn cháy bỏng"
+  },
+  {
+    "id": "f6",
+    "fact": "Có nguyên tắc nhóm cố vấn tinh thần",
+    "needle": "nhóm cố vấn tinh thần"
+  }
+]

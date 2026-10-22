@@ -1,0 +1,502 @@
+[
+ {
+  "config": {
+   "name": "chunk60-ov0",
+   "max_tokens": 60,
+   "overlap_pct": 0,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.5222,
+   "mrr": 0.9954,
+   "ctx_tokens": 365.0,
+   "chunks": 94.0
+  },
+  "pool": {
+   "recall": 0.9908,
+   "precision": 0.5252,
+   "mrr": 0.9908,
+   "ctx_tokens": 369.633,
+   "chunks": 94.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk60-ov15",
+   "max_tokens": 60,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.2798,
+   "mrr": 0.9801,
+   "ctx_tokens": 221.7523,
+   "chunks": 94.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2936,
+   "mrr": 0.9709,
+   "ctx_tokens": 239.9266,
+   "chunks": 94.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov0",
+   "max_tokens": 100,
+   "overlap_pct": 0,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.4885,
+   "mrr": 0.9908,
+   "ctx_tokens": 346.7706,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.4128,
+   "mrr": 0.9931,
+   "ctx_tokens": 440.2202,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.3494,
+   "mrr": 0.9709,
+   "ctx_tokens": 248.1284,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2913,
+   "mrr": 0.9862,
+   "ctx_tokens": 348.7431,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk150-ov0",
+   "max_tokens": 150,
+   "overlap_pct": 0,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.5061,
+   "mrr": 0.9954,
+   "ctx_tokens": 237.3945,
+   "chunks": 41.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2867,
+   "mrr": 0.9885,
+   "ctx_tokens": 472.8991,
+   "chunks": 41.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk150-ov15",
+   "max_tokens": 150,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.5,
+   "mrr": 0.9954,
+   "ctx_tokens": 231.5229,
+   "chunks": 41.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2798,
+   "mrr": 0.9885,
+   "ctx_tokens": 457.7982,
+   "chunks": 41.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk250-ov0",
+   "max_tokens": 250,
+   "overlap_pct": 0,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.5046,
+   "mrr": 0.9954,
+   "ctx_tokens": 230.5138,
+   "chunks": 40.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2752,
+   "mrr": 0.9885,
+   "ctx_tokens": 469.4495,
+   "chunks": 40.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk250-ov15",
+   "max_tokens": 250,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.5046,
+   "mrr": 0.9954,
+   "ctx_tokens": 230.5138,
+   "chunks": 40.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2752,
+   "mrr": 0.9885,
+   "ctx_tokens": 469.4495,
+   "chunks": 40.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk800-ov0",
+   "max_tokens": 800,
+   "overlap_pct": 0,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.5046,
+   "mrr": 0.9954,
+   "ctx_tokens": 230.5138,
+   "chunks": 40.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2752,
+   "mrr": 0.9885,
+   "ctx_tokens": 469.4495,
+   "chunks": 40.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk800-ov15",
+   "max_tokens": 800,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.5046,
+   "mrr": 0.9954,
+   "ctx_tokens": 230.5138,
+   "chunks": 40.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2752,
+   "mrr": 0.9885,
+   "ctx_tokens": 469.4495,
+   "chunks": 40.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15-vector",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "vector",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.3494,
+   "mrr": 0.9664,
+   "ctx_tokens": 248.1284,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.289,
+   "mrr": 0.9893,
+   "ctx_tokens": 305.1835,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15-keyword",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "keyword",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.4786,
+   "mrr": 0.9954,
+   "ctx_tokens": 209.156,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 0.9817,
+   "precision": 0.2775,
+   "mrr": 0.9587,
+   "ctx_tokens": 371.0275,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk800-ov15-vector",
+   "max_tokens": 800,
+   "overlap_pct": 15,
+   "mode": "vector",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.5046,
+   "mrr": 0.9954,
+   "ctx_tokens": 230.5138,
+   "chunks": 40.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2706,
+   "mrr": 0.9908,
+   "ctx_tokens": 466.055,
+   "chunks": 40.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk800-ov15-keyword",
+   "max_tokens": 800,
+   "overlap_pct": 15,
+   "mode": "keyword",
+   "top_k": 8,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.578,
+   "mrr": 0.9954,
+   "ctx_tokens": 213.3578,
+   "chunks": 40.0
+  },
+  "pool": {
+   "recall": 0.9908,
+   "precision": 0.2706,
+   "mrr": 0.9817,
+   "ctx_tokens": 470.1376,
+   "chunks": 40.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15-k4-n2",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 4,
+   "top_n": 2,
+   "rerank": false
+  },
+  "book": {
+   "recall": 0.9908,
+   "precision": 0.5367,
+   "mrr": 0.9679,
+   "ctx_tokens": 163.5505,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.5459,
+   "mrr": 0.9862,
+   "ctx_tokens": 178.8165,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15-k8-n2",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 2,
+   "rerank": false
+  },
+  "book": {
+   "recall": 0.9908,
+   "precision": 0.5367,
+   "mrr": 0.9679,
+   "ctx_tokens": 163.5505,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.5459,
+   "mrr": 0.9862,
+   "ctx_tokens": 179.2569,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15-k8-n3",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 3,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.37,
+   "mrr": 0.9709,
+   "ctx_tokens": 237.5963,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.3853,
+   "mrr": 0.9862,
+   "ctx_tokens": 265.5138,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15-k8-n6",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 8,
+   "top_n": 6,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.3494,
+   "mrr": 0.9709,
+   "ctx_tokens": 248.1284,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.1957,
+   "mrr": 0.9862,
+   "ctx_tokens": 524.3486,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15-k12-n4",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 12,
+   "top_n": 4,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.3494,
+   "mrr": 0.9709,
+   "ctx_tokens": 248.1284,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.2913,
+   "mrr": 0.9862,
+   "ctx_tokens": 348.367,
+   "chunks": 64.0
+  }
+ },
+ {
+  "config": {
+   "name": "chunk100-ov15-k12-n6",
+   "max_tokens": 100,
+   "overlap_pct": 15,
+   "mode": "hybrid",
+   "top_k": 12,
+   "top_n": 6,
+   "rerank": false
+  },
+  "book": {
+   "recall": 1.0,
+   "precision": 0.3494,
+   "mrr": 0.9709,
+   "ctx_tokens": 248.1284,
+   "chunks": 64.0
+  },
+  "pool": {
+   "recall": 1.0,
+   "precision": 0.1957,
+   "mrr": 0.9862,
+   "ctx_tokens": 524.055,
+   "chunks": 64.0
+  }
+ }
+]

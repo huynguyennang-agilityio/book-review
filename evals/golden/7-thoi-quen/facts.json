@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Stephen R. Covey",
+    "needle": "Stephen R. Covey"
+  },
+  {
+    "id": "f2",
+    "fact": "Xuất bản năm 1989",
+    "needle": "năm 1989"
+  },
+  {
+    "id": "f3",
+    "fact": "Cuốn sách có bảy thói quen",
+    "needle": "Bảy thói quen"
+  },
+  {
+    "id": "f4",
+    "fact": "Thói quen đầu tiên là hãy chủ động",
+    "needle": "hãy chủ động"
+  },
+  {
+    "id": "f5",
+    "fact": "Một thói quen là tư duy đôi bên cùng thắng",
+    "needle": "đôi bên cùng thắng"
+  },
+  {
+    "id": "f6",
+    "fact": "Thói quen cuối là mài giũa lưỡi cưa",
+    "needle": "mài giũa lưỡi cưa"
+  }
+]

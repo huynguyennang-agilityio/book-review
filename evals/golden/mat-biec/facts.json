@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Nguyễn Nhật Ánh",
+    "needle": "Nguyễn Nhật Ánh"
+  },
+  {
+    "id": "f2",
+    "fact": "Tiểu thuyết xuất bản năm 1990",
+    "needle": "năm 1990"
+  },
+  {
+    "id": "f3",
+    "fact": "Bối cảnh là làng Đo Đo",
+    "needle": "làng Đo Đo"
+  },
+  {
+    "id": "f4",
+    "fact": "Nhân vật chính là Ngạn, yêu Hà Lan",
+    "needle": "Hà Lan"
+  },
+  {
+    "id": "f5",
+    "fact": "Hà Lan rời làng ra Sài Gòn",
+    "needle": "Sài Gòn"
+  },
+  {
+    "id": "f6",
+    "fact": "Hà Lan lấy Dũng",
+    "needle": "lấy Dũng"
+  }
+]

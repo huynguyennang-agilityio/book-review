@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Jared Diamond",
+    "needle": "Jared Diamond"
+  },
+  {
+    "id": "f2",
+    "fact": "Xuất bản năm 1997",
+    "needle": "năm 1997"
+  },
+  {
+    "id": "f3",
+    "fact": "Sách đoạt giải Pulitzer",
+    "needle": "giải Pulitzer"
+  },
+  {
+    "id": "f4",
+    "fact": "Câu hỏi xuất phát từ Yali ở New Guinea",
+    "needle": "Yali"
+  },
+  {
+    "id": "f5",
+    "fact": "Chênh lệch đến từ môi trường địa lý",
+    "needle": "môi trường địa lý"
+  },
+  {
+    "id": "f6",
+    "fact": "Trục chính của Á-Âu chạy theo hướng đông tây",
+    "needle": "hướng đông tây"
+  }
+]

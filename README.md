@@ -57,7 +57,7 @@ chạy các file chưa chạy (ghi lại trong `app_private.schema_migrations`),
 
 Dữ liệu người dùng (`projects`, `assets`, `documents`, `chunks`) đều có `user_id` và RLS `user_id = auth.uid()`. Backend không dùng `service_role`: mỗi request mở transaction với role `authenticated` và claims JWT của người gửi (`db.user_transaction`), nên Postgres tự lọc dữ liệu theo người dùng.
 
-Test RLS và integration cần `TEST_DATABASE_URL` (xem `.env.example`); thiếu thì các test này bị skip, CI thì bắt buộc có.
+Test RLS và integration cần `TEST_DATABASE_URL` (xem `.env.example`; nếu cổng 5432 đã bị Postgres khác chiếm, chạy `POSTGRES_PORT=5433 docker compose up -d` và đổi cổng trong URL); thiếu thì các test này bị skip, CI thì bắt buộc có.
 
 ```bash
 TEST_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres uv run pytest
