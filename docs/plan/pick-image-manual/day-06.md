@@ -12,14 +12,14 @@ Trang một lượt cho nhân vật và ảnh cảnh.
 
 ## Công việc
 
-- [ ] **Giao diện**: `ManualImages.tsx`: phần nhân vật (prompt, ô tải 1 ảnh) và phần cảnh theo từng cảnh (lời đọc rút gọn, prompt, ô tải, xem trước 9:16).
-- [ ] **Tiện ích**: Sao chép từng prompt, sao chép tất cả, tải file prompt; kéo thả nhiều file gán theo thứ tự có bước xác nhận; thay ảnh trước khi tiếp tục.
-- [ ] **Trạng thái**: Thanh "đã tải 18/28", nút "Tiếp tục dựng video" chỉ bật khi đủ; lỗi từng ô hiện tại ô.
-- [ ] **Lưu ý**: Dòng nhắc: người dùng chịu trách nhiệm về độ liền mạch và bản quyền ảnh.
+- [x] **Giao diện**: `ManualImages.tsx`: phần nhân vật (prompt, ô tải 1 ảnh) và phần cảnh theo từng cảnh (lời đọc rút gọn, prompt, ô tải, xem trước 9:16).
+- [x] **Tiện ích**: Sao chép từng prompt, sao chép tất cả, tải file prompt; kéo thả nhiều file gán theo thứ tự có bước xác nhận; thay ảnh trước khi tiếp tục.
+- [x] **Trạng thái**: Thanh "đã tải 18/28", nút "Tiếp tục dựng video" chỉ bật khi đủ; lỗi từng ô hiện tại ô.
+- [x] **Lưu ý**: Dòng nhắc: người dùng chịu trách nhiệm về độ liền mạch và bản quyền ảnh.
 
 ## Tiêu chí hoàn thành
 
-- [ ] Tải đủ ảnh trên web thì graph chạy tiếp
+- [x] Tải đủ ảnh trên web thì graph chạy tiếp
 
 ---
 

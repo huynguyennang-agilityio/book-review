@@ -77,6 +77,7 @@ def test_payload_has_prompt_for_every_image(tmp_path: Path) -> None:
     assert len(payload["scenes"]) == sum(plan.values())
     assert len(payload["required"]) == 3 + sum(plan.values())
     assert all(i["prompt"] for i in payload["characters"] + payload["scenes"])
+    assert all(i["narration"] for i in payload["scenes"])
 
 
 def test_missing_images_ask_again_without_failing(tmp_path: Path) -> None:

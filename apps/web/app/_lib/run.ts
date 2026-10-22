@@ -273,6 +273,8 @@ export function useReviewRun(getToken: () => Promise<string>) {
                 say("assistant", "Kịch bản đã sẵn sàng, xem lại và duyệt trước khi dựng video.");
               } else if (p.type === "review_characters") {
                 say("assistant", "Ảnh nhân vật đã sẵn sàng, chọn ảnh cho từng nhân vật.");
+              } else if (p.type === "upload_images") {
+                say("assistant", "Tải một ảnh cho mỗi prompt, đủ ảnh mới dựng tiếp được.");
               } else say("assistant", p.message || "Đã tới bước duyệt.");
               return;
             }

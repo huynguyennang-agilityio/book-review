@@ -8,6 +8,7 @@ import { IdentifyConfirm } from "./_components/IdentifyConfirm";
 import { MemorySettings } from "./_components/MemorySettings";
 import { LoginForm } from "./_components/LoginForm";
 import { ImageModeChoice } from "./_components/ImageModeChoice";
+import { ManualImages } from "./_components/ManualImages";
 import { Progress } from "./_components/Progress";
 import { ResultScreen } from "./_components/ResultScreen";
 import { ScriptReview } from "./_components/ScriptReview";
@@ -117,6 +118,15 @@ function ReviewApp({ session }: { session: Session }) {
               busy={busy || run.cancelling}
               onChoose={(mode) => void run.chooseImageMode(mode)}
               onUpload={run.uploadImage}
+              onCancel={run.cancel}
+            />
+          )}
+          {run.pending?.type === "upload_images" && (
+            <ManualImages
+              pending={run.pending}
+              busy={busy || run.cancelling}
+              onUpload={run.uploadImage}
+              onSubmit={(uploads) => void run.resume({ uploads })}
               onCancel={run.cancel}
             />
           )}
