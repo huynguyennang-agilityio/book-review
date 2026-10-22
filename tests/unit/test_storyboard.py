@@ -171,7 +171,7 @@ def test_writer_builds_storyboard_with_resolved_citations() -> None:
     assert body.citations[0].chunk_id.startswith("nha-gia-kim/")
     assert body.citations[0].source_id.startswith("nha-gia-kim/")
     assert sb.hook_vi == sb.scenes[0].narration_vi
-    assert sb.prompt_version == "storyboard_v1"
+    assert sb.prompt_version == "storyboard_v2"
     assert w.usage.input_tokens == 500
 
 

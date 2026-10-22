@@ -31,6 +31,7 @@ from typing import Any
 from langchain_core.language_models import BaseChatModel
 
 from book_review_api.config import Settings, get_settings
+from book_review_api.prompt_loader import ACTIVE_PROMPTS
 from book_review_api.providers.llm_gemini import make_chat_model, make_embeddings, make_judge_model
 from book_review_api.rag.golden import GoldenBook, load_golden
 from book_review_api.rag.memory import InMemoryRetriever
@@ -124,6 +125,12 @@ def _question(book: GoldenBook, scene: Scene) -> str:
     return f"Viết lời đọc phần `{scene.section}` cho video review sách {book.title}."
 
 
+def _sb_file(stem: str) -> str:
+    """Cache storyboard theo version prompt: v1 giữ tên cũ, version khác thêm hậu tố."""
+    version = ACTIVE_PROMPTS["storyboard"]
+    return f"{stem}.json" if version == "storyboard_v1" else f"{stem}_{version}.json"
+
+
 class BookEval:
     def __init__(
         self,
@@ -142,7 +149,7 @@ class BookEval:
         self.cache = Cache(self.dir / "scores.json")
 
     def storyboard(self) -> Storyboard | None:
-        path = self.dir / "storyboard.json"
+        path = self.dir / _sb_file("storyboard")
         if path.is_file():
             return Storyboard.model_validate_json(path.read_text(encoding="utf-8"))
         runner = make_storyboard_runner(
@@ -160,7 +167,7 @@ class BookEval:
             return None
         self.dir.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(out["storyboard"], ensure_ascii=False, indent=1), "utf-8")
-        (self.dir / "storyboard_cost.json").write_text(json.dumps(out["cost"]), "utf-8")
+        (self.dir / _sb_file("storyboard_cost")).write_text(json.dumps(out["cost"]), "utf-8")
         return Storyboard.model_validate(out["storyboard"])
 
     def contexts(self, scene: Scene) -> list[str]:
@@ -237,7 +244,7 @@ class BookEval:
                 f" ragas={_fmt(row['ragas'])}"
                 + (f" → vi={row['vi_final']:.2f}" if row.get("rounds") else "")
             )
-        cost_path = self.dir / "storyboard_cost.json"
+        cost_path = self.dir / _sb_file("storyboard_cost")
         return {
             "slug": self.book.slug,
             "title": self.book.title,
@@ -347,7 +354,7 @@ def main() -> None:
         "judge_model": settings.judge_model,
         "threshold": settings.faithfulness_threshold,
         "rewrite_rounds": settings.faithfulness_rounds,
-        "prompts": [JUDGE_PROMPT_VERSION, REWRITE_PROMPT_VERSION],
+        "prompts": [ACTIVE_PROMPTS["storyboard"], JUDGE_PROMPT_VERSION, REWRITE_PROMPT_VERSION],
         "ragas_version": ragas.version if ragas else None,
         "scope": (
             "Ngưỡng tính trên context/body (nguồn = chunk cảnh trích dẫn). hook và review_cta "

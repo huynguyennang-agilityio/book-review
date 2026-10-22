@@ -16,6 +16,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from pydantic import BaseModel, Field
 
 from book_review_api.config import Settings, get_settings
+from book_review_api.prompt_loader import ACTIVE_PROMPTS
 from book_review_api.prompt_loader import load_prompt as _load_prompt
 from book_review_api.providers.structured import (
     StructuredOutputError,
@@ -40,7 +41,7 @@ from book_review_api.storyboard.validate import scene_problems
 
 log = logging.getLogger(__name__)
 
-PROMPT_VERSION = "storyboard_v1"
+PROMPT_VERSION = ACTIVE_PROMPTS["storyboard"]
 
 # Số đoạn tối đa đưa cho model viết một phần.
 MAX_PASSAGES = 12

@@ -1,10 +1,11 @@
 {
- "generated_at": "2026-10-21T13:29:55+00:00",
+ "generated_at": "2026-10-22T05:28:09+00:00",
  "writer_model": "gemini-3.5-flash-lite",
  "judge_model": "gemini-3.1-flash-lite",
  "threshold": 0.9,
  "rewrite_rounds": 2,
  "prompts": [
+  "storyboard_v2",
   "faithfulness_judge_v1",
   "faithfulness_rewrite_v1"
  ],
@@ -13,112 +14,122 @@
  "books_failed": [],
  "summary": {
   "hook": {
-   "n": 10,
-   "vi": 0.5,
-   "ragas": 0.35
+   "n": 20,
+   "vi": 0.8083,
+   "ragas": 0.4917
   },
   "context": {
-   "n": 18,
-   "vi": 1.0,
-   "ragas": 1.0
+   "n": 29,
+   "vi": 0.9828,
+   "ragas": 0.9828
   },
   "body": {
-   "n": 31,
-   "vi": 0.9892,
-   "ragas": 0.9382
+   "n": 56,
+   "vi": 1.0,
+   "ragas": 0.9265
   },
   "review_cta": {
-   "n": 19,
-   "vi": 0.6316,
-   "ragas": 0.4298
+   "n": 40,
+   "vi": 0.9792,
+   "ragas": 0.7042
   },
   "context_body": {
-   "n": 49,
-   "vi": 0.9932,
-   "ragas": 0.9609,
+   "n": 85,
+   "vi": 0.9941,
+   "ragas": 0.9457,
    "vi_final": 1.0,
-   "ragas_final": 0.9609,
+   "ragas_final": 0.9516,
    "rewritten": 1,
    "low_faithfulness": 0
   }
  },
  "manual": {
-  "n": 10,
-  "manual_mean": 0.909,
-  "vi_mean": 0.9667,
-  "ragas_mean": 0.9,
-  "mae_vi": 0.1243,
-  "mae_ragas": 0.141,
-  "threshold_agreement_vi": 0.6,
-  "threshold_agreement_ragas": 0.8,
+  "n": 20,
+  "manual_mean": 0.9835,
+  "vi_mean": 0.975,
+  "ragas_mean": 0.9333,
+  "mae_vi": 0.0085,
+  "mae_ragas": 0.0502,
+  "threshold_agreement_vi": 1,
+  "threshold_agreement_ragas": 0.9,
   "rows": [
    {
     "slug": "1984",
     "scene_id": 2,
     "section": "context",
-    "narration_vi": "Cuốn tiểu thuyết phản địa đàng 1984 của George Orwell ra mắt vào năm 1949.",
+    "narration_vi": "Cuốn tiểu thuyết phản địa đàng 1984 của nhà văn người Anh George Orwell được xuất bản năm 1949.",
     "manual": 1.0,
-    "note": "Tên, thể loại, tác giả, năm đều có trong nguồn.",
+    "note": "Mọi khẳng định có trong nguồn.",
     "vi": 1.0,
     "ragas": 1.0
    },
    {
-    "slug": "1984",
-    "scene_id": 4,
+    "slug": "7-thoi-quen",
+    "scene_id": 3,
     "section": "body",
-    "narration_vi": "Winston thầm chán ghét chế độ, viết nhật ký bí mật và bắt đầu yêu Julia, một đồng nghiệp.",
+    "narration_vi": "Bảy thói quen gồm: hãy chủ động; bắt đầu với mục đích cuối cùng trong tâm trí; và ưu tiên việc quan trọng trước.",
     "manual": 1.0,
-    "note": "Chán ghét chế độ, nhật ký bí mật, yêu Julia đồng nghiệp: đủ trong nguồn.",
+    "note": "Mọi khẳng định có trong nguồn.",
     "vi": 1.0,
     "ragas": 1.0
    },
    {
     "slug": "atomic-habits",
-    "scene_id": 6,
-    "section": "body",
-    "narration_vi": "Bạn cần tập trung vào bản sắc, nghĩa là trở thành kiểu người mình muốn thay vì chỉ đặt mục tiêu kết quả.",
+    "scene_id": 2,
+    "section": "context",
+    "narration_vi": "Atomic Habits là cuốn sách về xây dựng thói quen của tác giả người Mỹ James Clear, xuất bản năm 2018.",
     "manual": 1.0,
-    "note": "Diễn đạt lại sát câu về bản sắc.",
+    "note": "Mọi khẳng định có trong nguồn.",
     "vi": 1.0,
     "ragas": 1.0
    },
    {
     "slug": "cha-giau-cha-ngheo",
+    "scene_id": 5,
+    "section": "body",
+    "narration_vi": "Người giàu mua tài sản là thứ bỏ tiền vào túi bạn, trong khi người nghèo và người trung lưu mua nợ là thứ lấy tiền ra khỏi túi.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 0.5
+   },
+   {
+    "slug": "chi-pheo",
     "scene_id": 3,
     "section": "context",
-    "narration_vi": "Tác phẩm khắc họa hai người cha có quan điểm hoàn toàn trái ngược nhau về tiền bạc.",
+    "narration_vi": "Truyện lấy bối cảnh làng Vũ Đại, nơi người nông dân bị đẩy đến đường cùng và tha hóa.",
     "manual": 1.0,
-    "note": "Hai người cha quan điểm trái ngược có trong nguồn; 'hoàn toàn' chỉ là nhấn giọng.",
+    "note": "Mọi khẳng định có trong nguồn.",
     "vi": 1.0,
     "ragas": 1.0
    },
    {
     "slug": "dac-nhan-tam",
-    "scene_id": 4,
-    "section": "body",
-    "narration_vi": "Bên cạnh đó, việc mỉm cười, nhớ tên và biết lắng nghe sẽ giúp bạn kết nối tốt hơn.",
-    "manual": 0.75,
-    "note": "Mỉm cười, nhớ tên, lắng nghe có; 'giúp kết nối tốt hơn' là suy diễn, nguồn không nói.",
-    "vi": 1.0,
-    "ragas": 0.0
-   },
-   {
-    "slug": "de-men-phieu-luu-ky",
-    "scene_id": 5,
-    "section": "body",
-    "narration_vi": "Sau cái chết của người hàng xóm yếu ớt Dế Choắt, Mèn vô cùng hối hận và quyết định rời hang đi phiêu lưu.",
+    "scene_id": 2,
+    "section": "context",
+    "narration_vi": "Đắc nhân tâm là cuốn sách kỹ năng giao tiếp của tác giả người Mỹ Dale Carnegie, xuất bản năm 1936.",
     "manual": 1.0,
-    "note": "Cái chết của Dế Choắt, hối hận, rời hang: có trong nguồn.",
+    "note": "Mọi khẳng định có trong nguồn.",
     "vi": 1.0,
     "ragas": 1.0
    },
    {
     "slug": "de-men-phieu-luu-ky",
-    "scene_id": 7,
+    "scene_id": 4,
     "section": "body",
-    "narration_vi": "Câu chuyện mang đến cho chúng ta những bài học quý giá về sự khiêm tốn, tình bạn và lòng dũng cảm.",
+    "narration_vi": "Dế Mèn lúc đầu là một chàng dế thanh niên cường tráng và hay kiêu căng.",
     "manual": 1.0,
-    "note": "Ba bài học khớp nguồn; 'quý giá' là nhấn giọng.",
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 1.0
+   },
+   {
+    "slug": "deep-work",
+    "scene_id": 2,
+    "section": "context",
+    "narration_vi": "Deep Work là sách của giáo sư khoa học máy tính Cal Newport, xuất bản năm 2016.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
     "vi": 1.0,
     "ragas": 1.0
    },
@@ -126,38 +137,128 @@
     "slug": "hoang-tu-be",
     "scene_id": 3,
     "section": "context",
-    "narration_vi": "Cuốn sách được xuất bản lần đầu năm 1943 tại New York và trở thành một trong những tác phẩm được dịch nhiều nhất thế giới.",
-    "manual": 0.67,
-    "note": "1943 và New York đúng; nguồn nói 'tác phẩm văn học Pháp được dịch nhiều nhất', lời đọc nới thành 'nhiều nhất thế giới'.",
+    "narration_vi": "Tác phẩm được xuất bản lần đầu năm 1943 tại New York.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 1.0
+   },
+   {
+    "slug": "mat-biec",
+    "scene_id": 4,
+    "section": "body",
+    "narration_vi": "Ngạn là chàng trai nhút nhát, yêu cô bạn hàng xóm Hà Lan có đôi mắt biếc từ nhỏ.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 1.0
+   },
+   {
+    "slug": "nghi-giau-lam-giau",
+    "scene_id": 2,
+    "section": "context",
+    "narration_vi": "Cuốn sách Nghĩ giàu làm giàu do Napoleon Hill viết và xuất bản năm 1937.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
     "vi": 1.0,
     "ragas": 1.0
    },
    {
     "slug": "nha-gia-kim",
+    "scene_id": 4,
+    "section": "body",
+    "narration_vi": "Ở ốc đảo, cậu gặp cô gái sa mạc mà cậu yêu và nhà giả kim.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 0.6666666666666666
+   },
+   {
+    "slug": "ong-gia-va-bien-ca",
+    "scene_id": 3,
+    "section": "context",
+    "narration_vi": "Tác phẩm này lấy bối cảnh chính tại vùng biển Cuba.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 1.0
+   },
+   {
+    "slug": "sapiens",
     "scene_id": 5,
     "section": "body",
-    "narration_vi": "Trên đường đi, cậu phải vượt qua muôn vàn thử thách từ việc bị lừa tiền ở Tangier cho đến việc làm việc cho một người bán pha lê.",
-    "manual": 0.67,
-    "note": "Tangier và người bán pha lê đúng; 'muôn vàn thử thách' là thêm thắt.",
+    "narration_vi": "Cách mạng Khoa học khoảng năm trăm năm trước mở ra thời kỳ tiến bộ nhanh chóng.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
     "vi": 1.0,
     "ragas": 1.0
    },
    {
-    "slug": "nha-gia-kim",
-    "scene_id": 7,
-    "section": "body",
-    "narration_vi": "Cuốn sách gửi gắm thông điệp sâu sắc về khái niệm huyền thoại cá nhân, chính là sứ mệnh riêng mà mỗi người sinh ra đều cần phải theo đuổi.",
+    "slug": "so-do",
+    "scene_id": 2,
+    "section": "context",
+    "narration_vi": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng xuất bản từ năm 1936.",
+    "manual": 0.67,
+    "note": "Câu \"xuất bản từ năm 1936\" nới rộng: nguồn nói đăng báo từ 1936, in sách năm 1938.",
+    "vi": 0.5,
+    "ragas": 0.5
+   },
+   {
+    "slug": "sung-vi-trung-va-thep",
+    "scene_id": 2,
+    "section": "context",
+    "narration_vi": "Cuốn sách Súng, vi trùng và thép của Jared Diamond, xuất bản năm 1997, xuất phát từ câu hỏi của một chính trị gia.",
     "manual": 1.0,
-    "note": "Huyền thoại cá nhân là sứ mệnh riêng mỗi người cần theo đuổi: khớp nguồn.",
-    "vi": 0.6666666666666666,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 1.0
+   },
+   {
+    "slug": "tam-ly-hoc-dam-dong",
+    "scene_id": 6,
+    "section": "body",
+    "narration_vi": "Đám đông suy nghĩ bằng hình ảnh và bị dẫn dắt bởi người lãnh đạo biết lặp lại.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 1.0
+   },
+   {
+    "slug": "tat-den",
+    "scene_id": 3,
+    "section": "body",
+    "narration_vi": "Nhà chị thiếu suất sưu của chồng nên anh Dậu đang ốm vẫn bị cai lệ và người nhà lý trưởng đến trói đánh.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 1.0
+   },
+   {
+    "slug": "tram-nam-co-don",
+    "scene_id": 4,
+    "section": "body",
+    "narration_vi": "Truyện kể lịch sử bảy thế hệ của dòng họ Buendía ở thị trấn hư cấu Macondo do José Arcadio Buendía sáng lập.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
+    "ragas": 1.0
+   },
+   {
+    "slug": "tu-duy-nhanh-va-cham",
+    "scene_id": 5,
+    "section": "body",
+    "narration_vi": "Tâm lý ngại mất mát khiến người ta sợ thua lỗ hơn là thích lợi nhuận.",
+    "manual": 1.0,
+    "note": "Mọi khẳng định có trong nguồn.",
+    "vi": 1.0,
     "ragas": 1.0
    }
   ]
  },
  "judge_cost": {
-  "usd": 0.0116245,
-  "input_tokens": 11240.0,
-  "output_tokens": 3301.0
+  "usd": 0.0,
+  "input_tokens": 0.0,
+  "output_tokens": 0.0
  },
  "books": [
   {
@@ -165,15 +266,15 @@
    "title": "1984",
    "kind": "fiction",
    "storyboard_cost": {
-    "usd": 0.0061476000000000005,
-    "input_tokens": 4567.0,
-    "output_tokens": 1911.0
+    "usd": 0.005937,
+    "input_tokens": 5940.0,
+    "output_tokens": 1662.0
    },
    "sections": {
     "hook": {
      "n": 1,
-     "vi": 1.0,
-     "ragas": 1.0
+     "vi": 0.5,
+     "ragas": 0.0
     },
     "context": {
      "n": 1,
@@ -183,19 +284,19 @@
     "body": {
      "n": 2,
      "vi": 1.0,
-     "ragas": 0.8333
+     "ragas": 1.0
     },
     "review_cta": {
      "n": 2,
-     "vi": 1.0,
+     "vi": 0.8333,
      "ragas": 0.75
     },
     "context_body": {
      "n": 3,
      "vi": 1.0,
-     "ragas": 0.8889,
+     "ragas": 1.0,
      "vi_final": 1.0,
-     "ragas_final": 0.8889,
+     "ragas_final": 1.0,
      "rewritten": 0,
      "low_faithfulness": 0
     }
@@ -204,27 +305,27 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Điều gì xảy ra khi ngay cả suy nghĩ trong đầu bạn cũng bị định tội và kiểm soát tuyệt đối?",
+     "narration_vi": "Liệu bạn có thể giấu được suy nghĩ của mình khi nhà nước kiểm soát từng góc khuất?",
      "chunk_ids": [],
-     "vi": 1.0,
+     "vi": 0.5,
      "vi_claims": [
       {
-       "claim": "Tiểu thuyết 1984 mô tả một xã hội nơi nhà nước kiểm soát suy nghĩ của công dân.",
+       "claim": "Nhà nước trong tiểu thuyết 1984 kiểm soát từng góc khuất của công dân.",
        "supported": true,
-       "reason": "Nguồn [1] nêu nhà nước giám sát cả suy nghĩ của công dân."
+       "reason": "Nguồn [1] nêu nhà nước giám sát mọi hành vi và cả suy nghĩ của công dân."
       },
       {
-       "claim": "Tiểu thuyết 1984 mô tả một xã hội nơi suy nghĩ của công dân bị định tội.",
-       "supported": true,
-       "reason": "Nguồn [2] nhắc đến Cảnh sát Tư tưởng bắt giữ nhân vật vì tư tưởng chống đối."
+       "claim": "Công dân trong tiểu thuyết 1984 có thể giấu được suy nghĩ của mình.",
+       "supported": false,
+       "reason": "Nguồn [1] khẳng định nhà nước giám sát cả suy nghĩ của công dân nên không thể giấu."
       }
      ],
-     "ragas": 1.0
+     "ragas": 0.0
     },
     {
      "id": 2,
      "section": "context",
-     "narration_vi": "Cuốn tiểu thuyết phản địa đàng 1984 của George Orwell ra mắt vào năm 1949.",
+     "narration_vi": "Cuốn tiểu thuyết phản địa đàng 1984 của nhà văn người Anh George Orwell được xuất bản năm 1949.",
      "chunk_ids": [
       "1984/01-tong-quan.txt:0"
      ],
@@ -236,12 +337,12 @@
        "reason": "Nguồn [1] xác nhận 1984 là tiểu thuyết phản địa đàng."
       },
       {
-       "claim": "Cuốn tiểu thuyết 1984 được viết bởi George Orwell.",
+       "claim": "Nhà văn George Orwell là người Anh.",
        "supported": true,
-       "reason": "Nguồn [1] ghi 1984 là tiểu thuyết của nhà văn George Orwell."
+       "reason": "Nguồn [1] ghi George Orwell là nhà văn người Anh."
       },
       {
-       "claim": "Cuốn tiểu thuyết 1984 ra mắt vào năm 1949.",
+       "claim": "Cuốn tiểu thuyết 1984 được xuất bản năm 1949.",
        "supported": true,
        "reason": "Nguồn [1] ghi 1984 xuất bản năm 1949."
       }
@@ -255,45 +356,40 @@
     {
      "id": 3,
      "section": "body",
-     "narration_vi": "Nhân vật chính là Winston Smith, một nhân viên của Bộ Chân lý làm nhiệm vụ sửa lại các tài liệu lịch sử.",
+     "narration_vi": "Tại Bộ Chân lý, Winston Smith làm công việc sửa lại các tài liệu lịch sử cho khớp với đường lối của Đảng.",
      "chunk_ids": [
       "1984/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Nhân vật chính của cuốn sách là Winston Smith.",
+       "claim": "Winston Smith làm việc tại Bộ Chân lý.",
        "supported": true,
-       "reason": "Nguồn ghi nhân vật chính là Winston Smith."
+       "reason": "Nguồn ghi Winston Smith là nhân viên của Bộ Chân lý."
       },
       {
-       "claim": "Winston Smith là một nhân viên của Bộ Chân lý.",
+       "claim": "Winston Smith làm công việc sửa lại các tài liệu lịch sử cho khớp với đường lối của Đảng.",
        "supported": true,
-       "reason": "Nguồn ghi Winston Smith là một nhân viên của Bộ Chân lý."
-      },
-      {
-       "claim": "Winston Smith làm nhiệm vụ sửa lại các tài liệu lịch sử.",
-       "supported": true,
-       "reason": "Nguồn ghi Winston Smith có nhiệm vụ sửa lại các tài liệu lịch sử."
+       "reason": "Nguồn ghi Winston Smith có nhiệm vụ sửa lại các tài liệu lịch sử cho khớp với đường lối của Đảng."
       }
      ],
-     "ragas": 0.6666666666666666,
+     "ragas": 1.0,
      "rounds": 0,
      "vi_final": 1.0,
      "flags": [],
-     "ragas_final": 0.6666666666666666
+     "ragas_final": 1.0
     },
     {
      "id": 4,
      "section": "body",
-     "narration_vi": "Winston thầm chán ghét chế độ, viết nhật ký bí mật và bắt đầu yêu Julia, một đồng nghiệp.",
+     "narration_vi": "Anh nuôi dưỡng sự chán ghét chế độ trong thâm tâm, viết nhật ký bí mật và có tình cảm với Julia, một người đồng nghiệp.",
      "chunk_ids": [
       "1984/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Winston Smith thầm chán ghét chế độ.",
+       "claim": "Winston Smith nuôi dưỡng sự chán ghét chế độ trong thâm tâm.",
        "supported": true,
        "reason": "Nguồn ghi Winston thầm chán ghét chế độ."
       },
@@ -303,7 +399,7 @@
        "reason": "Nguồn ghi Winston viết nhật ký bí mật."
       },
       {
-       "claim": "Winston Smith bắt đầu yêu Julia.",
+       "claim": "Winston Smith có tình cảm với Julia.",
        "supported": true,
        "reason": "Nguồn ghi Winston yêu Julia."
       },
@@ -322,22 +418,7 @@
     {
      "id": 5,
      "section": "review_cta",
-     "narration_vi": "Liệu có thế giới nào mà ngay cả suy nghĩ của bạn cũng bị giám sát chặt chẽ?",
-     "chunk_ids": [],
-     "vi": 1.0,
-     "vi_claims": [
-      {
-       "claim": "Trong tiểu thuyết 1984, nhà nước giám sát suy nghĩ của công dân.",
-       "supported": true,
-       "reason": "Nguồn [1] nêu rõ nhà nước giám sát mọi hành vi và cả suy nghĩ của công dân."
-      }
-     ],
-     "ragas": 0.5
-    },
-    {
-     "id": 6,
-     "section": "review_cta",
-     "narration_vi": "Cuốn tiểu thuyết phản địa đàng 1984 của George Orwell xuất bản năm 1949 mở ra một xã hội toàn trị nơi nhà nước kiểm soát mọi thứ.",
+     "narration_vi": "Tiểu thuyết phản địa đàng 1984 của George Orwell xuất bản năm 1949 mô tả một xã hội toàn trị kiểm soát mọi suy nghĩ.",
      "chunk_ids": [
       "1984/01-tong-quan.txt:0",
       "1984/01-tong-quan.txt:0"
@@ -345,61 +426,94 @@
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn tiểu thuyết 1984 là tiểu thuyết phản địa đàng của George Orwell.",
+       "claim": "Tiểu thuyết 1984 là tiểu thuyết phản địa đàng của George Orwell.",
        "supported": true,
        "reason": "Nguồn [1] xác nhận 1984 là tiểu thuyết phản địa đàng của George Orwell."
       },
       {
-       "claim": "Cuốn tiểu thuyết 1984 được xuất bản năm 1949.",
+       "claim": "Tiểu thuyết 1984 được xuất bản năm 1949.",
        "supported": true,
        "reason": "Nguồn [1] ghi rõ tác phẩm xuất bản năm 1949."
       },
       {
-       "claim": "Cuốn tiểu thuyết 1984 mô tả một xã hội toàn trị nơi nhà nước kiểm soát mọi thứ.",
+       "claim": "Tiểu thuyết 1984 mô tả một xã hội toàn trị.",
        "supported": true,
-       "reason": "Nguồn [1] mô tả xã hội toàn trị nơi nhà nước giám sát mọi hành vi và suy nghĩ."
+       "reason": "Nguồn [1] nêu tác phẩm mô tả một xã hội toàn trị."
+      },
+      {
+       "claim": "Xã hội toàn trị trong tiểu thuyết 1984 kiểm soát mọi suy nghĩ của công dân.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi nhà nước giám sát mọi hành vi và cả suy nghĩ của công dân."
       }
      ],
      "ragas": 1.0
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Nhân vật chính Winston Smith làm việc tại Bộ Chân lý và thầm chán ghét chế độ cùng Julia.",
+     "chunk_ids": [
+      "1984/02-noi-dung.txt:0",
+      "1984/02-noi-dung.txt:0"
+     ],
+     "vi": 0.6666666666666666,
+     "vi_claims": [
+      {
+       "claim": "Nhân vật chính Winston Smith làm việc tại Bộ Chân lý.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Winston Smith là nhân viên của Bộ Chân lý."
+      },
+      {
+       "claim": "Nhân vật chính Winston Smith thầm chán ghét chế độ.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi Winston Smith thầm chán ghét chế độ."
+      },
+      {
+       "claim": "Julia thầm chán ghét chế độ.",
+       "supported": false,
+       "reason": "Nguồn [2] chỉ nói Winston Smith chán ghét chế độ, không đề cập đến thái độ của Julia."
+      }
+     ],
+     "ragas": 0.5
     }
    ]
   },
   {
-   "slug": "atomic-habits",
-   "title": "Atomic Habits",
+   "slug": "7-thoi-quen",
+   "title": "7 thói quen của người thành đạt",
    "kind": "non_fiction",
    "storyboard_cost": {
-    "usd": 0.0065038000000000006,
-    "input_tokens": 4471.0,
-    "output_tokens": 2065.0
+    "usd": 0.0093455,
+    "input_tokens": 7210.0,
+    "output_tokens": 2873.0
    },
    "sections": {
     "hook": {
      "n": 1,
      "vi": 1.0,
-     "ragas": 0.0
+     "ragas": 1.0
     },
     "context": {
-     "n": 2,
+     "n": 1,
      "vi": 1.0,
      "ragas": 1.0
     },
     "body": {
-     "n": 3,
+     "n": 4,
      "vi": 1.0,
-     "ragas": 1.0
+     "ragas": 0.8333
     },
     "review_cta": {
      "n": 2,
-     "vi": 0.75,
-     "ragas": 0.5
+     "vi": 1.0,
+     "ragas": 1.0
     },
     "context_body": {
      "n": 5,
      "vi": 1.0,
-     "ragas": 1.0,
+     "ragas": 0.8667,
      "vi_final": 1.0,
-     "ragas_final": 1.0,
+     "ragas_final": 0.8667,
      "rewritten": 0,
      "low_faithfulness": 0
     }
@@ -408,36 +522,41 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Bạn có bao giờ tự hỏi vì sao những thay đổi nhỏ lại có thể tạo ra cú hích khổng lồ trong cuộc sống?",
+     "narration_vi": "Thành công bền vững thực chất đến từ đâu hay chỉ là những mẹo vặt bề ngoài?",
      "chunk_ids": [],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Những thay đổi nhỏ có thể tạo ra cú hích khổng lồ trong cuộc sống.",
+       "claim": "Thành công bền vững đến từ việc rèn luyện tính cách.",
        "supported": true,
-       "reason": "Nguồn [1] khẳng định những thay đổi rất nhỏ có thể tạo ra kết quả lớn khi tích lũy theo thời gian."
+       "reason": "Nguồn [1] khẳng định thành công bền vững đến từ việc rèn luyện tính cách."
+      },
+      {
+       "claim": "Thành công bền vững không đến từ kỹ thuật hay mẹo vặt.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu thành công bền vững không chỉ đến từ kỹ thuật hay mẹo vặt."
       }
      ],
-     "ragas": 0.0
+     "ragas": 1.0
     },
     {
      "id": 2,
      "section": "context",
-     "narration_vi": "Atomic Habits là cuốn sách xuất bản năm 2018 của tác giả James Clear.",
+     "narration_vi": "Sách 7 thói quen của người thành đạt là sách phát triển bản thân của Stephen R. Covey, xuất bản năm 1989.",
      "chunk_ids": [
-      "atomic-habits/01-tong-quan.txt:0"
+      "7-thoi-quen/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Atomic Habits là cuốn sách xuất bản năm 2018.",
+       "claim": "Sách 7 thói quen của người thành đạt là sách phát triển bản thân của Stephen R. Covey.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận Atomic Habits xuất bản năm 2018."
+       "reason": "Nguồn [1] xác nhận 7 thói quen của người thành đạt là sách phát triển bản thân của Stephen R. Covey."
       },
       {
-       "claim": "Atomic Habits là cuốn sách của tác giả James Clear.",
+       "claim": "Sách 7 thói quen của người thành đạt được xuất bản năm 1989.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận James Clear là tác giả của cuốn sách Atomic Habits."
+       "reason": "Nguồn [1] ghi rõ sách xuất bản năm 1989."
       }
      ],
      "ragas": 1.0,
@@ -448,17 +567,27 @@
     },
     {
      "id": 3,
-     "section": "context",
-     "narration_vi": "Cuốn sách tập trung vào những thay đổi rất nhỏ có thể tạo ra kết quả lớn khi tích lũy theo thời gian.",
+     "section": "body",
+     "narration_vi": "Bảy thói quen gồm: hãy chủ động; bắt đầu với mục đích cuối cùng trong tâm trí; và ưu tiên việc quan trọng trước.",
      "chunk_ids": [
-      "atomic-habits/01-tong-quan.txt:0"
+      "7-thoi-quen/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Atomic Habits tập trung vào những thay đổi rất nhỏ có thể tạo ra kết quả lớn khi tích lũy theo thời gian.",
+       "claim": "Bảy thói quen gồm thói quen hãy chủ động.",
        "supported": true,
-       "reason": "Nguồn khẳng định những thay đổi rất nhỏ có thể tạo ra kết quả lớn khi tích lũy theo thời gian."
+       "reason": "Nguồn liệt kê hãy chủ động là một trong bảy thói quen."
+      },
+      {
+       "claim": "Bảy thói quen gồm thói quen bắt đầu với mục đích cuối cùng trong tâm trí.",
+       "supported": true,
+       "reason": "Nguồn liệt kê bắt đầu với mục đích cuối cùng trong tâm trí là một trong bảy thói quen."
+      },
+      {
+       "claim": "Bảy thói quen gồm thói quen ưu tiên việc quan trọng trước.",
+       "supported": true,
+       "reason": "Nguồn liệt kê ưu tiên việc quan trọng trước là một trong bảy thói quen."
       }
      ],
      "ragas": 1.0,
@@ -470,16 +599,47 @@
     {
      "id": 4,
      "section": "body",
-     "narration_vi": "Cải thiện chỉ một phần trăm mỗi ngày sẽ cộng dồn thành khác biệt rất lớn sau một năm.",
+     "narration_vi": "Tiếp theo là tư duy đôi bên cùng thắng; hiểu người trước rồi mới được người hiểu; và tạo sự hợp lực.",
      "chunk_ids": [
-      "atomic-habits/02-noi-dung.txt:0"
+      "7-thoi-quen/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cải thiện một phần trăm mỗi ngày sẽ cộng dồn thành khác biệt rất lớn sau một năm.",
+       "claim": "Tư duy đôi bên cùng thắng là một trong bảy thói quen của cuốn sách Bảy thói quen.",
        "supported": true,
-       "reason": "Nguồn [1] ghi rõ cải thiện một phần trăm mỗi ngày sẽ cộng dồn thành khác biệt rất lớn sau một năm."
+       "reason": "Nguồn liệt kê tư duy đôi bên cùng thắng nằm trong danh sách bảy thói quen."
+      },
+      {
+       "claim": "Hiểu người trước rồi mới được người hiểu là một trong bảy thói quen của cuốn sách Bảy thói quen.",
+       "supported": true,
+       "reason": "Nguồn liệt kê hiểu người trước rồi mới được người hiểu nằm trong danh sách bảy thói quen."
+      },
+      {
+       "claim": "Tạo sự hợp lực là một trong bảy thói quen của cuốn sách Bảy thói quen.",
+       "supported": true,
+       "reason": "Nguồn liệt kê tạo sự hợp lực nằm trong danh sách bảy thói quen."
+      }
+     ],
+     "ragas": 0.3333333333333333,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 0.3333333333333333
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Thói quen thứ bảy là mài giũa lưỡi cưa.",
+     "chunk_ids": [
+      "7-thoi-quen/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Thói quen thứ bảy trong cuốn sách Bảy thói quen là mài giũa lưỡi cưa.",
+       "supported": true,
+       "reason": "Nguồn liệt kê thói quen thứ bảy là mài giũa lưỡi cưa."
       }
      ],
      "ragas": 1.0,
@@ -489,7 +649,167 @@
      "ragas_final": 1.0
     },
     {
-     "id": 5,
+     "id": 6,
+     "section": "body",
+     "narration_vi": "Ba thói quen đầu giúp con người đi từ phụ thuộc đến độc lập.",
+     "chunk_ids": [
+      "7-thoi-quen/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Ba thói quen đầu của cuốn Bảy thói quen giúp con người đi từ phụ thuộc đến độc lập.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ: Ba thói quen đầu giúp con người đi từ phụ thuộc đến độc lập."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Đây là cuốn sách phát triển bản thân của Stephen R Covey giúp người đọc tìm hiểu về bảy thói quen.",
+     "chunk_ids": [
+      "7-thoi-quen/01-tong-quan.txt:0",
+      "7-thoi-quen/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "7 thói quen của người thành đạt là cuốn sách phát triển bản thân của Stephen R. Covey.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận 7 thói quen của người thành đạt là sách phát triển bản thân của Stephen R. Covey."
+      },
+      {
+       "claim": "Cuốn sách 7 thói quen của người thành đạt giúp người đọc tìm hiểu về bảy thói quen.",
+       "supported": true,
+       "reason": "Nguồn [2] liệt kê bảy thói quen cụ thể được trình bày trong cuốn sách."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 8,
+     "section": "review_cta",
+     "narration_vi": "Sách nói về những thói quen giúp con người đi từ phụ thuộc đến độc lập và phụ thuộc lẫn nhau.",
+     "chunk_ids": [
+      "7-thoi-quen/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách 7 thói quen của người thành đạt nói về những thói quen giúp con người đi từ phụ thuộc đến độc lập.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu ba thói quen đầu giúp con người đi từ phụ thuộc đến độc lập."
+      },
+      {
+       "claim": "Cuốn sách 7 thói quen của người thành đạt nói về những thói quen giúp con người đi từ độc lập đến phụ thuộc lẫn nhau.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu ba thói quen tiếp theo đưa con người từ độc lập đến phụ thuộc lẫn nhau."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "atomic-habits",
+   "title": "Atomic Habits",
+   "kind": "non_fiction",
+   "storyboard_cost": {
+    "usd": 0.0071836,
+    "input_tokens": 5862.0,
+    "output_tokens": 2170.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "context": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 3,
+     "vi": 1.0,
+     "ragas": 0.7778
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.5
+    },
+    "context_body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 0.8333,
+     "vi_final": 1.0,
+     "ragas_final": 0.8333,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Liệu những thay đổi rất nhỏ có thực sự tạo ra kết quả lớn theo thời gian?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Những thay đổi rất nhỏ có thể tạo ra kết quả lớn khi tích lũy theo thời gian.",
+       "supported": true,
+       "reason": "Nguồn [1] khẳng định những thay đổi rất nhỏ có thể tạo ra kết quả lớn khi tích lũy theo thời gian."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Atomic Habits là cuốn sách về xây dựng thói quen của tác giả người Mỹ James Clear, xuất bản năm 2018.",
+     "chunk_ids": [
+      "atomic-habits/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Atomic Habits là cuốn sách về xây dựng thói quen.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Atomic Habits là cuốn sách về xây dựng thói quen."
+      },
+      {
+       "claim": "Tác giả của cuốn sách Atomic Habits là James Clear.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu rõ tác giả là James Clear."
+      },
+      {
+       "claim": "James Clear là tác giả người Mỹ.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ tác giả là người Mỹ."
+      },
+      {
+       "claim": "Cuốn sách Atomic Habits xuất bản năm 2018.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận sách xuất bản năm 2018."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 3,
      "section": "body",
      "narration_vi": "Tác giả đề xuất bốn quy luật để tạo thói quen tốt là làm cho nó rõ ràng, hấp dẫn, dễ dàng và thỏa mãn.",
      "chunk_ids": [
@@ -525,28 +845,18 @@
      "ragas_final": 1.0
     },
     {
-     "id": 6,
+     "id": 4,
      "section": "body",
-     "narration_vi": "Bạn cần tập trung vào bản sắc, nghĩa là trở thành kiểu người mình muốn thay vì chỉ đặt mục tiêu kết quả.",
+     "narration_vi": "Đối với thói quen xấu, người ta có thể đảo ngược bốn quy luật này.",
      "chunk_ids": [
       "atomic-habits/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Người đọc cần tập trung vào bản sắc.",
+       "claim": "Đối với thói quen xấu, người ta có thể đảo ngược bốn quy luật tạo thói quen tốt.",
        "supported": true,
-       "reason": "Nguồn ghi sách nhấn mạnh việc tập trung vào bản sắc."
-      },
-      {
-       "claim": "Tập trung vào bản sắc nghĩa là trở thành kiểu người mình muốn.",
-       "supported": true,
-       "reason": "Nguồn ghi bản sắc tức trở thành kiểu người mình muốn."
-      },
-      {
-       "claim": "Tập trung vào bản sắc thay vì chỉ đặt mục tiêu kết quả.",
-       "supported": true,
-       "reason": "Nguồn ghi tập trung vào bản sắc thay vì chỉ đặt mục tiêu kết quả."
+       "reason": "Nguồn ghi rõ: Với thói quen xấu thì đảo ngược bốn quy luật này."
       }
      ],
      "ragas": 1.0,
@@ -556,14 +866,35 @@
      "ragas_final": 1.0
     },
     {
-     "id": 7,
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Cuốn sách cũng nhấn mạnh việc tập trung vào bản sắc để trở thành kiểu người mình muốn thay vì chỉ đặt mục tiêu kết quả.",
+     "chunk_ids": [
+      "atomic-habits/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách Atomic Habits nhấn mạnh việc tập trung vào bản sắc để trở thành kiểu người mình muốn thay vì chỉ đặt mục tiêu kết quả.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu rõ sách nhấn mạnh việc tập trung vào bản sắc, tức trở thành kiểu người mình muốn, thay vì chỉ đặt mục tiêu kết quả."
+      }
+     ],
+     "ragas": 0.3333333333333333,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 0.3333333333333333
+    },
+    {
+     "id": 6,
      "section": "review_cta",
-     "narration_vi": "Bạn có bao giờ tự hỏi vì sao những thay đổi nhỏ bé lại có thể tạo nên bước ngoặt khổng lồ trong cuộc sống?",
+     "narration_vi": "Làm thế nào những thay đổi nhỏ bé lại có thể tạo ra kết quả lớn theo thời gian?",
      "chunk_ids": [],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Những thay đổi nhỏ bé có thể tạo nên bước ngoặt khổng lồ trong cuộc sống.",
+       "claim": "Những thay đổi nhỏ bé có thể tạo ra kết quả lớn theo thời gian.",
        "supported": true,
        "reason": "Nguồn [1] khẳng định những thay đổi rất nhỏ có thể tạo ra kết quả lớn khi tích lũy theo thời gian."
       }
@@ -571,23 +902,33 @@
      "ragas": 0.0
     },
     {
-     "id": 8,
+     "id": 7,
      "section": "review_cta",
-     "narration_vi": "Cuốn sách Atomic Habits của tác giả người Mỹ James Clear xuất bản năm 2018 mang đến góc nhìn mới về việc tích lũy năng lượng từ những điều nhỏ nhất.",
+     "narration_vi": "Atomic Habits là cuốn sách về xây dựng thói quen của tác giả người Mỹ James Clear, xuất bản năm 2018.",
      "chunk_ids": [
       "atomic-habits/01-tong-quan.txt:0"
      ],
-     "vi": 0.5,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Atomic Habits của tác giả người Mỹ James Clear xuất bản năm 2018.",
+       "claim": "Atomic Habits là cuốn sách về xây dựng thói quen.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận Atomic Habits là sách của James Clear, người Mỹ, xuất bản năm 2018."
+       "reason": "Nguồn [1] xác nhận Atomic Habits là cuốn sách về xây dựng thói quen."
       },
       {
-       "claim": "Cuốn sách Atomic Habits mang đến góc nhìn mới về việc tích lũy năng lượng từ những điều nhỏ nhất.",
-       "supported": false,
-       "reason": "Nguồn [1] nói về việc tích lũy thay đổi nhỏ tạo kết quả lớn, không đề cập đến việc tích lũy năng lượng."
+       "claim": "Tác giả của cuốn sách Atomic Habits là James Clear.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu tác giả là James Clear."
+      },
+      {
+       "claim": "James Clear là người Mỹ.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ tác giả là người Mỹ."
+      },
+      {
+       "claim": "Cuốn sách Atomic Habits xuất bản năm 2018.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi cuốn sách xuất bản năm 2018."
       }
      ],
      "ragas": 1.0
@@ -599,15 +940,225 @@
    "title": "Cha giàu cha nghèo",
    "kind": "non_fiction",
    "storyboard_cost": {
-    "usd": 0.0066211,
-    "input_tokens": 4562.0,
-    "output_tokens": 2101.0
+    "usd": 0.0070206,
+    "input_tokens": 5927.0,
+    "output_tokens": 2097.0
    },
    "sections": {
     "hook": {
      "n": 1,
-     "vi": 0.0,
+     "vi": 0.5,
+     "ragas": 0.3333
+    },
+    "context": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.75
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.5
+    },
+    "context_body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 0.875,
+     "vi_final": 1.0,
+     "ragas_final": 0.875,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Vì sao hai người cha cùng dạy con về tiền bạc lại có hai quan điểm trái ngược nhau?",
+     "chunk_ids": [],
+     "vi": 0.5,
+     "vi_claims": [
+      {
+       "claim": "Hai người cha trong cuốn sách Cha giàu cha nghèo cùng dạy con về tiền bạc.",
+       "supported": false,
+       "reason": "Nguồn chỉ nói về hai người cha có quan điểm trái ngược, không xác nhận cả hai đều dạy con về tiền bạc."
+      },
+      {
+       "claim": "Hai người cha trong cuốn sách Cha giàu cha nghèo có hai quan điểm trái ngược nhau về tiền bạc.",
+       "supported": true,
+       "reason": "Nguồn [1] khẳng định sách kể về hai người cha có quan điểm trái ngược về tiền bạc."
+      }
+     ],
+     "ragas": 0.3333333333333333
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Cha giàu cha nghèo của tác giả Robert Kiyosaki được xuất bản năm 1997.",
+     "chunk_ids": [
+      "cha-giau-cha-ngheo/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách Cha giàu cha nghèo được viết bởi tác giả Robert Kiyosaki.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Cha giàu cha nghèo là sách của tác giả Robert Kiyosaki."
+      },
+      {
+       "claim": "Cuốn sách Cha giàu cha nghèo được xuất bản năm 1997.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản năm 1997."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 3,
+     "section": "context",
+     "narration_vi": "Cuốn sách kể về hai người cha có quan điểm trái ngược về tiền bạc.",
+     "chunk_ids": [
+      "cha-giau-cha-ngheo/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách Cha giàu cha nghèo kể về hai người cha có quan điểm trái ngược về tiền bạc.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách kể về hai người cha có quan điểm trái ngược về tiền bạc."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Tác giả có hai người cha với hoàn cảnh trái ngược, một người luôn chật vật về tiền còn người kia kinh doanh thành công.",
+     "chunk_ids": [
+      "cha-giau-cha-ngheo/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tác giả Robert Kiyosaki có hai người cha.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu rõ Kiyosaki kể rằng ông có hai người cha."
+      },
+      {
+       "claim": "Người cha ruột của Robert Kiyosaki luôn chật vật về tiền.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận cha ruột của ông luôn chật vật về tiền."
+      },
+      {
+       "claim": "Người cha của bạn thân Robert Kiyosaki là người kinh doanh thành công.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận cha của người bạn thân là người kinh doanh thành công."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Người giàu mua tài sản là thứ bỏ tiền vào túi bạn, trong khi người nghèo và người trung lưu mua nợ là thứ lấy tiền ra khỏi túi.",
+     "chunk_ids": [
+      "cha-giau-cha-ngheo/02-noi-dung.txt:0",
+      "cha-giau-cha-ngheo/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Người giàu mua tài sản là thứ bỏ tiền vào túi bạn.",
+       "supported": true,
+       "reason": "Nguồn ghi người giàu mua tài sản và định nghĩa tài sản là thứ bỏ tiền vào túi bạn."
+      },
+      {
+       "claim": "Người nghèo và người trung lưu mua nợ là thứ lấy tiền ra khỏi túi bạn.",
+       "supported": true,
+       "reason": "Nguồn ghi người nghèo và người trung lưu mua những thứ là nợ và định nghĩa nợ là thứ lấy tiền ra khỏi túi bạn."
+      }
+     ],
+     "ragas": 0.5,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 0.5
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Bạn chọn mua tài sản bỏ tiền vào túi hay mua những thứ thực ra là nợ?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Người đọc chọn mua tài sản bỏ tiền vào túi hoặc mua những thứ thực ra là nợ.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu rõ người giàu mua tài sản, người nghèo và trung lưu mua nợ, và định nghĩa tài sản là thứ bỏ tiền vào túi."
+      }
+     ],
      "ragas": 0.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Cuốn sách tài chính cá nhân Cha giàu cha nghèo do tác giả người Mỹ Robert Kiyosaki viết và xuất bản năm 1997.",
+     "chunk_ids": [
+      "cha-giau-cha-ngheo/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách Cha giàu cha nghèo là sách về tài chính cá nhân.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Cha giàu cha nghèo là cuốn sách về tài chính cá nhân."
+      },
+      {
+       "claim": "Tác giả Robert Kiyosaki là người Mỹ.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ tác giả người Mỹ Robert Kiyosaki."
+      },
+      {
+       "claim": "Cuốn sách Cha giàu cha nghèo được xuất bản năm 1997.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ xuất bản năm 1997."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "chi-pheo",
+   "title": "Chí Phèo",
+   "kind": "fiction",
+   "storyboard_cost": {
+    "usd": 0.0087888,
+    "input_tokens": 5821.0,
+    "output_tokens": 2817.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 0.5
     },
     "context": {
      "n": 2,
@@ -621,8 +1172,8 @@
     },
     "review_cta": {
      "n": 2,
-     "vi": 0.3333,
-     "ragas": 0.3333
+     "vi": 1.0,
+     "ragas": 0.75
     },
     "context_body": {
      "n": 5,
@@ -638,36 +1189,46 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Bạn có bao giờ tự hỏi vì sao mình mãi làm việc vất vả nhưng tiền vẫn không ở lại trong ví?",
+     "narration_vi": "Bát cháo hành có sức mạnh gì khiến kẻ say triền miên bất ngờ khao khát làm người lương thiện?",
      "chunk_ids": [],
-     "vi": 0.0,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Người đọc làm việc vất vả nhưng tiền không ở lại trong ví.",
-       "supported": false,
-       "reason": "Nguồn không đề cập đến tình trạng tài chính cá nhân của người đọc."
+       "claim": "Bát cháo hành của thị Nở khiến Chí Phèo khao khát làm người lương thiện.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu rõ khi được thị Nở cho bát cháo hành, Chí Phèo thức tỉnh khát vọng làm người lương thiện."
+      },
+      {
+       "claim": "Chí Phèo là kẻ say triền miên.",
+       "supported": true,
+       "reason": "Nguồn [2] mô tả Chí Phèo là kẻ say triền miên."
       }
      ],
-     "ragas": 0.0
+     "ragas": 0.5
     },
     {
      "id": 2,
      "section": "context",
-     "narration_vi": "Cuốn sách Cha giàu cha nghèo của Robert Kiyosaki được xuất bản năm 1997 là một tác phẩm nổi tiếng về tài chính cá nhân.",
+     "narration_vi": "Chí Phèo là truyện ngắn của nhà văn Nam Cao, in lần đầu năm 1941 với tên Đôi lứa xứng đôi.",
      "chunk_ids": [
-      "cha-giau-cha-ngheo/01-tong-quan.txt:0"
+      "chi-pheo/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Cha giàu cha nghèo của Robert Kiyosaki được xuất bản năm 1997.",
+       "claim": "Chí Phèo là truyện ngắn của nhà văn Nam Cao.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận Cha giàu cha nghèo của Robert Kiyosaki xuất bản năm 1997."
+       "reason": "Nguồn [1] xác nhận Chí Phèo là truyện ngắn của nhà văn Nam Cao."
       },
       {
-       "claim": "Cuốn sách Cha giàu cha nghèo là một tác phẩm nổi tiếng về tài chính cá nhân.",
+       "claim": "Truyện ngắn Chí Phèo được in lần đầu năm 1941.",
        "supported": true,
-       "reason": "Nguồn [1] nêu đây là cuốn sách về tài chính cá nhân và là một trong những cuốn sách bán chạy nhất."
+       "reason": "Nguồn [1] ghi rõ truyện in lần đầu năm 1941."
+      },
+      {
+       "claim": "Truyện ngắn Chí Phèo được in lần đầu với tên Đôi lứa xứng đôi.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ truyện in lần đầu năm 1941 với tên Đôi lứa xứng đôi."
       }
      ],
      "ragas": 1.0,
@@ -679,16 +1240,26 @@
     {
      "id": 3,
      "section": "context",
-     "narration_vi": "Tác phẩm khắc họa hai người cha có quan điểm hoàn toàn trái ngược nhau về tiền bạc.",
+     "narration_vi": "Truyện lấy bối cảnh làng Vũ Đại, nơi người nông dân bị đẩy đến đường cùng và tha hóa.",
      "chunk_ids": [
-      "cha-giau-cha-ngheo/01-tong-quan.txt:0"
+      "chi-pheo/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Tác phẩm Cha giàu cha nghèo khắc họa hai người cha có quan điểm hoàn toàn trái ngược nhau về tiền bạc.",
+       "claim": "Truyện Chí Phèo lấy bối cảnh làng Vũ Đại.",
        "supported": true,
-       "reason": "Nguồn ghi sách kể về hai người cha có quan điểm trái ngược về tiền bạc."
+       "reason": "Nguồn ghi rõ truyện lấy bối cảnh làng Vũ Đại."
+      },
+      {
+       "claim": "Làng Vũ Đại là nơi người nông dân bị đẩy đến đường cùng.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ làng Vũ Đại là nơi người nông dân bị đẩy đến đường cùng."
+      },
+      {
+       "claim": "Làng Vũ Đại là nơi người nông dân bị tha hóa.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ làng Vũ Đại là nơi người nông dân bị tha hóa cả nhân hình lẫn nhân tính."
       }
      ],
      "ragas": 1.0,
@@ -700,21 +1271,21 @@
     {
      "id": 4,
      "section": "body",
-     "narration_vi": "Tác giả có hai người cha với hai quan điểm hoàn toàn trái ngược về tiền bạc.",
+     "narration_vi": "Chí Phèo là đứa trẻ bị bỏ rơi ở một cái lò gạch cũ, được dân làng nhặt về nuôi.",
      "chunk_ids": [
-      "cha-giau-cha-ngheo/02-noi-dung.txt:0"
+      "chi-pheo/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Tác giả Robert Kiyosaki có hai người cha.",
+       "claim": "Chí Phèo là đứa trẻ bị bỏ rơi ở một cái lò gạch cũ.",
        "supported": true,
-       "reason": "Nguồn [1] nêu Kiyosaki kể rằng ông có hai người cha."
+       "reason": "Nguồn [1] ghi rõ Chí Phèo là đứa trẻ bị bỏ rơi ở một cái lò gạch cũ."
       },
       {
-       "claim": "Hai người cha của Robert Kiyosaki có hai quan điểm trái ngược về tiền bạc.",
+       "claim": "Chí Phèo được dân làng nhặt về nuôi.",
        "supported": true,
-       "reason": "Nguồn [1] mô tả một người cha chật vật về tiền và một người cha kinh doanh thành công, cùng sự khác biệt trong tư duy về tài sản và nợ."
+       "reason": "Nguồn [1] ghi rõ Chí Phèo được dân làng nhặt về nuôi."
       }
      ],
      "ragas": 1.0,
@@ -726,21 +1297,31 @@
     {
      "id": 5,
      "section": "body",
-     "narration_vi": "Người giàu mua tài sản còn người nghèo mua những thứ tưởng là tài sản nhưng thực chất là nợ.",
+     "narration_vi": "Lớn lên, anh làm canh điền cho nhà Bá Kiến rồi bị đẩy vào tù, ra tù thì trở thành kẻ rạch mặt ăn vạ, say triền miên.",
      "chunk_ids": [
-      "cha-giau-cha-ngheo/02-noi-dung.txt:0"
+      "chi-pheo/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Người giàu mua tài sản.",
+       "claim": "Chí Phèo làm canh điền cho nhà Bá Kiến.",
        "supported": true,
-       "reason": "Nguồn ghi người giàu mua tài sản."
+       "reason": "Nguồn ghi Chí Phèo làm canh điền cho nhà Bá Kiến."
       },
       {
-       "claim": "Người nghèo mua những thứ tưởng là tài sản nhưng thực chất là nợ.",
+       "claim": "Chí Phèo bị đẩy vào tù.",
        "supported": true,
-       "reason": "Nguồn ghi người nghèo mua những thứ họ tưởng là tài sản nhưng thực ra là nợ."
+       "reason": "Nguồn ghi Chí Phèo bị đẩy vào tù."
+      },
+      {
+       "claim": "Sau khi ra tù, Chí Phèo trở thành kẻ rạch mặt ăn vạ.",
+       "supported": true,
+       "reason": "Nguồn ghi ra tù thì trở thành kẻ rạch mặt ăn vạ."
+      },
+      {
+       "claim": "Chí Phèo say triền miên.",
+       "supported": true,
+       "reason": "Nguồn ghi Chí Phèo say triền miên."
       }
      ],
      "ragas": 1.0,
@@ -752,21 +1333,26 @@
     {
      "id": 6,
      "section": "body",
-     "narration_vi": "Tài sản đơn giản là thứ bỏ tiền vào túi bạn còn nợ là thứ lấy tiền ra khỏi túi.",
+     "narration_vi": "Gặp thị Nở và được bà cho bát cháo hành, Chí Phèo thức tỉnh khát vọng làm người lương thiện.",
      "chunk_ids": [
-      "cha-giau-cha-ngheo/02-noi-dung.txt:0"
+      "chi-pheo/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Tài sản là thứ bỏ tiền vào túi bạn.",
+       "claim": "Chí Phèo gặp thị Nở.",
        "supported": true,
-       "reason": "Nguồn định nghĩa tài sản là thứ bỏ tiền vào túi bạn."
+       "reason": "Nguồn ghi 'Gặp thị Nở'."
       },
       {
-       "claim": "Nợ là thứ lấy tiền ra khỏi túi bạn.",
+       "claim": "Thị Nở cho Chí Phèo bát cháo hành.",
        "supported": true,
-       "reason": "Nguồn định nghĩa nợ là thứ lấy tiền ra khỏi túi bạn."
+       "reason": "Nguồn ghi 'được bà cho bát cháo hành'."
+      },
+      {
+       "claim": "Chí Phèo thức tỉnh khát vọng làm người lương thiện sau khi ăn bát cháo hành của thị Nở.",
+       "supported": true,
+       "reason": "Nguồn ghi 'Gặp thị Nở và được bà cho bát cháo hành, Chí Phèo thức tỉnh khát vọng làm người lương thiện'."
       }
      ],
      "ragas": 1.0,
@@ -778,44 +1364,44 @@
     {
      "id": 7,
      "section": "review_cta",
-     "narration_vi": "Bạn có bao giờ thắc mắc tại sao mình làm việc vất vả nhưng vẫn không giàu?",
+     "narration_vi": "Bạn có tò mò về câu chuyện một kẻ say khướt bỗng thức tỉnh khát vọng làm người lương thiện không?",
      "chunk_ids": [],
-     "vi": 0.0,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Người đọc làm việc vất vả nhưng vẫn không giàu.",
-       "supported": false,
-       "reason": "Nguồn không đề cập đến tình trạng tài chính hay thói quen làm việc của người đọc."
+       "claim": "Chí Phèo là một kẻ say khướt.",
+       "supported": true,
+       "reason": "Nguồn [2] mô tả Chí Phèo là kẻ say triền miên."
+      },
+      {
+       "claim": "Chí Phèo thức tỉnh khát vọng làm người lương thiện.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi rõ Chí Phèo thức tỉnh khát vọng làm người lương thiện."
       }
      ],
-     "ragas": 0.0
+     "ragas": 0.5
     },
     {
      "id": 8,
      "section": "review_cta",
-     "narration_vi": "Cuốn sách Cha giàu cha nghèo xuất bản năm 1997 của tác giả Robert Kiyosaki đã thay đổi hoàn toàn cách nhìn về tiền.",
+     "narration_vi": "Chí Phèo là truyện ngắn nổi tiếng của nhà văn Nam Cao, in lần đầu năm 1941.",
      "chunk_ids": [
-      "cha-giau-cha-ngheo/01-tong-quan.txt:0"
+      "chi-pheo/01-tong-quan.txt:0"
      ],
-     "vi": 0.6666666666666666,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Cha giàu cha nghèo xuất bản năm 1997.",
+       "claim": "Chí Phèo là truyện ngắn nổi tiếng của nhà văn Nam Cao.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận sách xuất bản năm 1997."
+       "reason": "Nguồn [1] khẳng định Chí Phèo là truyện ngắn nổi tiếng của nhà văn Nam Cao."
       },
       {
-       "claim": "Cuốn sách Cha giàu cha nghèo là của tác giả Robert Kiyosaki.",
+       "claim": "Truyện ngắn Chí Phèo được in lần đầu năm 1941.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận tác giả là Robert Kiyosaki."
-      },
-      {
-       "claim": "Cuốn sách Cha giàu cha nghèo đã thay đổi hoàn toàn cách nhìn về tiền.",
-       "supported": false,
-       "reason": "Nguồn không đề cập đến việc sách thay đổi hoàn toàn cách nhìn về tiền."
+       "reason": "Nguồn [1] ghi rõ truyện in lần đầu năm 1941."
       }
      ],
-     "ragas": 0.6666666666666666
+     "ragas": 1.0
     }
    ]
   },
@@ -824,15 +1410,15 @@
    "title": "Đắc nhân tâm",
    "kind": "non_fiction",
    "storyboard_cost": {
-    "usd": 0.0054725,
-    "input_tokens": 4450.0,
-    "output_tokens": 1655.0
+    "usd": 0.0077743000000000005,
+    "input_tokens": 5831.0,
+    "output_tokens": 2410.0
    },
    "sections": {
     "hook": {
      "n": 1,
-     "vi": 0.0,
-     "ragas": 0.0
+     "vi": 1.0,
+     "ragas": 0.5
     },
     "context": {
      "n": 1,
@@ -842,19 +1428,19 @@
     "body": {
      "n": 3,
      "vi": 1.0,
-     "ragas": 0.5556
+     "ragas": 1.0
     },
     "review_cta": {
-     "n": 1,
-     "vi": 0.5,
-     "ragas": 0.0
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.5
     },
     "context_body": {
      "n": 4,
      "vi": 1.0,
-     "ragas": 0.6667,
+     "ragas": 1.0,
      "vi_final": 1.0,
-     "ragas_final": 0.6667,
+     "ragas_final": 1.0,
      "rewritten": 0,
      "low_faithfulness": 0
     }
@@ -863,17 +1449,17 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Làm sao để người khác tự nguyện làm theo ý bạn mà không cần tranh cãi?",
+     "narration_vi": "Làm thế nào để thuyết phục người khác làm theo ý mình mà không gây tranh cãi?",
      "chunk_ids": [],
-     "vi": 0.0,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Đắc nhân tâm hướng dẫn cách để người khác tự nguyện làm theo ý người đọc mà không cần tranh cãi.",
-       "supported": false,
-       "reason": "Nguồn chỉ nêu các nguyên tắc ứng xử và cách thuyết phục người khác dựa trên mong muốn của họ, không đề cập đến việc làm theo ý người đọc mà không tranh cãi."
+       "claim": "Dale Carnegie đưa ra phương pháp thuyết phục người khác làm theo ý mình mà không gây tranh cãi.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu các nguyên tắc ứng xử và lập luận của Dale Carnegie về cách thuyết phục người khác."
       }
      ],
-     "ragas": 0.0
+     "ragas": 0.5
     },
     {
      "id": 2,
@@ -904,21 +1490,31 @@
     {
      "id": 3,
      "section": "body",
-     "narration_vi": "Dale Carnegie cho rằng đừng chỉ trích, oán trách hay phàn nàn và hãy thật sự quan tâm đến người khác.",
+     "narration_vi": "Đừng chỉ trích, oán trách hay phàn nàn mà hãy khen ngợi chân thành.",
      "chunk_ids": [
       "dac-nhan-tam/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Dale Carnegie cho rằng đừng chỉ trích, oán trách hay phàn nàn.",
+       "claim": "Người đọc không nên chỉ trích người khác.",
        "supported": true,
-       "reason": "Nguồn ghi: Đừng chỉ trích, oán trách hay phàn nàn về người khác."
+       "reason": "Nguồn ghi rõ đừng chỉ trích người khác."
       },
       {
-       "claim": "Dale Carnegie cho rằng hãy thật sự quan tâm đến người khác.",
+       "claim": "Người đọc không nên oán trách người khác.",
        "supported": true,
-       "reason": "Nguồn ghi: Hãy thật sự quan tâm đến người khác thay vì chỉ nói về mình."
+       "reason": "Nguồn ghi rõ đừng oán trách người khác."
+      },
+      {
+       "claim": "Người đọc không nên phàn nàn về người khác.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ đừng phàn nàn về người khác."
+      },
+      {
+       "claim": "Người đọc nên khen ngợi người khác một cách chân thành.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ hãy khen ngợi chân thành."
       }
      ],
      "ragas": 1.0,
@@ -930,79 +1526,96 @@
     {
      "id": 4,
      "section": "body",
-     "narration_vi": "Bên cạnh đó, việc mỉm cười, nhớ tên và biết lắng nghe sẽ giúp bạn kết nối tốt hơn.",
+     "narration_vi": "Hãy thật sự quan tâm đến người khác và biết lắng nghe.",
      "chunk_ids": [
       "dac-nhan-tam/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Việc mỉm cười giúp người đọc kết nối tốt hơn với người khác.",
+       "claim": "Người đọc nên thật sự quan tâm đến người khác.",
        "supported": true,
-       "reason": "Nguồn liệt kê việc mỉm cười là một trong các nguyên tắc ứng xử để giao tiếp hiệu quả."
+       "reason": "Nguồn ghi hãy thật sự quan tâm đến người khác."
       },
       {
-       "claim": "Việc nhớ tên người đối diện giúp người đọc kết nối tốt hơn với người khác.",
+       "claim": "Người đọc nên biết lắng nghe.",
        "supported": true,
-       "reason": "Nguồn liệt kê việc nhớ tên người đối diện là một trong các nguyên tắc ứng xử để giao tiếp hiệu quả."
-      },
-      {
-       "claim": "Việc biết lắng nghe giúp người đọc kết nối tốt hơn với người khác.",
-       "supported": true,
-       "reason": "Nguồn liệt kê việc biết lắng nghe là một trong các nguyên tắc ứng xử để giao tiếp hiệu quả."
+       "reason": "Nguồn ghi hãy biết lắng nghe."
       }
      ],
-     "ragas": 0.0,
+     "ragas": 1.0,
      "rounds": 0,
      "vi_final": 1.0,
      "flags": [],
-     "ragas_final": 0.0
+     "ragas_final": 1.0
     },
     {
      "id": 5,
      "section": "body",
-     "narration_vi": "Muốn thuyết phục ai đó, bạn phải bắt đầu từ điều họ muốn vì họ hành động vì mong muốn của chính họ.",
+     "narration_vi": "Muốn thuyết phục ai thì phải bắt đầu từ điều họ muốn.",
      "chunk_ids": [
       "dac-nhan-tam/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Người đọc muốn thuyết phục ai đó thì phải bắt đầu từ điều người đó muốn.",
+       "claim": "Muốn thuyết phục ai thì phải bắt đầu từ điều người đó muốn.",
        "supported": true,
-       "reason": "Nguồn ghi: muốn thuyết phục ai thì phải bắt đầu từ điều họ muốn."
-      },
-      {
-       "claim": "Con người hành động vì mong muốn của chính họ.",
-       "supported": true,
-       "reason": "Nguồn ghi: Carnegie lập luận rằng con người hành động vì mong muốn của chính họ."
+       "reason": "Nguồn ghi: Carnegie lập luận rằng con người hành động vì mong muốn của chính họ, nên muốn thuyết phục ai thì phải bắt đầu từ điều họ muốn."
       }
      ],
-     "ragas": 0.6666666666666666,
+     "ragas": 1.0,
      "rounds": 0,
      "vi_final": 1.0,
      "flags": [],
-     "ragas_final": 0.6666666666666666
+     "ragas_final": 1.0
     },
     {
      "id": 6,
      "section": "review_cta",
-     "narration_vi": "Cuốn sách kỹ năng giao tiếp này sẽ thay đổi cách bạn đối nhân xử thế mỗi ngày.",
+     "narration_vi": "Bạn đã biết cách thuyết phục người khác bằng chính điều họ muốn chưa?",
      "chunk_ids": [],
-     "vi": 0.5,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Đắc nhân tâm là cuốn sách kỹ năng giao tiếp.",
+       "claim": "Dale Carnegie lập luận rằng con người hành động vì mong muốn của chính họ.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi rõ Carnegie lập luận rằng con người hành động vì mong muốn của chính họ."
+      },
+      {
+       "claim": "Muốn thuyết phục người khác thì phải bắt đầu từ điều họ muốn.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi rõ muốn thuyết phục ai thì phải bắt đầu từ điều họ muốn."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Cuốn sách kỹ năng giao tiếp Đắc nhân tâm là tác phẩm của Dale Carnegie xuất bản năm 1936.",
+     "chunk_ids": [
+      "dac-nhan-tam/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Đắc nhân tâm là cuốn sách kỹ năng giao tiếp.",
        "supported": true,
        "reason": "Nguồn [1] xác nhận Đắc nhân tâm là cuốn sách kỹ năng giao tiếp."
       },
       {
-       "claim": "Cuốn sách Đắc nhân tâm sẽ thay đổi cách người đọc đối nhân xử thế mỗi ngày.",
-       "supported": false,
-       "reason": "Nguồn chỉ nêu nội dung và nguyên tắc ứng xử, không khẳng định sách sẽ thay đổi cách đối nhân xử thế của người đọc."
+       "claim": "Đắc nhân tâm là tác phẩm của Dale Carnegie.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi tác giả là Dale Carnegie."
+      },
+      {
+       "claim": "Đắc nhân tâm xuất bản năm 1936.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi sách xuất bản năm 1936."
       }
      ],
-     "ragas": 0.0
+     "ragas": 1.0
     }
    ]
   },
@@ -1011,15 +1624,15 @@
    "title": "Dế Mèn phiêu lưu ký",
    "kind": "fiction",
    "storyboard_cost": {
-    "usd": 0.0077212,
-    "input_tokens": 4754.0,
-    "output_tokens": 2518.0
+    "usd": 0.0085983,
+    "input_tokens": 6136.0,
+    "output_tokens": 2703.0
    },
    "sections": {
     "hook": {
      "n": 1,
      "vi": 1.0,
-     "ragas": 0.5
+     "ragas": 0.0
     },
     "context": {
      "n": 2,
@@ -1027,17 +1640,17 @@
      "ragas": 1.0
     },
     "body": {
-     "n": 4,
+     "n": 3,
      "vi": 1.0,
      "ragas": 1.0
     },
     "review_cta": {
      "n": 2,
-     "vi": 0.75,
-     "ragas": 0.5
+     "vi": 1.0,
+     "ragas": 1.0
     },
     "context_body": {
-     "n": 6,
+     "n": 5,
      "vi": 1.0,
      "ragas": 1.0,
      "vi_final": 1.0,
@@ -1050,46 +1663,36 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Bạn có tò mò về một chàng dế trẻ từng kiêu căng rồi bước vào cuộc phiêu lưu đổi thay cuộc đời?",
+     "narration_vi": "Liệu sự kiêu căng của tuổi trẻ có cái giá phải trả như thế nào trước khi ta kịp trưởng thành?",
      "chunk_ids": [],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Dế Mèn là một chàng dế trẻ.",
+       "claim": "Sự kiêu căng của tuổi trẻ có cái giá phải trả trước khi trưởng thành.",
        "supported": true,
-       "reason": "Nguồn [2] mô tả Dế Mèn là một chàng dế thanh niên."
-      },
-      {
-       "claim": "Dế Mèn từng là một chàng dế kiêu căng.",
-       "supported": true,
-       "reason": "Nguồn [2] khẳng định Dế Mèn lúc đầu là một chàng dế kiêu căng."
-      },
-      {
-       "claim": "Dế Mèn bước vào cuộc phiêu lưu đổi thay cuộc đời.",
-       "supported": true,
-       "reason": "Nguồn [2] nêu Dế Mèn quyết định rời hang đi phiêu lưu và trưởng thành dần."
+       "reason": "Nguồn [2] mô tả Dế Mèn kiêu căng, gây ra cái chết của Dế Choắt và phải hối hận, trưởng thành dần sau đó."
       }
      ],
-     "ragas": 0.5
+     "ragas": 0.0
     },
     {
      "id": 2,
      "section": "context",
-     "narration_vi": "Bạn đã biết gì về Dế Mèn phiêu lưu ký, tác phẩm nổi tiếng của nhà văn Tô Hoài xuất bản năm 1941?",
+     "narration_vi": "Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của nhà văn Tô Hoài, xuất bản lần đầu năm 1941.",
      "chunk_ids": [
       "de-men-phieu-luu-ky/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Dế Mèn phiêu lưu ký là tác phẩm nổi tiếng của nhà văn Tô Hoài.",
+       "claim": "Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của nhà văn Tô Hoài.",
        "supported": true,
-       "reason": "Nguồn xác nhận Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của nhà văn Tô Hoài."
+       "reason": "Nguồn khẳng định Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của nhà văn Tô Hoài."
       },
       {
-       "claim": "Dế Mèn phiêu lưu ký xuất bản năm 1941.",
+       "claim": "Dế Mèn phiêu lưu ký xuất bản lần đầu năm 1941.",
        "supported": true,
-       "reason": "Nguồn ghi tác phẩm xuất bản lần đầu năm 1941."
+       "reason": "Nguồn ghi rõ tác phẩm xuất bản lần đầu năm 1941."
       }
      ],
      "ragas": 1.0,
@@ -1101,7 +1704,7 @@
     {
      "id": 3,
      "section": "context",
-     "narration_vi": "Truyện kể bằng ngôi thứ nhất với nhân vật chính là một chú dế, mô tả thế giới loài vật sinh động như thế giới con người.",
+     "narration_vi": "Truyện kể bằng ngôi thứ nhất, thế giới loài vật được miêu tả sinh động như thế giới con người.",
      "chunk_ids": [
       "de-men-phieu-luu-ky/01-tong-quan.txt:0"
      ],
@@ -1110,17 +1713,12 @@
       {
        "claim": "Dế Mèn phiêu lưu ký kể bằng ngôi thứ nhất.",
        "supported": true,
-       "reason": "Nguồn ghi Truyện kể bằng ngôi thứ nhất."
+       "reason": "Nguồn ghi 'Truyện kể bằng ngôi thứ nhất'."
       },
       {
-       "claim": "Nhân vật chính của Dế Mèn phiêu lưu ký là một chú dế.",
+       "claim": "Thế giới loài vật trong Dế Mèn phiêu lưu ký được miêu tả sinh động như thế giới con người.",
        "supported": true,
-       "reason": "Nguồn ghi nhân vật chính là một chú dế tên là Dế Mèn."
-      },
-      {
-       "claim": "Dế Mèn phiêu lưu ký mô tả thế giới loài vật sinh động như thế giới con người.",
-       "supported": true,
-       "reason": "Nguồn ghi thế giới loài vật được miêu tả sinh động như thế giới con người."
+       "reason": "Nguồn ghi 'thế giới loài vật được miêu tả sinh động như thế giới con người'."
       }
      ],
      "ragas": 1.0,
@@ -1132,7 +1730,7 @@
     {
      "id": 4,
      "section": "body",
-     "narration_vi": "Dế Mèn lúc đầu là một chàng dế thanh niên cường tráng, kiêu căng và hay coi thường người khác.",
+     "narration_vi": "Dế Mèn lúc đầu là một chàng dế thanh niên cường tráng và hay kiêu căng.",
      "chunk_ids": [
       "de-men-phieu-luu-ky/02-noi-dung.txt:0"
      ],
@@ -1144,14 +1742,9 @@
        "reason": "Nguồn ghi Dế Mèn lúc đầu là một chàng dế thanh niên cường tráng."
       },
       {
-       "claim": "Dế Mèn lúc đầu là một chàng dế kiêu căng.",
+       "claim": "Dế Mèn lúc đầu là một chàng dế hay kiêu căng.",
        "supported": true,
        "reason": "Nguồn ghi Dế Mèn lúc đầu là một chàng dế kiêu căng."
-      },
-      {
-       "claim": "Dế Mèn lúc đầu hay coi thường người khác.",
-       "supported": true,
-       "reason": "Nguồn ghi Dế Mèn lúc đầu hay coi thường người khác."
       }
      ],
      "ragas": 1.0,
@@ -1163,21 +1756,26 @@
     {
      "id": 5,
      "section": "body",
-     "narration_vi": "Sau cái chết của người hàng xóm yếu ớt Dế Choắt, Mèn vô cùng hối hận và quyết định rời hang đi phiêu lưu.",
+     "narration_vi": "Sau cái chết của người hàng xóm yếu ớt là Dế Choắt, Mèn đã hối hận và quyết định rời hang đi phiêu lưu.",
      "chunk_ids": [
       "de-men-phieu-luu-ky/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Dế Mèn vô cùng hối hận sau cái chết của Dế Choắt.",
+       "claim": "Dế Choắt là người hàng xóm yếu ớt của Dế Mèn.",
+       "supported": true,
+       "reason": "Nguồn ghi Dế Choắt là hàng xóm yếu ớt."
+      },
+      {
+       "claim": "Dế Mèn hối hận sau cái chết của Dế Choắt.",
        "supported": true,
        "reason": "Nguồn ghi cái chết của Dế Choắt khiến Mèn hối hận."
       },
       {
        "claim": "Dế Mèn quyết định rời hang đi phiêu lưu sau cái chết của Dế Choắt.",
        "supported": true,
-       "reason": "Nguồn ghi cái chết của Dế Choắt khiến Mèn hối hận và quyết định rời hang đi phiêu lưu."
+       "reason": "Nguồn ghi Mèn hối hận và quyết định rời hang đi phiêu lưu."
       }
      ],
      "ragas": 1.0,
@@ -1189,19 +1787,19 @@
     {
      "id": 6,
      "section": "body",
-     "narration_vi": "Trên hành trình đó, chú đã kết bạn với Dế Trũi và trưởng thành dần qua nhiều cảnh ngộ.",
+     "narration_vi": "Trên hành trình của mình, chú kết bạn với Dế Trũi và trải qua nhiều cảnh ngộ để trưởng thành.",
      "chunk_ids": [
       "de-men-phieu-luu-ky/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Dế Mèn kết bạn với Dế Trũi trên hành trình phiêu lưu.",
+       "claim": "Dế Mèn kết bạn với Dế Trũi trên hành trình của Dế Mèn.",
        "supported": true,
-       "reason": "Nguồn ghi Mèn kết bạn với Dế Trũi trên đường đi."
+       "reason": "Nguồn ghi trên đường đi Mèn kết bạn với Dế Trũi."
       },
       {
-       "claim": "Dế Mèn trưởng thành dần qua nhiều cảnh ngộ trên hành trình phiêu lưu.",
+       "claim": "Dế Mèn trải qua nhiều cảnh ngộ để trưởng thành.",
        "supported": true,
        "reason": "Nguồn ghi Mèn gặp nhiều cảnh ngộ và trưởng thành dần."
       }
@@ -1214,27 +1812,122 @@
     },
     {
      "id": 7,
-     "section": "body",
-     "narration_vi": "Câu chuyện mang đến cho chúng ta những bài học quý giá về sự khiêm tốn, tình bạn và lòng dũng cảm.",
+     "section": "review_cta",
+     "narration_vi": "Chàng dế kiêu căng sẽ ra sao sau khi gây ra hậu quả không thể cứu vãn?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Dế Mèn là một chàng dế kiêu căng.",
+       "supported": true,
+       "reason": "Nguồn [2] mô tả Dế Mèn là chàng dế thanh niên kiêu căng."
+      },
+      {
+       "claim": "Dế Mèn gây ra hậu quả không thể cứu vãn.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Dế Mèn trêu chị Cốc dẫn đến cái chết của Dế Choắt."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 8,
+     "section": "review_cta",
+     "narration_vi": "Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của nhà văn Tô Hoài, xuất bản lần đầu năm 1941.",
      "chunk_ids": [
-      "de-men-phieu-luu-ky/02-noi-dung.txt:0"
+      "de-men-phieu-luu-ky/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Câu chuyện Dế Mèn phiêu lưu ký mang đến bài học về sự khiêm tốn.",
+       "claim": "Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của nhà văn Tô Hoài.",
        "supported": true,
-       "reason": "Nguồn ghi truyện gửi gắm bài học về sự khiêm tốn."
+       "reason": "Nguồn [1] khẳng định Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của nhà văn Tô Hoài."
       },
       {
-       "claim": "Câu chuyện Dế Mèn phiêu lưu ký mang đến bài học về tình bạn.",
+       "claim": "Dế Mèn phiêu lưu ký xuất bản lần đầu năm 1941.",
        "supported": true,
-       "reason": "Nguồn ghi truyện gửi gắm bài học về tình bạn."
+       "reason": "Nguồn [1] ghi rõ tác phẩm xuất bản lần đầu năm 1941."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "deep-work",
+   "title": "Deep Work",
+   "kind": "non_fiction",
+   "storyboard_cost": {
+    "usd": 0.0074342,
+    "input_tokens": 5739.0,
+    "output_tokens": 2285.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 0.0,
+     "ragas": 0.0
+    },
+    "context": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 3,
+     "vi": 1.0,
+     "ragas": 0.9333
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "context_body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 0.95,
+     "vi_final": 1.0,
+     "ragas_final": 0.95,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Điều gì tạo nên ranh giới giữa những người tập trung cao độ và những ai luôn bị xao nhãng trong công việc hàng ngày?",
+     "chunk_ids": [],
+     "vi": 0.0,
+     "vi_claims": [
+      {
+       "claim": "Có một ranh giới giữa những người tập trung cao độ và những người luôn bị xao nhãng trong công việc hàng ngày.",
+       "supported": false,
+       "reason": "Nguồn chỉ định nghĩa làm việc sâu và làm việc nông chứ không đề cập đến khái niệm ranh giới giữa hai nhóm người này."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Deep Work là sách của giáo sư khoa học máy tính Cal Newport, xuất bản năm 2016.",
+     "chunk_ids": [
+      "deep-work/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Deep Work là sách của giáo sư khoa học máy tính Cal Newport.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Deep Work là sách của giáo sư khoa học máy tính Cal Newport."
       },
       {
-       "claim": "Câu chuyện Dế Mèn phiêu lưu ký mang đến bài học về lòng dũng cảm.",
+       "claim": "Sách Deep Work được xuất bản năm 2016.",
        "supported": true,
-       "reason": "Nguồn ghi truyện gửi gắm bài học về lòng dũng cảm."
+       "reason": "Nguồn [1] ghi rõ sách xuất bản năm 2016."
       }
      ],
      "ragas": 1.0,
@@ -1244,38 +1937,121 @@
      "ragas_final": 1.0
     },
     {
-     "id": 8,
-     "section": "review_cta",
-     "narration_vi": "Bạn có tò mò về cuộc phiêu lưu rực rỡ nhất của văn học thiếu nhi Việt Nam không?",
-     "chunk_ids": [],
-     "vi": 0.5,
-     "vi_claims": [
-      {
-       "claim": "Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của Việt Nam.",
-       "supported": true,
-       "reason": "Nguồn [1] xác nhận Dế Mèn phiêu lưu ký là tác phẩm văn học thiếu nhi nổi tiếng của nhà văn Tô Hoài."
-      },
-      {
-       "claim": "Dế Mèn phiêu lưu ký là cuộc phiêu lưu rực rỡ nhất của văn học thiếu nhi Việt Nam.",
-       "supported": false,
-       "reason": "Nguồn không có thông tin đánh giá tác phẩm là cuộc phiêu lưu rực rỡ nhất."
-      }
-     ],
-     "ragas": 0.0
-    },
-    {
-     "id": 9,
-     "section": "review_cta",
-     "narration_vi": "Tác phẩm Dế Mèn phiêu lưu ký của nhà văn Tô Hoài xuất bản lần đầu năm 1941.",
+     "id": 3,
+     "section": "body",
+     "narration_vi": "Làm việc sâu là hoạt động nghề nghiệp thực hiện trong trạng thái tập trung cao độ, không bị phân tâm.",
      "chunk_ids": [
-      "de-men-phieu-luu-ky/01-tong-quan.txt:0"
+      "deep-work/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Tác phẩm Dế Mèn phiêu lưu ký của nhà văn Tô Hoài xuất bản lần đầu năm 1941.",
+       "claim": "Làm việc sâu là hoạt động nghề nghiệp thực hiện trong trạng thái tập trung cao độ.",
        "supported": true,
-       "reason": "Nguồn [1] ghi rõ Dế Mèn phiêu lưu ký là tác phẩm của Tô Hoài, xuất bản lần đầu năm 1941."
+       "reason": "Nguồn [1] ghi rõ: làm việc sâu là hoạt động nghề nghiệp thực hiện trong trạng thái tập trung cao độ."
+      },
+      {
+       "claim": "Làm việc sâu là hoạt động nghề nghiệp thực hiện trong trạng thái không bị phân tâm.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ: làm việc sâu là hoạt động nghề nghiệp thực hiện trong trạng thái không bị phân tâm."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Đối lập với làm việc sâu là làm việc nông, những việc nhẹ về nhận thức thường làm khi bị xao nhãng.",
+     "chunk_ids": [
+      "deep-work/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Làm việc nông đối lập với làm việc sâu.",
+       "supported": true,
+       "reason": "Nguồn ghi 'Đối lập với làm việc sâu là làm việc nông'."
+      },
+      {
+       "claim": "Làm việc nông là những việc nhẹ về nhận thức.",
+       "supported": true,
+       "reason": "Nguồn ghi 'làm việc nông: những việc nhẹ về nhận thức'."
+      },
+      {
+       "claim": "Làm việc nông thường được thực hiện khi bị xao nhãng.",
+       "supported": true,
+       "reason": "Nguồn ghi 'thường làm khi bị xao nhãng'."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Cuốn sách nêu bốn triết lý sắp xếp thời gian làm việc sâu gồm tu viện, hai chế độ, nhịp điệu và nhà báo.",
+     "chunk_ids": [
+      "deep-work/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách nêu bốn triết lý sắp xếp thời gian làm việc sâu gồm tu viện, hai chế độ, nhịp điệu và nhà báo.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu rõ Newport nêu bốn triết lý sắp xếp thời gian làm việc sâu: tu viện, hai chế độ, nhịp điệu và nhà báo."
+      }
+     ],
+     "ragas": 0.8,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 0.8
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Vì sao làm việc tập trung cao độ lại ngày càng trở nên hiếm có và có giá trị?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Làm việc tập trung cao độ ngày càng trở nên hiếm có.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi Cal Newport lập luận kỹ năng này ngày càng hiếm."
+      },
+      {
+       "claim": "Làm việc tập trung cao độ ngày càng trở nên có giá trị.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi Cal Newport lập luận kỹ năng này ngày càng có giá trị."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Deep Work là sách của giáo sư khoa học máy tính Cal Newport, xuất bản năm 2016.",
+     "chunk_ids": [
+      "deep-work/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Deep Work là sách của giáo sư khoa học máy tính Cal Newport.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Deep Work là sách của giáo sư khoa học máy tính Cal Newport."
+      },
+      {
+       "claim": "Sách Deep Work xuất bản năm 2016.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản năm 2016."
       }
      ],
      "ragas": 1.0
@@ -1287,9 +2063,9 @@
    "title": "Hoàng tử bé",
    "kind": "fiction",
    "storyboard_cost": {
-    "usd": 0.0076281000000000005,
-    "input_tokens": 4577.0,
-    "output_tokens": 2502.0
+    "usd": 0.008434,
+    "input_tokens": 5955.0,
+    "output_tokens": 2659.0
    },
    "sections": {
     "hook": {
@@ -1303,17 +2079,17 @@
      "ragas": 1.0
     },
     "body": {
-     "n": 2,
+     "n": 3,
      "vi": 1.0,
      "ragas": 1.0
     },
     "review_cta": {
      "n": 2,
-     "vi": 0.5,
+     "vi": 1.0,
      "ragas": 0.5
     },
     "context_body": {
-     "n": 4,
+     "n": 5,
      "vi": 1.0,
      "ragas": 1.0,
      "vi_final": 1.0,
@@ -1326,14 +2102,19 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Bạn có bao giờ tự hỏi vì sao thế giới của người lớn lại trở nên khô khan đến vậy chưa?",
+     "narration_vi": "Vì sao thế giới của người lớn lại thiếu đi những điều cốt yếu mà chỉ trẻ em mới thấy được bằng trái tim?",
      "chunk_ids": [],
      "vi": 0.0,
      "vi_claims": [
       {
-       "claim": "Thế giới của người lớn trở nên khô khan.",
+       "claim": "Thế giới của người lớn thiếu đi những điều cốt yếu.",
        "supported": false,
-       "reason": "Nguồn chỉ đề cập đến cách người lớn nhìn cuộc sống chứ không khẳng định thế giới của người lớn khô khan."
+       "reason": "Nguồn chỉ đề cập đến cách người lớn nhìn cuộc sống chứ không khẳng định thế giới người lớn thiếu đi những điều cốt yếu."
+      },
+      {
+       "claim": "Chỉ trẻ em mới thấy được những điều cốt yếu bằng trái tim.",
+       "supported": false,
+       "reason": "Nguồn chỉ trích dẫn câu nói về việc nhìn bằng trái tim chứ không khẳng định chỉ trẻ em mới có khả năng này."
       }
      ],
      "ragas": 0.0
@@ -1341,16 +2122,16 @@
     {
      "id": 2,
      "section": "context",
-     "narration_vi": "Tác phẩm Hoàng tử bé là tiểu thuyết ngắn của nhà văn và phi công người Pháp Antoine de Saint-Exupéry.",
+     "narration_vi": "Hoàng tử bé là tiểu thuyết ngắn của nhà văn và phi công người Pháp Antoine de Saint-Exupéry.",
      "chunk_ids": [
       "hoang-tu-be/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Tác phẩm Hoàng tử bé là tiểu thuyết ngắn của nhà văn và phi công người Pháp Antoine de Saint-Exupéry.",
+       "claim": "Hoàng tử bé là tiểu thuyết ngắn của nhà văn và phi công người Pháp Antoine de Saint-Exupéry.",
        "supported": true,
-       "reason": "Nguồn [1] khẳng định Hoàng tử bé là tiểu thuyết ngắn của nhà văn và phi công người Pháp Antoine de Saint-Exupéry."
+       "reason": "Nguồn ghi Hoàng tử bé là tiểu thuyết ngắn của nhà văn và phi công người Pháp Antoine de Saint-Exupéry."
       }
      ],
      "ragas": 1.0,
@@ -1362,21 +2143,21 @@
     {
      "id": 3,
      "section": "context",
-     "narration_vi": "Cuốn sách được xuất bản lần đầu năm 1943 tại New York và trở thành một trong những tác phẩm được dịch nhiều nhất thế giới.",
+     "narration_vi": "Tác phẩm được xuất bản lần đầu năm 1943 tại New York.",
      "chunk_ids": [
       "hoang-tu-be/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Hoàng tử bé được xuất bản lần đầu năm 1943 tại New York.",
+       "claim": "Tác phẩm Hoàng tử bé được xuất bản lần đầu năm 1943.",
        "supported": true,
-       "reason": "Nguồn ghi rõ Hoàng tử bé xuất bản lần đầu năm 1943 tại New York."
+       "reason": "Nguồn ghi Hoàng tử bé xuất bản lần đầu năm 1943."
       },
       {
-       "claim": "Cuốn sách Hoàng tử bé trở thành một trong những tác phẩm được dịch nhiều nhất thế giới.",
+       "claim": "Tác phẩm Hoàng tử bé được xuất bản lần đầu tại New York.",
        "supported": true,
-       "reason": "Nguồn ghi đây là một trong những tác phẩm văn học Pháp được dịch nhiều nhất thế giới."
+       "reason": "Nguồn ghi Hoàng tử bé xuất bản lần đầu tại New York."
       }
      ],
      "ragas": 1.0,
@@ -1414,16 +2195,26 @@
     {
      "id": 5,
      "section": "body",
-     "narration_vi": "Cậu bé đã kể về bông hồng kiêu kỳ mà cậu yêu thương và chăm sóc trên hành tinh nhỏ của mình.",
+     "narration_vi": "Cậu bé kể về bông hồng kiêu kỳ mà cậu yêu thương và chăm sóc trên hành tinh nhỏ của mình, rồi về chuyến du hành qua nhiều hành tinh khác gặp những người lớn kỳ lạ.",
      "chunk_ids": [
       "hoang-tu-be/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cậu bé đến từ tiểu hành tinh B-612 đã kể về bông hồng kiêu kỳ mà cậu yêu thương và chăm sóc trên hành tinh nhỏ của mình.",
+       "claim": "Cậu bé kể về bông hồng kiêu kỳ mà cậu bé yêu thương và chăm sóc trên hành tinh nhỏ của mình.",
        "supported": true,
-       "reason": "Nguồn ghi rõ cậu bé kể về bông hồng kiêu kỳ mà cậu yêu thương và chăm sóc trên hành tinh nhỏ của mình."
+       "reason": "Nguồn ghi: Cậu bé kể về bông hồng kiêu kỳ mà cậu yêu thương và chăm sóc trên hành tinh nhỏ của mình."
+      },
+      {
+       "claim": "Cậu bé kể về chuyến du hành qua nhiều hành tinh khác.",
+       "supported": true,
+       "reason": "Nguồn ghi: rồi về chuyến du hành qua nhiều hành tinh khác."
+      },
+      {
+       "claim": "Cậu bé gặp những người lớn kỳ lạ trong chuyến du hành.",
+       "supported": true,
+       "reason": "Nguồn ghi: gặp những người lớn kỳ lạ."
       }
      ],
      "ragas": 1.0,
@@ -1434,21 +2225,47 @@
     },
     {
      "id": 6,
-     "section": "review_cta",
-     "narration_vi": "Bạn có bao giờ tự hỏi vì sao người lớn đôi khi lại đánh mất đi sự trong trẻo thuở bé?",
-     "chunk_ids": [],
-     "vi": 0.0,
+     "section": "body",
+     "narration_vi": "Trên Trái Đất, cậu gặp con cáo, người dạy cậu ý nghĩa của sự thuần hóa.",
+     "chunk_ids": [
+      "hoang-tu-be/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Người lớn đôi khi đánh mất đi sự trong trẻo thuở bé.",
-       "supported": false,
-       "reason": "Nguồn không đề cập đến việc người lớn đánh mất sự trong trẻo thuở bé."
+       "claim": "Cậu bé gặp con cáo trên Trái Đất.",
+       "supported": true,
+       "reason": "Nguồn ghi: Trên Trái Đất, cậu gặp con cáo."
+      },
+      {
+       "claim": "Con cáo dạy cậu bé ý nghĩa của sự thuần hóa.",
+       "supported": true,
+       "reason": "Nguồn ghi: con cáo, người dạy cậu ý nghĩa của sự thuần hóa."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Bạn có bao giờ tự hỏi vì sao người lớn lại nhìn cuộc sống khác với trẻ thơ không?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Người lớn nhìn cuộc sống khác với trẻ thơ.",
+       "supported": true,
+       "reason": "Nguồn [1] đề cập đến cách người lớn nhìn cuộc sống như một chủ đề trong tác phẩm."
       }
      ],
      "ragas": 0.0
     },
     {
-     "id": 7,
+     "id": 8,
      "section": "review_cta",
      "narration_vi": "Hoàng tử bé là tiểu thuyết ngắn của nhà văn và phi công người Pháp Antoine de Saint-Exupéry, xuất bản lần đầu năm 1943 tại New York.",
      "chunk_ids": [
@@ -1472,13 +2289,13 @@
    ]
   },
   {
-   "slug": "nha-gia-kim",
-   "title": "Nhà giả kim",
+   "slug": "mat-biec",
+   "title": "Mắt biếc",
    "kind": "fiction",
    "storyboard_cost": {
-    "usd": 0.005888399999999999,
-    "input_tokens": 4878.0,
-    "output_tokens": 1770.0
+    "usd": 0.007050600000000001,
+    "input_tokens": 5702.0,
+    "output_tokens": 2136.0
    },
    "sections": {
     "hook": {
@@ -1492,324 +2309,17 @@
      "ragas": 1.0
     },
     "body": {
-     "n": 4,
-     "vi": 0.9167,
-     "ragas": 1.0
-    },
-    "review_cta": {
      "n": 2,
-     "vi": 0.75,
-     "ragas": 0.25
-    },
-    "context_body": {
-     "n": 6,
-     "vi": 0.9444,
-     "ragas": 1.0,
-     "vi_final": 1.0,
-     "ragas_final": 1.0,
-     "rewritten": 1,
-     "low_faithfulness": 0
-    }
-   },
-   "scenes": [
-    {
-     "id": 1,
-     "section": "hook",
-     "narration_vi": "Chỉ vì một giấc mơ lặp đi lặp lại về kho báu, cậu bé chăn cừu đã dám từ bỏ tất cả để lên đường.",
-     "chunk_ids": [],
-     "vi": 1.0,
-     "vi_claims": [
-      {
-       "claim": "Santiago là một cậu bé chăn cừu.",
-       "supported": true,
-       "reason": "Nguồn [2] xác nhận Santiago là một cậu bé chăn cừu."
-      },
-      {
-       "claim": "Santiago mơ thấy kho báu hai lần.",
-       "supported": true,
-       "reason": "Nguồn [2] ghi cậu hai lần mơ thấy một kho báu."
-      },
-      {
-       "claim": "Santiago từ bỏ tất cả để lên đường vì giấc mơ về kho báu.",
-       "supported": true,
-       "reason": "Nguồn [2] nêu cậu bán đàn cừu và vượt eo biển sang châu Phi để theo đuổi giấc mơ."
-      }
-     ],
-     "ragas": 1.0
-    },
-    {
-     "id": 2,
-     "section": "context",
-     "narration_vi": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho, xuất bản lần đầu năm 1988 bằng tiếng Bồ Đào Nha.",
-     "chunk_ids": [
-      "nha-gia-kim/01-tong-quan.txt:0"
-     ],
-     "vi": 1.0,
-     "vi_claims": [
-      {
-       "claim": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho.",
-       "supported": true,
-       "reason": "Nguồn [1] xác nhận Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho."
-      },
-      {
-       "claim": "Nhà giả kim xuất bản lần đầu năm 1988.",
-       "supported": true,
-       "reason": "Nguồn [1] ghi rõ sách xuất bản lần đầu năm 1988."
-      },
-      {
-       "claim": "Nhà giả kim xuất bản lần đầu bằng tiếng Bồ Đào Nha.",
-       "supported": true,
-       "reason": "Nguồn [1] ghi rõ sách xuất bản lần đầu bằng tiếng Bồ Đào Nha."
-      }
-     ],
-     "ragas": 1.0,
-     "rounds": 0,
-     "vi_final": 1.0,
-     "flags": [],
-     "ragas_final": 1.0
-    },
-    {
-     "id": 3,
-     "section": "context",
-     "narration_vi": "Tác phẩm kể một hành trình đi tìm ý nghĩa cuộc đời bằng giọng văn giản dị, nhiều câu triết lý ngắn gọn dễ nhớ.",
-     "chunk_ids": [
-      "nha-gia-kim/01-tong-quan.txt:0"
-     ],
-     "vi": 1.0,
-     "vi_claims": [
-      {
-       "claim": "Tác phẩm Nhà giả kim kể một hành trình đi tìm ý nghĩa cuộc đời.",
-       "supported": true,
-       "reason": "Nguồn ghi tác phẩm kể một hành trình đi tìm ý nghĩa cuộc đời."
-      },
-      {
-       "claim": "Tác phẩm Nhà giả kim có giọng văn giản dị.",
-       "supported": true,
-       "reason": "Nguồn ghi tác phẩm kể bằng giọng văn giản dị."
-      },
-      {
-       "claim": "Tác phẩm Nhà giả kim có nhiều câu triết lý ngắn gọn dễ nhớ.",
-       "supported": true,
-       "reason": "Nguồn ghi tác phẩm có nhiều câu triết lý ngắn gọn dễ nhớ."
-      }
-     ],
-     "ragas": 1.0,
-     "rounds": 0,
-     "vi_final": 1.0,
-     "flags": [],
-     "ragas_final": 1.0
-    },
-    {
-     "id": 4,
-     "section": "body",
-     "narration_vi": "Hành trình bắt đầu với cậu bé chăn cừu Santiago, người quyết định bán đàn cừu và vượt eo biển sang châu Phi để theo đuổi giấc mơ kho báu.",
-     "chunk_ids": [
-      "nha-gia-kim/02-noi-dung.txt:0"
-     ],
-     "vi": 1.0,
-     "vi_claims": [
-      {
-       "claim": "Hành trình bắt đầu với cậu bé chăn cừu Santiago.",
-       "supported": true,
-       "reason": "Nguồn xác nhận nhân vật chính là Santiago, một cậu bé chăn cừu."
-      },
-      {
-       "claim": "Santiago quyết định bán đàn cừu.",
-       "supported": true,
-       "reason": "Nguồn ghi rõ cậu bán đàn cừu theo lời khuyên của ông vua."
-      },
-      {
-       "claim": "Santiago vượt eo biển sang châu Phi để theo đuổi giấc mơ kho báu.",
-       "supported": true,
-       "reason": "Nguồn ghi cậu vượt eo biển sang châu Phi để theo đuổi giấc mơ về kho báu."
-      }
-     ],
-     "ragas": 1.0,
-     "rounds": 0,
-     "vi_final": 1.0,
-     "flags": [],
-     "ragas_final": 1.0
-    },
-    {
-     "id": 5,
-     "section": "body",
-     "narration_vi": "Trên đường đi, cậu phải vượt qua muôn vàn thử thách từ việc bị lừa tiền ở Tangier cho đến việc làm việc cho một người bán pha lê.",
-     "chunk_ids": [
-      "nha-gia-kim/02-noi-dung.txt:0"
-     ],
-     "vi": 1.0,
-     "vi_claims": [
-      {
-       "claim": "Santiago bị lừa mất tiền ở Tangier.",
-       "supported": true,
-       "reason": "Nguồn [1] xác nhận Santiago bị lừa mất tiền ở Tangier."
-      },
-      {
-       "claim": "Santiago làm việc cho một người bán pha lê.",
-       "supported": true,
-       "reason": "Nguồn [1] xác nhận Santiago làm việc cho một người bán pha lê."
-      }
-     ],
-     "ragas": 1.0,
-     "rounds": 0,
-     "vi_final": 1.0,
-     "flags": [],
-     "ragas_final": 1.0
-    },
-    {
-     "id": 6,
-     "section": "body",
-     "narration_vi": "Đến ốc đảo, cậu gặp gỡ cô gái sa mạc Fatima và người nhà giả kim, người dạy cậu biết lắng nghe trái tim mình.",
-     "chunk_ids": [
-      "nha-gia-kim/02-noi-dung.txt:0"
-     ],
-     "vi": 1.0,
-     "vi_claims": [
-      {
-       "claim": "Santiago đến ốc đảo.",
-       "supported": true,
-       "reason": "Nguồn ghi 'Ở ốc đảo, cậu gặp Fatima'."
-      },
-      {
-       "claim": "Santiago gặp gỡ cô gái sa mạc Fatima tại ốc đảo.",
-       "supported": true,
-       "reason": "Nguồn ghi 'Ở ốc đảo, cậu gặp Fatima, cô gái sa mạc'."
-      },
-      {
-       "claim": "Santiago gặp nhà giả kim tại ốc đảo.",
-       "supported": true,
-       "reason": "Nguồn ghi 'Ở ốc đảo... gặp nhà giả kim'."
-      },
-      {
-       "claim": "Nhà giả kim dạy Santiago biết lắng nghe trái tim mình.",
-       "supported": true,
-       "reason": "Nguồn ghi 'nhà giả kim, người dạy cậu lắng nghe trái tim'."
-      }
-     ],
-     "ragas": 1.0,
-     "rounds": 0,
-     "vi_final": 1.0,
-     "flags": [],
-     "ragas_final": 1.0
-    },
-    {
-     "id": 7,
-     "section": "body",
-     "narration_vi": "Cuốn sách gửi gắm thông điệp sâu sắc về khái niệm huyền thoại cá nhân, chính là sứ mệnh riêng mà mỗi người sinh ra đều cần phải theo đuổi.",
-     "chunk_ids": [
-      "nha-gia-kim/02-noi-dung.txt:0"
-     ],
-     "vi": 0.6666666666666666,
-     "vi_claims": [
-      {
-       "claim": "Cuốn sách gửi gắm thông điệp về khái niệm huyền thoại cá nhân.",
-       "supported": true,
-       "reason": "Nguồn ghi sách nhấn mạnh khái niệm huyền thoại cá nhân."
-      },
-      {
-       "claim": "Huyền thoại cá nhân là sứ mệnh riêng mà mỗi người cần theo đuổi.",
-       "supported": true,
-       "reason": "Nguồn định nghĩa huyền thoại cá nhân là sứ mệnh riêng mà mỗi người cần theo đuổi."
-      },
-      {
-       "claim": "Mỗi người sinh ra đều cần phải theo đuổi sứ mệnh riêng.",
-       "supported": false,
-       "reason": "Nguồn chỉ nói mỗi người cần theo đuổi sứ mệnh riêng chứ không đề cập đến việc mỗi người sinh ra đều cần làm điều đó."
-      }
-     ],
-     "ragas": 1.0,
-     "rounds": 1,
-     "vi_final": 1.0,
-     "flags": [],
-     "final_narration_vi": "Sách nhấn mạnh khái niệm huyền thoại cá nhân, tức sứ mệnh riêng mà mỗi người cần theo đuổi.",
-     "final_vi_claims": [
-      {
-       "claim": "Cuốn sách nhấn mạnh khái niệm huyền thoại cá nhân.",
-       "supported": true,
-       "reason": "Nguồn ghi rõ: Sách nhấn mạnh khái niệm huyền thoại cá nhân."
-      },
-      {
-       "claim": "Huyền thoại cá nhân là sứ mệnh riêng mà mỗi người cần theo đuổi.",
-       "supported": true,
-       "reason": "Nguồn ghi rõ: tức sứ mệnh riêng mà mỗi người cần theo đuổi."
-      }
-     ],
-     "ragas_final": 1.0
-    },
-    {
-     "id": 8,
-     "section": "review_cta",
-     "narration_vi": "Một cuốn sách nhỏ bé nhưng chứa đựng những câu triết lý sâu sắc về hành trình theo đuổi ước mơ.",
-     "chunk_ids": [],
-     "vi": 0.5,
-     "vi_claims": [
-      {
-       "claim": "Cuốn sách Nhà giả kim là một cuốn sách nhỏ bé.",
-       "supported": false,
-       "reason": "Nguồn không đề cập đến kích thước vật lý của cuốn sách."
-      },
-      {
-       "claim": "Cuốn sách Nhà giả kim chứa đựng những câu triết lý sâu sắc về hành trình theo đuổi ước mơ.",
-       "supported": true,
-       "reason": "Nguồn [1] nhắc đến các câu triết lý và nguồn [2] mô tả hành trình theo đuổi giấc mơ/huyền thoại cá nhân."
-      }
-     ],
-     "ragas": 0.5
-    },
-    {
-     "id": 9,
-     "section": "review_cta",
-     "narration_vi": "Hãy đọc ngay để cùng Santiago bước vào hành trình sa mạc và lắng nghe trái tim mình bạn nhé.",
-     "chunk_ids": [],
-     "vi": 1.0,
-     "vi_claims": [
-      {
-       "claim": "Santiago bước vào hành trình sa mạc.",
-       "supported": true,
-       "reason": "Nguồn [2] xác nhận Santiago cùng đoàn lữ hành băng qua sa mạc Sahara."
-      },
-      {
-       "claim": "Santiago lắng nghe trái tim mình.",
-       "supported": true,
-       "reason": "Nguồn [2] xác nhận nhà giả kim dạy Santiago lắng nghe trái tim."
-      }
-     ],
-     "ragas": 0.0
-    }
-   ]
-  },
-  {
-   "slug": "sapiens",
-   "title": "Sapiens: Lược sử loài người",
-   "kind": "non_fiction",
-   "storyboard_cost": {
-    "usd": 0.0069339,
-    "input_tokens": 4613.0,
-    "output_tokens": 2220.0
-   },
-   "sections": {
-    "hook": {
-     "n": 1,
-     "vi": 0.0,
-     "ragas": 0.0
-    },
-    "context": {
-     "n": 2,
-     "vi": 1.0,
-     "ragas": 1.0
-    },
-    "body": {
-     "n": 4,
      "vi": 1.0,
      "ragas": 1.0
     },
     "review_cta": {
      "n": 2,
-     "vi": 0.5,
+     "vi": 1.0,
      "ragas": 0.5
     },
     "context_body": {
-     "n": 6,
+     "n": 4,
      "vi": 1.0,
      "ragas": 1.0,
      "vi_final": 1.0,
@@ -1822,31 +2332,36 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Điều gì đã giúp loài người chúng ta vươn lên thống trị cả trái đất này?",
+     "narration_vi": "Liệu một mối tình đơn phương từ tuổi thơ có thể kéo dài suốt đến khi trưởng thành không?",
      "chunk_ids": [],
-     "vi": 0.0,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Loài người đã vươn lên thống trị trái đất.",
-       "supported": false,
-       "reason": "Nguồn chỉ nói về lịch sử loài người và sức mạnh của Sapiens, không khẳng định loài người thống trị trái đất."
+       "claim": "Mối tình đơn phương trong tiểu thuyết Mắt biếc kéo dài từ tuổi thơ đến khi trưởng thành.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận truyện kể về một mối tình đơn phương kéo dài từ tuổi thơ đến khi trưởng thành."
       }
      ],
-     "ragas": 0.0
+     "ragas": 1.0
     },
     {
      "id": 2,
      "section": "context",
-     "narration_vi": "Cuốn sách Sapiens: Lược sử loài người là tác phẩm của nhà sử học người Israel Yuval Noah Harari.",
+     "narration_vi": "Mắt biếc là cuốn tiểu thuyết của nhà văn Nguyễn Nhật Ánh, xuất bản năm 1990.",
      "chunk_ids": [
-      "sapiens/01-tong-quan.txt:0"
+      "mat-biec/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Sapiens: Lược sử loài người là tác phẩm của nhà sử học người Israel Yuval Noah Harari.",
+       "claim": "Mắt biếc là cuốn tiểu thuyết của nhà văn Nguyễn Nhật Ánh.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận Sapiens: Lược sử loài người là cuốn sách của nhà sử học người Israel Yuval Noah Harari."
+       "reason": "Nguồn [1] xác nhận Mắt biếc là tiểu thuyết của nhà văn Nguyễn Nhật Ánh."
+      },
+      {
+       "claim": "Mắt biếc được xuất bản năm 1990.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ Mắt biếc xuất bản năm 1990."
       }
      ],
      "ragas": 1.0,
@@ -1858,16 +2373,16 @@
     {
      "id": 3,
      "section": "context",
-     "narration_vi": "Tác phẩm được xuất bản lần đầu bằng tiếng Do Thái vào năm 2011.",
+     "narration_vi": "Câu chuyện được đặt trong khung cảnh làng Đo Đo yên bình ở miền Trung.",
      "chunk_ids": [
-      "sapiens/01-tong-quan.txt:0"
+      "mat-biec/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Sapiens: Lược sử loài người được xuất bản lần đầu bằng tiếng Do Thái vào năm 2011.",
+       "claim": "Câu chuyện Mắt biếc được đặt trong khung cảnh làng Đo Đo yên bình ở miền Trung.",
        "supported": true,
-       "reason": "Nguồn [1] ghi rõ sách xuất bản lần đầu bằng tiếng Do Thái năm 2011."
+       "reason": "Nguồn [1] ghi rõ truyện đặt trong khung cảnh làng Đo Đo yên bình ở miền Trung."
       }
      ],
      "ragas": 1.0,
@@ -1879,21 +2394,31 @@
     {
      "id": 4,
      "section": "body",
-     "narration_vi": "Lịch sử nhân loại được chia thành ba cuộc cách mạng lớn bắt đầu từ Cách mạng Nhận thức khoảng bảy mươi nghìn năm trước.",
+     "narration_vi": "Ngạn là chàng trai nhút nhát, yêu cô bạn hàng xóm Hà Lan có đôi mắt biếc từ nhỏ.",
      "chunk_ids": [
-      "sapiens/02-noi-dung.txt:0"
+      "mat-biec/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Lịch sử nhân loại được chia thành ba cuộc cách mạng lớn.",
+       "claim": "Ngạn là chàng trai nhút nhát.",
        "supported": true,
-       "reason": "Nguồn ghi Harari chia lịch sử loài người thành ba cuộc cách mạng lớn."
+       "reason": "Nguồn ghi Ngạn là chàng trai nhút nhát."
       },
       {
-       "claim": "Cách mạng Nhận thức bắt đầu khoảng bảy mươi nghìn năm trước.",
+       "claim": "Ngạn yêu Hà Lan từ nhỏ.",
        "supported": true,
-       "reason": "Nguồn ghi Cách mạng Nhận thức khoảng 70.000 năm trước."
+       "reason": "Nguồn ghi Ngạn yêu cô bạn hàng xóm Hà Lan từ nhỏ."
+      },
+      {
+       "claim": "Hà Lan là bạn hàng xóm của Ngạn.",
+       "supported": true,
+       "reason": "Nguồn ghi Hà Lan là cô bạn hàng xóm của Ngạn."
+      },
+      {
+       "claim": "Hà Lan có đôi mắt biếc.",
+       "supported": true,
+       "reason": "Nguồn ghi Hà Lan có đôi mắt biếc."
       }
      ],
      "ragas": 1.0,
@@ -1905,21 +2430,470 @@
     {
      "id": 5,
      "section": "body",
-     "narration_vi": "Tiếp theo là Cách mạng Nông nghiệp khoảng mười hai nghìn năm trước đưa con người bước vào đời sống định cư.",
+     "narration_vi": "Hà Lan lớn lên rồi rời làng ra Sài Gòn học, bị cuộc sống thành phố cuốn đi.",
      "chunk_ids": [
-      "sapiens/02-noi-dung.txt:0"
+      "mat-biec/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cách mạng Nông nghiệp diễn ra khoảng 12.000 năm trước.",
+       "claim": "Hà Lan lớn lên rồi rời làng ra Sài Gòn học.",
        "supported": true,
-       "reason": "Nguồn [1] ghi rõ Cách mạng Nông nghiệp khoảng 12.000 năm trước."
+       "reason": "Nguồn ghi Hà Lan lớn lên rồi rời làng ra Sài Gòn học."
       },
       {
-       "claim": "Cách mạng Nông nghiệp đưa con người bước vào đời sống định cư.",
+       "claim": "Hà Lan bị cuộc sống thành phố cuốn đi.",
        "supported": true,
-       "reason": "Nguồn [1] ghi Cách mạng Nông nghiệp đưa con người vào đời sống định cư."
+       "reason": "Nguồn ghi Hà Lan bị cuộc sống thành phố cuốn đi."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Một mối tình đơn phương kéo dài từ tuổi thơ đến khi trưởng thành có thật sự bền lâu?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Mối tình đơn phương trong tiểu thuyết Mắt biếc kéo dài từ tuổi thơ đến khi trưởng thành.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Mắt biếc kể về một mối tình đơn phương kéo dài từ tuổi thơ đến khi trưởng thành."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Mắt biếc là tiểu thuyết của nhà văn Nguyễn Nhật Ánh xuất bản năm 1990.",
+     "chunk_ids": [
+      "mat-biec/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Mắt biếc là tiểu thuyết của nhà văn Nguyễn Nhật Ánh.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Mắt biếc là tiểu thuyết của nhà văn Nguyễn Nhật Ánh."
+      },
+      {
+       "claim": "Tiểu thuyết Mắt biếc xuất bản năm 1990.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ Mắt biếc xuất bản năm 1990."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "nghi-giau-lam-giau",
+   "title": "Nghĩ giàu làm giàu",
+   "kind": "non_fiction",
+   "storyboard_cost": {
+    "usd": 0.0078936,
+    "input_tokens": 5687.0,
+    "output_tokens": 2475.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 0.0
+    },
+    "context": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 0.625
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.5
+    },
+    "context_body": {
+     "n": 5,
+     "vi": 1.0,
+     "ragas": 0.7,
+     "vi_final": 1.0,
+     "ragas_final": 0.7,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Suy nghĩ và niềm tin có thực sự quyết định kết quả tài chính của bạn không?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Suy nghĩ và niềm tin quyết định kết quả tài chính của con người.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu rõ Hill nhấn mạnh suy nghĩ và niềm tin quyết định kết quả tài chính."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Cuốn sách Nghĩ giàu làm giàu do Napoleon Hill viết và xuất bản năm 1937.",
+     "chunk_ids": [
+      "nghi-giau-lam-giau/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách Nghĩ giàu làm giàu do Napoleon Hill viết.",
+       "supported": true,
+       "reason": "Nguồn xác nhận Nghĩ giàu làm giàu là sách của Napoleon Hill."
+      },
+      {
+       "claim": "Cuốn sách Nghĩ giàu làm giàu được xuất bản năm 1937.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ sách xuất bản năm 1937."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 3,
+     "section": "body",
+     "narration_vi": "Cuốn sách trình bày mười ba nguyên tắc, mở đầu bằng mong muốn cháy bỏng làm điểm xuất phát.",
+     "chunk_ids": [
+      "nghi-giau-lam-giau/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách trình bày mười ba nguyên tắc.",
+       "supported": true,
+       "reason": "Nguồn ghi cuốn sách trình bày mười ba nguyên tắc."
+      },
+      {
+       "claim": "Mười ba nguyên tắc mở đầu bằng mong muốn cháy bỏng làm điểm xuất phát.",
+       "supported": true,
+       "reason": "Nguồn ghi mở đầu bằng mong muốn cháy bỏng làm điểm xuất phát của mọi thành tựu."
+      }
+     ],
+     "ragas": 0.5,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 0.5
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Các nguyên tắc khác gồm niềm tin, tự kỷ ám thị, kiến thức chuyên môn, trí tưởng tượng và kế hoạch hành động.",
+     "chunk_ids": [
+      "nghi-giau-lam-giau/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Các nguyên tắc khác trong cuốn sách gồm niềm tin.",
+       "supported": true,
+       "reason": "Nguồn liệt kê niềm tin là một trong các nguyên tắc khác."
+      },
+      {
+       "claim": "Các nguyên tắc khác trong cuốn sách gồm tự kỷ ám thị.",
+       "supported": true,
+       "reason": "Nguồn liệt kê tự kỷ ám thị là một trong các nguyên tắc khác."
+      },
+      {
+       "claim": "Các nguyên tắc khác trong cuốn sách gồm kiến thức chuyên môn.",
+       "supported": true,
+       "reason": "Nguồn liệt kê kiến thức chuyên môn là một trong các nguyên tắc khác."
+      },
+      {
+       "claim": "Các nguyên tắc khác trong cuốn sách gồm trí tưởng tượng.",
+       "supported": true,
+       "reason": "Nguồn liệt kê trí tưởng tượng là một trong các nguyên tắc khác."
+      },
+      {
+       "claim": "Các nguyên tắc khác trong cuốn sách gồm kế hoạch hành động.",
+       "supported": true,
+       "reason": "Nguồn liệt kê kế hoạch hành động là một trong các nguyên tắc khác."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Bên cạnh đó còn có sự kiên trì và nhóm cố vấn tinh thần.",
+     "chunk_ids": [
+      "nghi-giau-lam-giau/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cuốn sách có đề cập đến sự kiên trì.",
+       "supported": true,
+       "reason": "Nguồn liệt kê kiên trì là một trong các nguyên tắc."
+      },
+      {
+       "claim": "Cuốn sách có đề cập đến nhóm cố vấn tinh thần.",
+       "supported": true,
+       "reason": "Nguồn liệt kê nhóm cố vấn tinh thần là một trong các nguyên tắc."
+      }
+     ],
+     "ragas": 0.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 0.0
+    },
+    {
+     "id": 6,
+     "section": "body",
+     "narration_vi": "Tác giả nhấn mạnh suy nghĩ và niềm tin quyết định kết quả tài chính.",
+     "chunk_ids": [
+      "nghi-giau-lam-giau/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tác giả Hill nhấn mạnh suy nghĩ và niềm tin quyết định kết quả tài chính.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ Hill nhấn mạnh suy nghĩ và niềm tin quyết định kết quả tài chính."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Liệu suy nghĩ và niềm tin có thực sự quyết định kết quả tài chính của bạn không?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Suy nghĩ quyết định kết quả tài chính của con người.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu rõ Hill nhấn mạnh suy nghĩ quyết định kết quả tài chính."
+      },
+      {
+       "claim": "Niềm tin quyết định kết quả tài chính của con người.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu rõ Hill nhấn mạnh niềm tin quyết định kết quả tài chính."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 8,
+     "section": "review_cta",
+     "narration_vi": "Nghĩ giàu làm giàu là sách của Napoleon Hill, xuất bản năm 1937.",
+     "chunk_ids": [
+      "nghi-giau-lam-giau/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nghĩ giàu làm giàu là sách của Napoleon Hill.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ Nghĩ giàu làm giàu là sách của Napoleon Hill."
+      },
+      {
+       "claim": "Nghĩ giàu làm giàu xuất bản năm 1937.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản năm 1937."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "nha-gia-kim",
+   "title": "Nhà giả kim",
+   "kind": "fiction",
+   "storyboard_cost": {
+    "usd": 0.0077286,
+    "input_tokens": 6287.0,
+    "output_tokens": 2337.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "context": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 0.9167
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.5
+    },
+    "context_body": {
+     "n": 5,
+     "vi": 1.0,
+     "ragas": 0.9333,
+     "vi_final": 1.0,
+     "ragas_final": 0.9333,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Chỉ vì hai lần mơ thấy kho báu gần kim tự tháp, cậu bé chăn cừu lại quyết định bán cả đàn cừu để lên đường.",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Santiago mơ thấy kho báu gần kim tự tháp hai lần.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi Santiago hai lần mơ thấy một kho báu nằm gần các kim tự tháp Ai Cập."
+      },
+      {
+       "claim": "Santiago là một cậu bé chăn cừu.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Santiago là một cậu bé chăn cừu."
+      },
+      {
+       "claim": "Santiago quyết định bán đàn cừu để lên đường vì hai lần mơ thấy kho báu.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu Santiago bán đàn cừu để theo đuổi giấc mơ sau khi mơ thấy kho báu."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho xuất bản lần đầu năm 1988.",
+     "chunk_ids": [
+      "nha-gia-kim/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho.",
+       "supported": true,
+       "reason": "Nguồn ghi Nhà giả kim là tiểu thuyết của nhà văn Brazil Paulo Coelho."
+      },
+      {
+       "claim": "Nhà giả kim xuất bản lần đầu năm 1988.",
+       "supported": true,
+       "reason": "Nguồn ghi Nhà giả kim xuất bản lần đầu năm 1988."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 3,
+     "section": "body",
+     "narration_vi": "Cùng một đoàn lữ hành băng qua sa mạc Sahara, cậu bé chăn cừu trải qua nhiều thử thách trên đường đi.",
+     "chunk_ids": [
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cậu bé chăn cừu Santiago cùng một đoàn lữ hành băng qua sa mạc Sahara.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Santiago cùng một đoàn lữ hành băng qua sa mạc Sahara."
+      },
+      {
+       "claim": "Cậu bé chăn cừu Santiago trải qua nhiều thử thách trên đường đi.",
+       "supported": true,
+       "reason": "Nguồn [1] liệt kê các sự kiện như bị lừa mất tiền và làm việc cho người bán pha lê, đây là các thử thách trên đường đi."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Ở ốc đảo, cậu gặp cô gái sa mạc mà cậu yêu và nhà giả kim.",
+     "chunk_ids": [
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Santiago gặp cô gái sa mạc mà Santiago yêu ở ốc đảo.",
+       "supported": true,
+       "reason": "Nguồn ghi: Ở ốc đảo, cậu gặp Fatima, cô gái sa mạc mà cậu yêu."
+      },
+      {
+       "claim": "Santiago gặp nhà giả kim ở ốc đảo.",
+       "supported": true,
+       "reason": "Nguồn ghi: Ở ốc đảo, cậu gặp Fatima... và gặp nhà giả kim."
+      }
+     ],
+     "ragas": 0.6666666666666666,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 0.6666666666666666
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Nhà giả kim là người dạy cậu lắng nghe trái tim và đọc các điềm báo.",
+     "chunk_ids": [
+      "nha-gia-kim/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhà giả kim dạy Santiago lắng nghe trái tim.",
+       "supported": true,
+       "reason": "Nguồn ghi nhà giả kim là người dạy cậu lắng nghe trái tim."
+      },
+      {
+       "claim": "Nhà giả kim dạy Santiago đọc các điềm báo.",
+       "supported": true,
+       "reason": "Nguồn ghi nhà giả kim là người dạy cậu đọc các điềm báo."
       }
      ],
      "ragas": 1.0,
@@ -1931,21 +2905,21 @@
     {
      "id": 6,
      "section": "body",
-     "narration_vi": "Cuối cùng là Cách mạng Khoa học khoảng năm trăm năm trước mở ra thời kỳ tiến bộ nhanh chóng.",
+     "narration_vi": "Tác phẩm nhấn mạnh khái niệm huyền thoại cá nhân, tức sứ mệnh riêng mà mỗi người cần theo đuổi.",
      "chunk_ids": [
-      "sapiens/02-noi-dung.txt:0"
+      "nha-gia-kim/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cách mạng Khoa học diễn ra khoảng năm trăm năm trước.",
+       "claim": "Tác phẩm Nhà giả kim nhấn mạnh khái niệm huyền thoại cá nhân.",
        "supported": true,
-       "reason": "Nguồn [1] ghi Cách mạng Khoa học khoảng 500 năm trước."
+       "reason": "Nguồn [1] ghi rõ: Sách nhấn mạnh khái niệm huyền thoại cá nhân."
       },
       {
-       "claim": "Cách mạng Khoa học mở ra thời kỳ tiến bộ nhanh chóng.",
+       "claim": "Huyền thoại cá nhân là sứ mệnh riêng mà mỗi người cần theo đuổi.",
        "supported": true,
-       "reason": "Nguồn [1] ghi Cách mạng Khoa học mở ra thời kỳ tiến bộ nhanh chóng."
+       "reason": "Nguồn [1] giải thích: tức sứ mệnh riêng mà mỗi người cần theo đuổi."
       }
      ],
      "ragas": 1.0,
@@ -1956,17 +2930,127 @@
     },
     {
      "id": 7,
-     "section": "body",
-     "narration_vi": "Tác giả lập luận rằng sức mạnh của loài người đến từ khả năng tin vào những câu chuyện chung như tiền tệ, tôn giáo và quốc gia.",
+     "section": "review_cta",
+     "narration_vi": "Chàng chăn cừu trẻ tuổi liệu có tìm thấy kho báu ai cập khi đặt chân đến châu phi?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Santiago là một chàng chăn cừu trẻ tuổi.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Santiago là một cậu bé chăn cừu."
+      },
+      {
+       "claim": "Santiago đặt chân đến châu Phi để tìm kho báu Ai Cập.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu Santiago vượt eo biển sang châu Phi để theo đuổi giấc mơ về kho báu gần kim tự tháp Ai Cập."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 8,
+     "section": "review_cta",
+     "narration_vi": "Nhà giả kim là tiểu thuyết của nhà văn brazil paulo coelho xuất bản lần đầu năm một nghìn chín trăm tám mươi tám.",
      "chunk_ids": [
-      "sapiens/02-noi-dung.txt:0"
+      "nha-gia-kim/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Tác giả Harari lập luận rằng sức mạnh của loài người đến từ khả năng tin vào những câu chuyện chung như tiền tệ, tôn giáo và quốc gia.",
+       "claim": "Nhà giả kim là tiểu thuyết của nhà văn Paulo Coelho.",
        "supported": true,
-       "reason": "Nguồn [1] ghi rõ: Ông lập luận rằng sức mạnh của Sapiens đến từ khả năng tin vào những câu chuyện chung như tiền tệ, tôn giáo, quốc gia."
+       "reason": "Nguồn [1] xác nhận Nhà giả kim là tiểu thuyết của nhà văn Paulo Coelho."
+      },
+      {
+       "claim": "Nhà giả kim xuất bản lần đầu năm 1988.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi Nhà giả kim xuất bản lần đầu năm 1988."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "ong-gia-va-bien-ca",
+   "title": "Ông già và biển cả",
+   "kind": "fiction",
+   "storyboard_cost": {
+    "usd": 0.0073558,
+    "input_tokens": 5761.0,
+    "output_tokens": 2251.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 0.5
+    },
+    "context": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.8333
+    },
+    "context_body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 1.0,
+     "vi_final": 1.0,
+     "ragas_final": 1.0,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Liệu một ngư dân già đã tám mươi tư ngày không bắt được gì có thể đổi vận?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Santiago là một ngư dân già.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Santiago là một ngư dân già."
+      },
+      {
+       "claim": "Santiago đã tám mươi tư ngày không bắt được con cá nào.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi rõ Santiago đã tám mươi tư ngày liền không bắt được con cá nào."
+      }
+     ],
+     "ragas": 0.5
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Ông già và biển cả là tiểu thuyết ngắn do nhà văn Mỹ Ernest Hemingway viết và xuất bản vào năm 1952.",
+     "chunk_ids": [
+      "ong-gia-va-bien-ca/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Ông già và biển cả là tiểu thuyết ngắn do nhà văn Mỹ Ernest Hemingway viết.",
+       "supported": true,
+       "reason": "Nguồn xác nhận Ông già và biển cả là tiểu thuyết ngắn của nhà văn Mỹ Ernest Hemingway."
+      },
+      {
+       "claim": "Ông già và biển cả được xuất bản vào năm 1952.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ tác phẩm xuất bản năm 1952."
       }
      ],
      "ragas": 1.0,
@@ -1976,49 +3060,316 @@
      "ragas_final": 1.0
     },
     {
-     "id": 8,
-     "section": "review_cta",
-     "narration_vi": "Bạn có bao giờ tò mò loài người chúng ta đã thống trị Trái Đất như thế nào không?",
-     "chunk_ids": [],
-     "vi": 0.0,
+     "id": 3,
+     "section": "context",
+     "narration_vi": "Tác phẩm này lấy bối cảnh chính tại vùng biển Cuba.",
+     "chunk_ids": [
+      "ong-gia-va-bien-ca/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Loài người đã thống trị Trái Đất.",
+       "claim": "Ông già và biển cả lấy bối cảnh chính tại vùng biển Cuba.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ truyện lấy bối cảnh vùng biển Cuba."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Ông già Santiago quyết định ra khơi một mình trên biển.",
+     "chunk_ids": [
+      "ong-gia-va-bien-ca/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Ông già Santiago quyết định ra khơi một mình trên biển.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ Santiago ra khơi một mình."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Giữa biển khơi, ông đã câu được một con cá kiếm marlin khổng lồ.",
+     "chunk_ids": [
+      "ong-gia-va-bien-ca/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Santiago câu được một con cá kiếm marlin khổng lồ giữa biển khơi.",
+       "supported": true,
+       "reason": "Nguồn xác nhận Santiago câu được một con cá kiếm marlin khổng lồ khi ra khơi."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Tám mươi tư ngày không bắt được cá, liệu ông già Santiago có vượt qua được thử thách trên biển khơi?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Santiago đã tám mươi tư ngày không bắt được con cá nào.",
+       "supported": true,
+       "reason": "Nguồn [2] ghi Santiago là ngư dân già đã tám mươi tư ngày liền không bắt được con cá nào."
+      },
+      {
+       "claim": "Santiago phải đối mặt với thử thách trên biển khơi.",
+       "supported": true,
+       "reason": "Nguồn [2] mô tả việc Santiago ra khơi, vật lộn với cá kiếm và cá mập."
+      }
+     ],
+     "ragas": 0.6666666666666666
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Ông già và biển cả là tiểu thuyết ngắn của nhà văn Mỹ Ernest Hemingway, xuất bản năm 1952 với bối cảnh vùng biển Cuba.",
+     "chunk_ids": [
+      "ong-gia-va-bien-ca/01-tong-quan.txt:0",
+      "ong-gia-va-bien-ca/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Ông già và biển cả là tiểu thuyết ngắn của nhà văn Mỹ Ernest Hemingway.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Ông già và biển cả là tiểu thuyết ngắn của nhà văn Mỹ Ernest Hemingway."
+      },
+      {
+       "claim": "Ông già và biển cả được xuất bản năm 1952.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ tác phẩm xuất bản năm 1952."
+      },
+      {
+       "claim": "Ông già và biển cả lấy bối cảnh vùng biển Cuba.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu rõ truyện lấy bối cảnh vùng biển Cuba."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "sapiens",
+   "title": "Sapiens: Lược sử loài người",
+   "kind": "non_fiction",
+   "storyboard_cost": {
+    "usd": 0.0074831,
+    "input_tokens": 6002.0,
+    "output_tokens": 2273.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 0.5,
+     "ragas": 0.0
+    },
+    "context": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 3,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.5
+    },
+    "context_body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 1.0,
+     "vi_final": 1.0,
+     "ragas_final": 1.0,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Liệu sức mạnh thực sự của loài người nằm ở đâu mà giúp họ thống trị?",
+     "chunk_ids": [],
+     "vi": 0.5,
+     "vi_claims": [
+      {
+       "claim": "Sức mạnh thực sự của loài người nằm ở khả năng tin vào những câu chuyện chung như tiền tệ, tôn giáo, quốc gia.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu rõ sức mạnh của Sapiens đến từ khả năng tin vào những câu chuyện chung như tiền tệ, tôn giáo, quốc gia."
+      },
+      {
+       "claim": "Khả năng tin vào những câu chuyện chung giúp loài người thống trị.",
        "supported": false,
-       "reason": "Nguồn không đề cập đến việc loài người thống trị Trái Đất."
+       "reason": "Nguồn không đề cập trực tiếp đến việc khả năng này giúp loài người thống trị."
       }
      ],
      "ragas": 0.0
     },
     {
-     "id": 9,
-     "section": "review_cta",
-     "narration_vi": "Cuốn sách Sapiens: Lược sử loài người của nhà sử học Yuval Noah Harari xuất bản lần đầu năm 2011 kể lịch sử loài người và trở thành hiện tượng toàn cầu.",
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Sapiens: Lược sử loài người là cuốn sách của nhà sử học người Israel Yuval Noah Harari, xuất bản lần đầu năm 2011.",
      "chunk_ids": [
-      "sapiens/01-tong-quan.txt:0",
       "sapiens/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Sapiens: Lược sử loài người là của nhà sử học Yuval Noah Harari.",
+       "claim": "Sapiens: Lược sử loài người là cuốn sách của nhà sử học người Israel Yuval Noah Harari.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận Sapiens: Lược sử loài người là cuốn sách của nhà sử học Yuval Noah Harari."
+       "reason": "Nguồn [1] xác nhận Sapiens: Lược sử loài người là cuốn sách của nhà sử học người Israel Yuval Noah Harari."
       },
       {
-       "claim": "Cuốn sách Sapiens: Lược sử loài người xuất bản lần đầu năm 2011.",
+       "claim": "Sapiens: Lược sử loài người xuất bản lần đầu năm 2011.",
        "supported": true,
        "reason": "Nguồn [1] ghi sách xuất bản lần đầu bằng tiếng Do Thái năm 2011."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 3,
+     "section": "body",
+     "narration_vi": "Cách mạng Nhận thức khoảng bảy mươi nghìn năm trước giúp Homo sapiens hợp tác với số lượng lớn người xa lạ.",
+     "chunk_ids": [
+      "sapiens/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cách mạng Nhận thức xảy ra khoảng 70.000 năm trước.",
+       "supported": true,
+       "reason": "Nguồn ghi Cách mạng Nhận thức khoảng 70.000 năm trước."
       },
       {
-       "claim": "Cuốn sách Sapiens: Lược sử loài người kể lịch sử loài người.",
+       "claim": "Cách mạng Nhận thức giúp Homo sapiens hợp tác với số lượng lớn người xa lạ.",
        "supported": true,
-       "reason": "Nguồn [1] ghi sách kể lịch sử loài Homo sapiens."
+       "reason": "Nguồn ghi Cách mạng Nhận thức giúp Homo sapiens hợp tác với số lượng lớn người xa lạ."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Cách mạng Nông nghiệp khoảng mười hai nghìn năm trước đưa con người vào đời sống định cư.",
+     "chunk_ids": [
+      "sapiens/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cách mạng Nông nghiệp diễn ra khoảng mười hai nghìn năm trước.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ Cách mạng Nông nghiệp khoảng 12.000 năm trước."
       },
       {
-       "claim": "Cuốn sách Sapiens: Lược sử loài người trở thành hiện tượng toàn cầu.",
+       "claim": "Cách mạng Nông nghiệp đưa con người vào đời sống định cư.",
        "supported": true,
-       "reason": "Nguồn [1] ghi sách trở thành hiện tượng xuất bản toàn cầu."
+       "reason": "Nguồn [1] ghi rõ Cách mạng Nông nghiệp đưa con người vào đời sống định cư."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Cách mạng Khoa học khoảng năm trăm năm trước mở ra thời kỳ tiến bộ nhanh chóng.",
+     "chunk_ids": [
+      "sapiens/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Cách mạng Khoa học diễn ra khoảng năm trăm năm trước.",
+       "supported": true,
+       "reason": "Nguồn ghi Cách mạng Khoa học khoảng 500 năm trước."
+      },
+      {
+       "claim": "Cách mạng Khoa học mở ra thời kỳ tiến bộ nhanh chóng.",
+       "supported": true,
+       "reason": "Nguồn ghi Cách mạng Khoa học mở ra thời kỳ tiến bộ nhanh chóng."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Bạn có tò mò điều gì đã đưa loài người đi từ thời tiền sử đến hiện đại không?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Loài người đã đi từ thời tiền sử đến hiện đại.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận sách kể lịch sử loài Homo sapiens từ thời tiền sử đến hiện đại."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Sapiens: Lược sử loài người là cuốn sách của nhà sử học người Israel Yuval Noah Harari, xuất bản lần đầu bằng tiếng Do Thái năm 2011.",
+     "chunk_ids": [
+      "sapiens/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Sapiens: Lược sử loài người là cuốn sách của nhà sử học người Israel Yuval Noah Harari.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Sapiens: Lược sử loài người là cuốn sách của nhà sử học người Israel Yuval Noah Harari."
+      },
+      {
+       "claim": "Sapiens: Lược sử loài người xuất bản lần đầu bằng tiếng Do Thái năm 2011.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản lần đầu bằng tiếng Do Thái năm 2011."
       }
      ],
      "ragas": 1.0
@@ -2030,9 +3381,251 @@
    "title": "Số đỏ",
    "kind": "fiction",
    "storyboard_cost": {
-    "usd": 0.0080233,
-    "input_tokens": 4636.0,
-    "output_tokens": 2653.0
+    "usd": 0.0079329,
+    "input_tokens": 6018.0,
+    "output_tokens": 2451.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 0.6667,
+     "ragas": 0.0
+    },
+    "context": {
+     "n": 2,
+     "vi": 0.75,
+     "ragas": 0.75
+    },
+    "body": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.875
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "context_body": {
+     "n": 4,
+     "vi": 0.875,
+     "ragas": 0.8125,
+     "vi_final": 1.0,
+     "ragas_final": 0.9375,
+     "rewritten": 1,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Vì sao một gã vô học lại có thể một bước thành nhà cải cách xã hội?",
+     "chunk_ids": [],
+     "vi": 0.6666666666666666,
+     "vi_claims": [
+      {
+       "claim": "Xuân Tóc Đỏ là một gã vô học.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Xuân Tóc Đỏ là một gã vô học."
+      },
+      {
+       "claim": "Xuân Tóc Đỏ trở thành nhà cải cách xã hội.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Xuân Tóc Đỏ được tôn là nhà cải cách xã hội."
+      },
+      {
+       "claim": "Xuân Tóc Đỏ trở thành nhà cải cách xã hội chỉ trong một bước.",
+       "supported": false,
+       "reason": "Nguồn [2] chỉ nói Xuân Tóc Đỏ leo lên nhờ chuỗi may mắn và sự giả dối, không đề cập đến tốc độ một bước."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng xuất bản từ năm 1936.",
+     "chunk_ids": [
+      "so-do/01-tong-quan.txt:0"
+     ],
+     "vi": 0.5,
+     "vi_claims": [
+      {
+       "claim": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng."
+      },
+      {
+       "claim": "Số đỏ xuất bản từ năm 1936.",
+       "supported": false,
+       "reason": "Nguồn [1] ghi năm 1936 là thời điểm đăng nhiều kỳ trên báo, còn sách in năm 1938."
+      }
+     ],
+     "ragas": 0.5,
+     "rounds": 1,
+     "vi_final": 1.0,
+     "flags": [],
+     "final_narration_vi": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng in thành sách vào năm 1938.",
+     "final_vi_claims": [
+      {
+       "claim": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng.",
+       "supported": true,
+       "reason": "Nguồn xác nhận Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng."
+      },
+      {
+       "claim": "Số đỏ được in thành sách vào năm 1938.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ Số đỏ in thành sách vào năm 1938."
+      }
+     ],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 3,
+     "section": "context",
+     "narration_vi": "Tác phẩm châm biếm xã hội thành thị thời Pháp thuộc đang chạy theo lối sống Âu hóa lố lăng.",
+     "chunk_ids": [
+      "so-do/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tác phẩm Số đỏ châm biếm xã hội thành thị thời Pháp thuộc đang chạy theo lối sống Âu hóa lố lăng.",
+       "supported": true,
+       "reason": "Nguồn ghi tác phẩm châm biếm xã hội thành thị thời Pháp thuộc đang chạy theo lối sống Âu hóa lố lăng."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Nhân vật chính là Xuân Tóc Đỏ, một gã vô học xuất thân nghèo, từng đi nhặt bóng ở sân quần vợt.",
+     "chunk_ids": [
+      "so-do/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Nhân vật chính của tác phẩm là Xuân Tóc Đỏ.",
+       "supported": true,
+       "reason": "Nguồn khẳng định nhân vật chính là Xuân Tóc Đỏ."
+      },
+      {
+       "claim": "Xuân Tóc Đỏ là một gã vô học.",
+       "supported": true,
+       "reason": "Nguồn mô tả Xuân Tóc Đỏ là một gã vô học."
+      },
+      {
+       "claim": "Xuân Tóc Đỏ có xuất thân nghèo.",
+       "supported": true,
+       "reason": "Nguồn nêu Xuân Tóc Đỏ xuất thân nghèo."
+      },
+      {
+       "claim": "Xuân Tóc Đỏ từng đi nhặt bóng ở sân quần vợt.",
+       "supported": true,
+       "reason": "Nguồn xác nhận Xuân Tóc Đỏ từng đi nhặt bóng ở sân quần vợt."
+      }
+     ],
+     "ragas": 0.75,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 0.75
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Qua những nhân vật như cụ cố Hồng, bà Phó Đoan hay cô Tuyết, tác giả phơi bày sự giả tạo, thói hợm hĩnh và sự suy đồi đạo đức của tầng lớp thượng lưu.",
+     "chunk_ids": [
+      "so-do/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tác giả phơi bày sự giả tạo của tầng lớp thượng lưu qua nhân vật cụ cố Hồng, bà Phó Đoan và cô Tuyết.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ tác giả phơi bày sự giả tạo của tầng lớp thượng lưu qua các nhân vật này."
+      },
+      {
+       "claim": "Tác giả phơi bày thói hợm hĩnh của tầng lớp thượng lưu qua nhân vật cụ cố Hồng, bà Phó Đoan và cô Tuyết.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ tác giả phơi bày thói hợm hĩnh của tầng lớp thượng lưu qua các nhân vật này."
+      },
+      {
+       "claim": "Tác giả phơi bày sự suy đồi đạo đức của tầng lớp thượng lưu qua nhân vật cụ cố Hồng, bà Phó Đoan và cô Tuyết.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ tác giả phơi bày sự suy đồi đạo đức của tầng lớp thượng lưu qua các nhân vật này."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Liệu một kẻ vô học làm nghề nhặt bóng có thể bất ngờ trở thành nhà cải cách xã hội?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Xuân Tóc Đỏ là một kẻ vô học.",
+       "supported": true,
+       "reason": "Nguồn [2] mô tả Xuân Tóc Đỏ là một gã vô học."
+      },
+      {
+       "claim": "Xuân Tóc Đỏ làm nghề nhặt bóng.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu Xuân Tóc Đỏ từng đi nhặt bóng ở sân quần vợt."
+      },
+      {
+       "claim": "Xuân Tóc Đỏ trở thành nhà cải cách xã hội.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận Xuân Tóc Đỏ được tôn là nhà cải cách xã hội."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng, đăng nhiều kỳ trên báo Hà Nội báo từ năm 1936.",
+     "chunk_ids": [
+      "so-do/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng.",
+       "supported": true,
+       "reason": "Nguồn [1] khẳng định Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng."
+      },
+      {
+       "claim": "Số đỏ được đăng nhiều kỳ trên báo Hà Nội báo từ năm 1936.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ tác phẩm đăng nhiều kỳ trên báo Hà Nội báo từ năm 1936."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "sung-vi-trung-va-thep",
+   "title": "Súng, vi trùng và thép",
+   "kind": "non_fiction",
+   "storyboard_cost": {
+    "usd": 0.0065654,
+    "input_tokens": 5843.0,
+    "output_tokens": 1925.0
    },
    "sections": {
     "hook": {
@@ -2041,19 +3634,19 @@
      "ragas": 1.0
     },
     "context": {
-     "n": 2,
+     "n": 1,
      "vi": 1.0,
      "ragas": 1.0
     },
     "body": {
-     "n": 2,
+     "n": 3,
      "vi": 1.0,
      "ragas": 1.0
     },
     "review_cta": {
      "n": 2,
-     "vi": 0.6667,
-     "ragas": 0.25
+     "vi": 1.0,
+     "ragas": 0.5
     },
     "context_body": {
      "n": 4,
@@ -2069,29 +3662,19 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Bạn có tin một gã vô học nhặt bóng ở sân quần vợt lại có thể một bước thành anh hùng và nhà cải cách xã hội không?",
+     "narration_vi": "Vì sao người da trắng có nhiều của cải còn người New Guinea lại không có?",
      "chunk_ids": [],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Xuân Tóc Đỏ là một gã vô học.",
+       "claim": "Người da trắng có nhiều của cải.",
        "supported": true,
-       "reason": "Nguồn [2] mô tả Xuân Tóc Đỏ là một gã vô học."
+       "reason": "Nguồn [1] nhắc đến câu hỏi của Yali về việc người da trắng có nhiều của cải."
       },
       {
-       "claim": "Xuân Tóc Đỏ từng đi nhặt bóng ở sân quần vợt.",
+       "claim": "Người New Guinea không có nhiều của cải.",
        "supported": true,
-       "reason": "Nguồn [2] xác nhận Xuân Tóc Đỏ từng đi nhặt bóng ở sân quần vợt."
-      },
-      {
-       "claim": "Xuân Tóc Đỏ trở thành anh hùng.",
-       "supported": true,
-       "reason": "Nguồn [2] nêu Xuân Tóc Đỏ được tôn là anh hùng."
-      },
-      {
-       "claim": "Xuân Tóc Đỏ trở thành nhà cải cách xã hội.",
-       "supported": true,
-       "reason": "Nguồn [2] nêu Xuân Tóc Đỏ được tôn là nhà cải cách xã hội."
+       "reason": "Nguồn [1] nhắc đến câu hỏi của Yali về việc người New Guinea không có nhiều của cải."
       }
      ],
      "ragas": 1.0
@@ -2099,21 +3682,27 @@
     {
      "id": 2,
      "section": "context",
-     "narration_vi": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng, đăng nhiều kỳ trên báo từ năm 1936.",
+     "narration_vi": "Cuốn sách Súng, vi trùng và thép của Jared Diamond, xuất bản năm 1997, xuất phát từ câu hỏi của một chính trị gia.",
      "chunk_ids": [
-      "so-do/01-tong-quan.txt:0"
+      "sung-vi-trung-va-thep/01-tong-quan.txt:0",
+      "sung-vi-trung-va-thep/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng.",
+       "claim": "Cuốn sách Súng, vi trùng và thép là của tác giả Jared Diamond.",
        "supported": true,
-       "reason": "Nguồn xác nhận Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng."
+       "reason": "Nguồn [1] ghi Súng, vi trùng và thép là sách của Jared Diamond."
       },
       {
-       "claim": "Số đỏ được đăng nhiều kỳ trên báo từ năm 1936.",
+       "claim": "Cuốn sách Súng, vi trùng và thép được xuất bản năm 1997.",
        "supported": true,
-       "reason": "Nguồn ghi nhận tác phẩm đăng nhiều kỳ trên báo Hà Nội báo từ năm 1936."
+       "reason": "Nguồn [1] ghi sách xuất bản năm 1997."
+      },
+      {
+       "claim": "Cuốn sách Súng, vi trùng và thép xuất phát từ câu hỏi của một chính trị gia.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi sách xuất phát từ câu hỏi của Yali, một chính trị gia người New Guinea."
       }
      ],
      "ragas": 1.0,
@@ -2124,17 +3713,22 @@
     },
     {
      "id": 3,
-     "section": "context",
-     "narration_vi": "Tác phẩm được xem là kiệt tác châm biếm xã hội thành thị thời Pháp thuộc đang chạy theo lối sống Âu hóa lố lăng.",
+     "section": "body",
+     "narration_vi": "Chênh lệch giữa các dân tộc xuất phát từ môi trường địa lý chứ không phải khác biệt sinh học.",
      "chunk_ids": [
-      "so-do/01-tong-quan.txt:0"
+      "sung-vi-trung-va-thep/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Số đỏ được xem là kiệt tác châm biếm xã hội thành thị thời Pháp thuộc đang chạy theo lối sống Âu hóa lố lăng.",
+       "claim": "Chênh lệch giữa các dân tộc xuất phát từ môi trường địa lý.",
        "supported": true,
-       "reason": "Nguồn khẳng định tác phẩm là kiệt tác châm biếm xã hội thành thị thời Pháp thuộc chạy theo lối sống Âu hóa lố lăng."
+       "reason": "Nguồn [1] nêu chênh lệch đến từ môi trường địa lý."
+      },
+      {
+       "claim": "Chênh lệch giữa các dân tộc không xuất phát từ khác biệt sinh học.",
+       "supported": true,
+       "reason": "Nguồn [1] khẳng định chênh lệch không đến từ khác biệt sinh học."
       }
      ],
      "ragas": 1.0,
@@ -2146,26 +3740,21 @@
     {
      "id": 4,
      "section": "body",
-     "narration_vi": "Xuân Tóc Đỏ bắt đầu từ một gã vô học đi nhặt bóng rồi phất lên nhờ xã hội giả dối.",
+     "narration_vi": "Lục địa Á-Âu có nhiều loài cây trồng và vật nuôi có thể thuần hóa, cùng trục chính chạy theo hướng đông tây.",
      "chunk_ids": [
-      "so-do/02-noi-dung.txt:0"
+      "sung-vi-trung-va-thep/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Xuân Tóc Đỏ là một gã vô học.",
+       "claim": "Lục địa Á-Âu có nhiều loài cây trồng và vật nuôi có thể thuần hóa.",
        "supported": true,
-       "reason": "Nguồn ghi Xuân Tóc Đỏ là một gã vô học."
+       "reason": "Nguồn [1] khẳng định lục địa Á-Âu có nhiều loài cây trồng và vật nuôi có thể thuần hóa."
       },
       {
-       "claim": "Xuân Tóc Đỏ từng làm nghề nhặt bóng.",
+       "claim": "Lục địa Á-Âu có trục chính chạy theo hướng đông tây.",
        "supported": true,
-       "reason": "Nguồn ghi Xuân Tóc Đỏ từng đi nhặt bóng ở sân quần vợt."
-      },
-      {
-       "claim": "Xuân Tóc Đỏ trở nên nổi tiếng nhờ sự giả dối của xã hội.",
-       "supported": true,
-       "reason": "Nguồn ghi nhờ sự giả dối của xã hội xung quanh, hắn leo lên thành người nổi tiếng."
+       "reason": "Nguồn [1] khẳng định trục chính của lục địa Á-Âu chạy theo hướng đông tây."
       }
      ],
      "ragas": 1.0,
@@ -2177,21 +3766,26 @@
     {
      "id": 5,
      "section": "body",
-     "narration_vi": "Qua những nhân vật thượng lưu, tác phẩm phơi bày sự suy đồi đạo đức bằng tiếng cười châm biếm.",
+     "narration_vi": "Nông nghiệp tạo ra lương thực dư thừa, nuôi dân số đông và các nhà nước.",
      "chunk_ids": [
-      "so-do/02-noi-dung.txt:0"
+      "sung-vi-trung-va-thep/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Tác phẩm phơi bày sự suy đồi đạo đức của tầng lớp thượng lưu qua những nhân vật thượng lưu.",
+       "claim": "Nông nghiệp tạo ra lương thực dư thừa.",
        "supported": true,
-       "reason": "Nguồn ghi tác giả phơi bày sự suy đồi đạo đức của tầng lớp thượng lưu qua những nhân vật như cụ cố Hồng, bà Phó Đoan hay cô Tuyết."
+       "reason": "Nguồn ghi 'Nông nghiệp tạo ra lương thực dư thừa'."
       },
       {
-       "claim": "Tác phẩm phơi bày sự suy đồi đạo đức bằng tiếng cười châm biếm.",
+       "claim": "Nông nghiệp nuôi dân số đông.",
        "supported": true,
-       "reason": "Nguồn ghi giọng văn đặc trưng bởi tiếng cười châm biếm sắc sảo dùng để phơi bày sự giả tạo và suy đồi."
+       "reason": "Nguồn ghi 'nuôi dân số đông'."
+      },
+      {
+       "claim": "Nông nghiệp nuôi các nhà nước.",
+       "supported": true,
+       "reason": "Nguồn ghi 'nuôi... các nhà nước'."
       }
      ],
      "ragas": 1.0,
@@ -2203,19 +3797,14 @@
     {
      "id": 6,
      "section": "review_cta",
-     "narration_vi": "Bạn sẽ làm gì khi thấy một kẻ vô học bỗng chốc đổi đời thành nhân vật tầm cỡ trong xã hội?",
+     "narration_vi": "Bạn có thắc mắc vì sao các xã hội trên thế giới lại phát triển không đồng đều như vậy không?",
      "chunk_ids": [],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Xuân Tóc Đỏ là một kẻ vô học.",
+       "claim": "Các xã hội trên thế giới phát triển không đồng đều.",
        "supported": true,
-       "reason": "Nguồn [2] mô tả Xuân Tóc Đỏ là một gã vô học."
-      },
-      {
-       "claim": "Xuân Tóc Đỏ đổi đời thành nhân vật tầm cỡ trong xã hội.",
-       "supported": true,
-       "reason": "Nguồn [2] nêu Xuân Tóc Đỏ leo lên thành người nổi tiếng, được tôn là nhà cải cách xã hội và anh hùng."
+       "reason": "Nguồn [1] xác nhận cuốn sách trả lời câu hỏi vì sao các xã hội trên thế giới phát triển không đồng đều."
       }
      ],
      "ragas": 0.0
@@ -2223,46 +3812,46 @@
     {
      "id": 7,
      "section": "review_cta",
-     "narration_vi": "Số đỏ là tiểu thuyết trào phúng nổi tiếng của nhà văn Vũ Trọng Phụng xuất bản từ năm 1936.",
+     "narration_vi": "Cuốn sách Súng, vi trùng và thép của Jared Diamond xuất bản năm 1997 sẽ giải đáp thắc mắc này.",
      "chunk_ids": [
-      "so-do/01-tong-quan.txt:0"
+      "sung-vi-trung-va-thep/01-tong-quan.txt:0"
      ],
-     "vi": 0.3333333333333333,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Số đỏ là tiểu thuyết trào phúng của nhà văn Vũ Trọng Phụng.",
+       "claim": "Cuốn sách Súng, vi trùng và thép là của tác giả Jared Diamond.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận Số đỏ là tiểu thuyết trào phúng của Vũ Trọng Phụng."
+       "reason": "Nguồn [1] xác nhận Súng, vi trùng và thép là sách của Jared Diamond."
       },
       {
-       "claim": "Số đỏ là tiểu thuyết nổi tiếng.",
-       "supported": false,
-       "reason": "Nguồn không đề cập đến tính từ nổi tiếng."
+       "claim": "Cuốn sách Súng, vi trùng và thép được xuất bản năm 1997.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ sách xuất bản năm 1997."
       },
       {
-       "claim": "Số đỏ xuất bản từ năm 1936.",
-       "supported": false,
-       "reason": "Nguồn [1] ghi năm 1936 là thời điểm đăng báo, năm 1938 mới in thành sách."
+       "claim": "Cuốn sách Súng, vi trùng và thép giải đáp thắc mắc về sự phát triển không đồng đều giữa các xã hội.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu sách trả lời câu hỏi vì sao các xã hội phát triển không đồng đều."
       }
      ],
-     "ragas": 0.5
+     "ragas": 1.0
     }
    ]
   },
   {
-   "slug": "tu-duy-nhanh-va-cham",
-   "title": "Tư duy nhanh và chậm",
+   "slug": "tam-ly-hoc-dam-dong",
+   "title": "Tâm lý học đám đông",
    "kind": "non_fiction",
    "storyboard_cost": {
-    "usd": 0.0086756,
-    "input_tokens": 4527.0,
-    "output_tokens": 2927.0
+    "usd": 0.0078305,
+    "input_tokens": 5710.0,
+    "output_tokens": 2447.0
    },
    "sections": {
     "hook": {
      "n": 1,
-     "vi": 0.0,
-     "ragas": 0.0
+     "vi": 1.0,
+     "ragas": 1.0
     },
     "context": {
      "n": 2,
@@ -2270,21 +3859,21 @@
      "ragas": 1.0
     },
     "body": {
-     "n": 4,
+     "n": 3,
      "vi": 1.0,
-     "ragas": 0.9375
+     "ragas": 1.0
     },
     "review_cta": {
      "n": 2,
-     "vi": 0.5,
-     "ragas": 0.5
+     "vi": 0.75,
+     "ragas": 1.0
     },
     "context_body": {
-     "n": 6,
+     "n": 5,
      "vi": 1.0,
-     "ragas": 0.9583,
+     "ragas": 1.0,
      "vi_final": 1.0,
-     "ragas_final": 0.9583,
+     "ragas_final": 1.0,
      "rewritten": 0,
      "low_faithfulness": 0
     }
@@ -2293,42 +3882,36 @@
     {
      "id": 1,
      "section": "hook",
-     "narration_vi": "Bạn có bao giờ tự hỏi vì sao đôi khi chúng ta ra quyết định sai lầm một cách cực kỳ ngớ ngẩn?",
+     "narration_vi": "Liệu bạn có đánh mất ý thức riêng khi bước vào đám đông?",
      "chunk_ids": [],
-     "vi": 0.0,
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Con người đôi khi ra quyết định sai lầm một cách cực kỳ ngớ ngẩn.",
-       "supported": false,
-       "reason": "Nguồn chỉ đề cập đến việc con người mắc sai lầm trong tư duy chứ không mô tả tính chất sai lầm là ngớ ngẩn."
+       "claim": "Cá nhân đánh mất ý thức riêng khi hòa vào đám đông.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu rõ cá nhân đánh mất ý thức riêng khi hòa vào đám đông."
       }
      ],
-     "ragas": 0.0
+     "ragas": 1.0
     },
     {
      "id": 2,
      "section": "context",
-     "narration_vi": "Cuốn sách Tư duy nhanh và chậm của nhà tâm lý học Daniel Kahneman xuất bản năm 2011 tổng hợp nhiều thập kỷ nghiên cứu về cách con người suy nghĩ.",
+     "narration_vi": "Tâm lý học đám đông là tác phẩm của nhà tâm lý xã hội người Pháp Gustave Le Bon, xuất bản năm 1895.",
      "chunk_ids": [
-      "tu-duy-nhanh-va-cham/01-tong-quan.txt:0",
-      "tu-duy-nhanh-va-cham/01-tong-quan.txt:0"
+      "tam-ly-hoc-dam-dong/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Tư duy nhanh và chậm là của nhà tâm lý học Daniel Kahneman.",
+       "claim": "Tâm lý học đám đông là tác phẩm của nhà tâm lý xã hội người Pháp Gustave Le Bon.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận Tư duy nhanh và chậm là cuốn sách của nhà tâm lý học Daniel Kahneman."
+       "reason": "Nguồn ghi Tâm lý học đám đông là tác phẩm của nhà tâm lý xã hội người Pháp Gustave Le Bon."
       },
       {
-       "claim": "Cuốn sách Tư duy nhanh và chậm xuất bản năm 2011.",
+       "claim": "Tâm lý học đám đông được xuất bản năm 1895.",
        "supported": true,
-       "reason": "Nguồn [1] ghi rõ cuốn sách xuất bản năm 2011."
-      },
-      {
-       "claim": "Cuốn sách Tư duy nhanh và chậm tổng hợp nhiều thập kỷ nghiên cứu về cách con người suy nghĩ.",
-       "supported": true,
-       "reason": "Nguồn [1] nêu cuốn sách tổng hợp nhiều thập kỷ nghiên cứu về cách con người suy nghĩ."
+       "reason": "Nguồn ghi tác phẩm xuất bản năm 1895."
       }
      ],
      "ragas": 1.0,
@@ -2340,21 +3923,16 @@
     {
      "id": 3,
      "section": "context",
-     "narration_vi": "Tác giả Kahneman từng đoạt giải Nobel Kinh tế nhờ công trình về ra quyết định thực hiện cùng Amos Tversky.",
+     "narration_vi": "Đây là một trong những công trình sớm nhất phân tích hành vi của đám đông.",
      "chunk_ids": [
-      "tu-duy-nhanh-va-cham/01-tong-quan.txt:0"
+      "tam-ly-hoc-dam-dong/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Tác giả Daniel Kahneman từng đoạt giải Nobel Kinh tế.",
+       "claim": "Tâm lý học đám đông là một trong những công trình sớm nhất phân tích hành vi của đám đông.",
        "supported": true,
-       "reason": "Nguồn ghi Kahneman là người đoạt giải Nobel Kinh tế năm 2002."
-      },
-      {
-       "claim": "Tác giả Daniel Kahneman thực hiện công trình về ra quyết định cùng Amos Tversky.",
-       "supported": true,
-       "reason": "Nguồn ghi Kahneman đoạt giải nhờ công trình về ra quyết định thực hiện cùng Amos Tversky."
+       "reason": "Nguồn [1] khẳng định trực tiếp đây là một trong những công trình sớm nhất phân tích hành vi của đám đông."
       }
      ],
      "ragas": 1.0,
@@ -2366,26 +3944,21 @@
     {
      "id": 4,
      "section": "body",
-     "narration_vi": "Cuốn sách Tư duy nhanh và chậm xuất bản năm 2011 của nhà tâm lý học Daniel Kahneman tổng hợp nhiều thập kỷ nghiên cứu.",
+     "narration_vi": "Khi hòa vào đám đông, cá nhân đánh mất ý thức riêng và hành động theo cảm xúc tập thể.",
      "chunk_ids": [
-      "tu-duy-nhanh-va-cham/01-tong-quan.txt:0"
+      "tam-ly-hoc-dam-dong/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Tư duy nhanh và chậm xuất bản năm 2011.",
+       "claim": "Khi hòa vào đám đông, cá nhân đánh mất ý thức riêng.",
        "supported": true,
-       "reason": "Nguồn [1] xác nhận Tư duy nhanh và chậm xuất bản năm 2011."
+       "reason": "Nguồn [1] ghi rõ cá nhân đánh mất ý thức riêng khi hòa vào đám đông."
       },
       {
-       "claim": "Daniel Kahneman là nhà tâm lý học.",
+       "claim": "Khi hòa vào đám đông, cá nhân hành động theo cảm xúc tập thể.",
        "supported": true,
-       "reason": "Nguồn [1] ghi rõ Daniel Kahneman là nhà tâm lý học."
-      },
-      {
-       "claim": "Cuốn sách Tư duy nhanh và chậm tổng hợp nhiều thập kỷ nghiên cứu.",
-       "supported": true,
-       "reason": "Nguồn [1] ghi cuốn sách tổng hợp nhiều thập kỷ nghiên cứu về cách con người suy nghĩ."
+       "reason": "Nguồn [1] ghi rõ cá nhân hành động theo cảm xúc tập thể khi hòa vào đám đông."
       }
      ],
      "ragas": 1.0,
@@ -2397,62 +3970,42 @@
     {
      "id": 5,
      "section": "body",
-     "narration_vi": "Sách mô tả Hệ thống 1 hoạt động nhanh, tự động và theo trực giác, ít tốn công sức.",
+     "narration_vi": "Ba cơ chế chính là cảm giác sức mạnh vô danh, sự lây lan cảm xúc và tính dễ bị ám thị.",
      "chunk_ids": [
-      "tu-duy-nhanh-va-cham/02-noi-dung.txt:0"
+      "tam-ly-hoc-dam-dong/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách mô tả Hệ thống 1 hoạt động nhanh.",
+       "claim": "Ba cơ chế chính của đám đông là cảm giác sức mạnh vô danh, sự lây lan cảm xúc và tính dễ bị ám thị.",
        "supported": true,
-       "reason": "Nguồn ghi Hệ thống 1 hoạt động nhanh."
-      },
-      {
-       "claim": "Cuốn sách mô tả Hệ thống 1 hoạt động tự động.",
-       "supported": true,
-       "reason": "Nguồn ghi Hệ thống 1 hoạt động tự động."
-      },
-      {
-       "claim": "Cuốn sách mô tả Hệ thống 1 hoạt động theo trực giác.",
-       "supported": true,
-       "reason": "Nguồn ghi Hệ thống 1 hoạt động theo trực giác."
-      },
-      {
-       "claim": "Cuốn sách mô tả Hệ thống 1 ít tốn công sức.",
-       "supported": true,
-       "reason": "Nguồn ghi Hệ thống 1 ít tốn công sức."
+       "reason": "Nguồn [1] liệt kê chính xác ba cơ chế này là ba cơ chế chính."
       }
      ],
-     "ragas": 0.75,
+     "ragas": 1.0,
      "rounds": 0,
      "vi_final": 1.0,
      "flags": [],
-     "ragas_final": 0.75
+     "ragas_final": 1.0
     },
     {
      "id": 6,
      "section": "body",
-     "narration_vi": "Ngược lại, Hệ thống 2 hoạt động chậm, có chủ ý và cần nỗ lực để suy luận và tính toán.",
+     "narration_vi": "Đám đông suy nghĩ bằng hình ảnh và bị dẫn dắt bởi người lãnh đạo biết lặp lại.",
      "chunk_ids": [
-      "tu-duy-nhanh-va-cham/02-noi-dung.txt:0"
+      "tam-ly-hoc-dam-dong/02-noi-dung.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Hệ thống 2 hoạt động chậm.",
+       "claim": "Đám đông suy nghĩ bằng hình ảnh.",
        "supported": true,
-       "reason": "Nguồn ghi Hệ thống 2 hoạt động chậm."
+       "reason": "Nguồn ghi rõ đám đông suy nghĩ bằng hình ảnh."
       },
       {
-       "claim": "Hệ thống 2 hoạt động có chủ ý.",
+       "claim": "Đám đông bị dẫn dắt bởi người lãnh đạo biết lặp lại.",
        "supported": true,
-       "reason": "Nguồn ghi Hệ thống 2 hoạt động có chủ ý."
-      },
-      {
-       "claim": "Hệ thống 2 cần nỗ lực để suy luận và tính toán.",
-       "supported": true,
-       "reason": "Nguồn ghi Hệ thống 2 cần nỗ lực, dùng để suy luận và tính toán."
+       "reason": "Nguồn ghi đám đông bị dẫn dắt bởi người lãnh đạo biết lặp lại."
       }
      ],
      "ragas": 1.0,
@@ -2463,22 +4016,127 @@
     },
     {
      "id": 7,
-     "section": "body",
-     "narration_vi": "Đồng thời, sách phân tích các thiên kiến như hiệu ứng mỏ neo và tâm lý ngại mất mát.",
+     "section": "review_cta",
+     "narration_vi": "Liệu khi hòa vào đám đông, một người có đánh mất ý thức riêng và hành động hoàn toàn theo cảm xúc tập thể?",
+     "chunk_ids": [],
+     "vi": 0.5,
+     "vi_claims": [
+      {
+       "claim": "Khi hòa vào đám đông, cá nhân đánh mất ý thức riêng.",
+       "supported": true,
+       "reason": "Nguồn [2] khẳng định cá nhân đánh mất ý thức riêng khi hòa vào đám đông."
+      },
+      {
+       "claim": "Khi hòa vào đám đông, cá nhân hành động hoàn toàn theo cảm xúc tập thể.",
+       "supported": false,
+       "reason": "Nguồn [2] chỉ nói cá nhân hành động theo cảm xúc tập thể chứ không dùng từ 'hoàn toàn'."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 8,
+     "section": "review_cta",
+     "narration_vi": "Tâm lý học đám đông là tác phẩm của nhà tâm lý xã hội người Pháp Gustave Le Bon, xuất bản năm 1895.",
      "chunk_ids": [
-      "tu-duy-nhanh-va-cham/02-noi-dung.txt:0"
+      "tam-ly-hoc-dam-dong/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách phân tích thiên kiến hiệu ứng mỏ neo.",
+       "claim": "Tâm lý học đám đông là tác phẩm của nhà tâm lý xã hội người Pháp Gustave Le Bon.",
        "supported": true,
-       "reason": "Nguồn ghi sách phân tích nhiều thiên kiến nhận thức như hiệu ứng mỏ neo."
+       "reason": "Nguồn [1] xác nhận Tâm lý học đám đông là tác phẩm của nhà tâm lý xã hội người Pháp Gustave Le Bon."
       },
       {
-       "claim": "Cuốn sách phân tích tâm lý ngại mất mát.",
+       "claim": "Tâm lý học đám đông được xuất bản năm 1895.",
        "supported": true,
-       "reason": "Nguồn ghi sách phân tích nhiều thiên kiến nhận thức như tâm lý ngại mất mát."
+       "reason": "Nguồn [1] ghi rõ tác phẩm xuất bản năm 1895."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "tat-den",
+   "title": "Tắt đèn",
+   "kind": "fiction",
+   "storyboard_cost": {
+    "usd": 0.0074097,
+    "input_tokens": 5824.0,
+    "output_tokens": 2265.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "context": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "context_body": {
+     "n": 3,
+     "vi": 1.0,
+     "ragas": 1.0,
+     "vi_final": 1.0,
+     "ragas_final": 1.0,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Làm thế nào để một gia đình nghèo xoay sở khi gánh nặng thuế thân đè nặng từng nhà?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Gia đình chị Dậu là một gia đình nghèo.",
+       "supported": true,
+       "reason": "Nguồn [2] mô tả chị Dậu là một người phụ nữ nghèo."
+      },
+      {
+       "claim": "Gánh nặng thuế thân đè nặng lên từng nhà trong bối cảnh tác phẩm Tắt đèn.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu thuế thân đè nặng lên từng nhà trong bối cảnh làng quê Bắc Bộ trước Cách mạng tháng Tám."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Tắt đèn là tiểu thuyết của nhà văn Ngô Tất Tố xuất bản năm 1939.",
+     "chunk_ids": [
+      "tat-den/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tắt đèn là tiểu thuyết của nhà văn Ngô Tất Tố.",
+       "supported": true,
+       "reason": "Nguồn ghi Tắt đèn là tiểu thuyết của nhà văn Ngô Tất Tố."
+      },
+      {
+       "claim": "Tắt đèn được xuất bản năm 1939.",
+       "supported": true,
+       "reason": "Nguồn ghi Tắt đèn in thành sách năm 1939."
       }
      ],
      "ragas": 1.0,
@@ -2488,44 +4146,508 @@
      "ragas_final": 1.0
     },
     {
-     "id": 8,
-     "section": "review_cta",
-     "narration_vi": "Bạn có chắc mọi quyết định hàng ngày của mình đều hoàn toàn sáng suốt và lý trí không?",
-     "chunk_ids": [],
-     "vi": 0.0,
+     "id": 3,
+     "section": "body",
+     "narration_vi": "Nhà chị thiếu suất sưu của chồng nên anh Dậu đang ốm vẫn bị cai lệ và người nhà lý trưởng đến trói đánh.",
+     "chunk_ids": [
+      "tat-den/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Mọi quyết định hàng ngày của con người đều hoàn toàn sáng suốt và lý trí.",
-       "supported": false,
-       "reason": "Nguồn không đề cập đến việc mọi quyết định hàng ngày của con người có hoàn toàn sáng suốt và lý trí hay không."
+       "claim": "Nhà chị Dậu thiếu suất sưu của anh Dậu.",
+       "supported": true,
+       "reason": "Nguồn ghi nhà chị thiếu suất sưu của chồng."
+      },
+      {
+       "claim": "Anh Dậu đang ốm.",
+       "supported": true,
+       "reason": "Nguồn ghi anh Dậu đang ốm."
+      },
+      {
+       "claim": "Cai lệ và người nhà lý trưởng đến trói đánh anh Dậu.",
+       "supported": true,
+       "reason": "Nguồn ghi anh Dậu bị cai lệ và người nhà lý trưởng đến trói đánh."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Để có tiền nộp sưu, chị phải bán đàn chó và đứa con gái đầu lòng là cái Tí cho nhà Nghị Quế.",
+     "chunk_ids": [
+      "tat-den/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Chị Dậu bán đàn chó cho nhà Nghị Quế để có tiền nộp sưu.",
+       "supported": true,
+       "reason": "Nguồn ghi chị Dậu phải bán đàn chó cho nhà Nghị Quế để có tiền nộp sưu."
+      },
+      {
+       "claim": "Chị Dậu bán cái Tí cho nhà Nghị Quế để có tiền nộp sưu.",
+       "supported": true,
+       "reason": "Nguồn ghi chị Dậu phải bán đứa con gái đầu lòng là cái Tí cho nhà Nghị Quế để có tiền nộp sưu."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 5,
+     "section": "review_cta",
+     "narration_vi": "Liệu một người phụ nữ nghèo tần tảo có thể bảo vệ chồng trước sự áp bức của cường hào trong xã hội cũ?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Chị Dậu là một người phụ nữ nghèo tần tảo.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận chị Dậu là một người phụ nữ nghèo tần tảo."
+      },
+      {
+       "claim": "Chị Dậu bảo vệ chồng trước sự áp bức của cường hào trong xã hội cũ.",
+       "supported": true,
+       "reason": "Nguồn [2] mô tả cảnh chị Dậu đánh lại tên cai lệ để bảo vệ chồng trong bối cảnh bị áp bức bởi cai lệ và người nhà lý trưởng."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Tác phẩm thuộc dòng văn học hiện thực phê phán Việt Nam, vẽ lại đời sống người nông dân nghèo ở một làng quê Bắc Bộ trước Cách mạng tháng Tám.",
+     "chunk_ids": [
+      "tat-den/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tắt đèn thuộc dòng văn học hiện thực phê phán Việt Nam.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi Tác phẩm thuộc dòng văn học hiện thực phê phán Việt Nam."
+      },
+      {
+       "claim": "Tắt đèn vẽ lại đời sống người nông dân nghèo ở một làng quê Bắc Bộ trước Cách mạng tháng Tám.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi vẽ lại đời sống người nông dân nghèo ở một làng quê Bắc Bộ trước Cách mạng tháng Tám."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "tram-nam-co-don",
+   "title": "Trăm năm cô đơn",
+   "kind": "fiction",
+   "storyboard_cost": {
+    "usd": 0.0110613,
+    "input_tokens": 7371.0,
+    "output_tokens": 3540.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 0.0
+    },
+    "context": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.5
+    },
+    "context_body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 1.0,
+     "vi_final": 1.0,
+     "ragas_final": 1.0,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Liệu dòng họ Buendía có thoát khỏi sự cô đơn đã nuốt chửng họ qua nhiều thế hệ?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Dòng họ Buendía bị sự cô đơn nuốt chửng.",
+       "supported": true,
+       "reason": "Nguồn [2] khẳng định dòng họ cuối cùng bị chính sự cô đơn nuốt chửng."
+      },
+      {
+       "claim": "Dòng họ Buendía trải qua sự cô đơn qua nhiều thế hệ.",
+       "supported": true,
+       "reason": "Nguồn [2] nhắc đến lịch sử bảy thế hệ của dòng họ và sự cô đơn nuốt chửng họ."
       }
      ],
      "ragas": 0.0
     },
     {
-     "id": 9,
-     "section": "review_cta",
-     "narration_vi": "Cuốn sách Tư duy nhanh và chậm của nhà tâm lý học Daniel Kahneman, xuất bản năm 2011, đã tổng hợp nhiều thập kỷ nghiên cứu.",
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Trăm năm cô đơn là tiểu thuyết của nhà văn Colombia Gabriel García Márquez, xuất bản năm 1967.",
      "chunk_ids": [
-      "tu-duy-nhanh-va-cham/01-tong-quan.txt:0",
+      "tram-nam-co-don/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Trăm năm cô đơn là tiểu thuyết của nhà văn Colombia Gabriel García Márquez.",
+       "supported": true,
+       "reason": "Nguồn xác nhận Trăm năm cô đơn là tiểu thuyết của nhà văn Colombia Gabriel García Márquez."
+      },
+      {
+       "claim": "Trăm năm cô đơn được xuất bản năm 1967.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ tác phẩm xuất bản năm 1967."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 3,
+     "section": "context",
+     "narration_vi": "Tác phẩm là tác phẩm tiêu biểu của chủ nghĩa hiện thực huyền ảo và García Márquez nhận giải Nobel Văn học năm 1982.",
+     "chunk_ids": [
+      "tram-nam-co-don/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Trăm năm cô đơn là tác phẩm tiêu biểu của chủ nghĩa hiện thực huyền ảo.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi Trăm năm cô đơn là tác phẩm tiêu biểu của chủ nghĩa hiện thực huyền ảo."
+      },
+      {
+       "claim": "Gabriel García Márquez nhận giải Nobel Văn học năm 1982.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi García Márquez nhận giải Nobel Văn học năm 1982."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Truyện kể lịch sử bảy thế hệ của dòng họ Buendía ở thị trấn hư cấu Macondo do José Arcadio Buendía sáng lập.",
+     "chunk_ids": [
+      "tram-nam-co-don/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Truyện kể lịch sử bảy thế hệ của dòng họ Buendía ở thị trấn hư cấu Macondo.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ truyện kể lịch sử bảy thế hệ của dòng họ Buendía ở thị trấn hư cấu Macondo."
+      },
+      {
+       "claim": "Thị trấn Macondo do José Arcadio Buendía sáng lập.",
+       "supported": true,
+       "reason": "Nguồn ghi rõ thị trấn hư cấu Macondo do José Arcadio Buendía sáng lập."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Qua nhiều thế hệ, gia đình trải qua chiến tranh cùng cơn sốt chuối và trận mưa kéo dài bốn năm.",
+     "chunk_ids": [
+      "tram-nam-co-don/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Gia đình dòng họ Buendía trải qua chiến tranh qua nhiều thế hệ.",
+       "supported": true,
+       "reason": "Nguồn ghi gia đình trải qua chiến tranh qua nhiều thế hệ."
+      },
+      {
+       "claim": "Gia đình dòng họ Buendía trải qua cơn sốt chuối qua nhiều thế hệ.",
+       "supported": true,
+       "reason": "Nguồn ghi gia đình trải qua cơn sốt chuối qua nhiều thế hệ."
+      },
+      {
+       "claim": "Gia đình dòng họ Buendía trải qua trận mưa kéo dài bốn năm qua nhiều thế hệ.",
+       "supported": true,
+       "reason": "Nguồn ghi gia đình trải qua trận mưa kéo dài bốn năm qua nhiều thế hệ."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Liệu một dòng họ với những cái tên lặp lại có thể thoát khỏi sự cô đơn?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Dòng họ Buendía trong tiểu thuyết Trăm năm cô đơn có những cái tên lặp lại.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận các tên gọi như José Arcadio và Aureliano lặp lại trong dòng họ Buendía."
+      },
+      {
+       "claim": "Dòng họ Buendía trong tiểu thuyết Trăm năm cô đơn không thoát khỏi sự cô đơn.",
+       "supported": true,
+       "reason": "Nguồn [2] nêu dòng họ cuối cùng bị chính sự cô đơn nuốt chửng."
+      }
+     ],
+     "ragas": 0.0
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Trăm năm cô đơn là tiểu thuyết của nhà văn Colombia Gabriel García Márquez xuất bản năm 1967.",
+     "chunk_ids": [
+      "tram-nam-co-don/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Trăm năm cô đơn là tiểu thuyết của nhà văn Colombia Gabriel García Márquez.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Trăm năm cô đơn là tiểu thuyết của nhà văn Colombia Gabriel García Márquez."
+      },
+      {
+       "claim": "Trăm năm cô đơn xuất bản năm 1967.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ tác phẩm xuất bản năm 1967."
+      }
+     ],
+     "ragas": 1.0
+    }
+   ]
+  },
+  {
+   "slug": "tu-duy-nhanh-va-cham",
+   "title": "Tư duy nhanh và chậm",
+   "kind": "non_fiction",
+   "storyboard_cost": {
+    "usd": 0.00794,
+    "input_tokens": 5925.0,
+    "output_tokens": 2465.0
+   },
+   "sections": {
+    "hook": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "context": {
+     "n": 1,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "body": {
+     "n": 3,
+     "vi": 1.0,
+     "ragas": 1.0
+    },
+    "review_cta": {
+     "n": 2,
+     "vi": 1.0,
+     "ragas": 0.75
+    },
+    "context_body": {
+     "n": 4,
+     "vi": 1.0,
+     "ragas": 1.0,
+     "vi_final": 1.0,
+     "ragas_final": 1.0,
+     "rewritten": 0,
+     "low_faithfulness": 0
+    }
+   },
+   "scenes": [
+    {
+     "id": 1,
+     "section": "hook",
+     "narration_vi": "Vì sao bộ máy suy nghĩ của chúng ta có lúc chớp nhoáng, có lúc lại phải xoắn não tính toán?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Bộ máy suy nghĩ của con người có lúc hoạt động chớp nhoáng.",
+       "supported": true,
+       "reason": "Nguồn mô tả Hệ thống 1 hoạt động nhanh và tự động."
+      },
+      {
+       "claim": "Bộ máy suy nghĩ của con người có lúc phải xoắn não tính toán.",
+       "supported": true,
+       "reason": "Nguồn mô tả Hệ thống 2 hoạt động chậm, cần nỗ lực và dùng để tính toán."
+      }
+     ],
+     "ragas": 1.0
+    },
+    {
+     "id": 2,
+     "section": "context",
+     "narration_vi": "Tư duy nhanh và chậm là cuốn sách của nhà tâm lý học Daniel Kahneman xuất bản năm 2011.",
+     "chunk_ids": [
       "tu-duy-nhanh-va-cham/01-tong-quan.txt:0"
      ],
      "vi": 1.0,
      "vi_claims": [
       {
-       "claim": "Cuốn sách Tư duy nhanh và chậm là của nhà tâm lý học Daniel Kahneman.",
+       "claim": "Tư duy nhanh và chậm là cuốn sách của nhà tâm lý học Daniel Kahneman.",
        "supported": true,
        "reason": "Nguồn [1] xác nhận Tư duy nhanh và chậm là cuốn sách của nhà tâm lý học Daniel Kahneman."
       },
       {
-       "claim": "Cuốn sách Tư duy nhanh và chậm xuất bản năm 2011.",
+       "claim": "Tư duy nhanh và chậm được xuất bản năm 2011.",
        "supported": true,
        "reason": "Nguồn [1] ghi rõ cuốn sách xuất bản năm 2011."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 3,
+     "section": "body",
+     "narration_vi": "Hệ thống một hoạt động tự động còn hệ thống hai cần sự nỗ lực.",
+     "chunk_ids": [
+      "tu-duy-nhanh-va-cham/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Hệ thống một hoạt động tự động.",
+       "supported": true,
+       "reason": "Nguồn ghi Hệ thống 1 hoạt động nhanh, tự động."
       },
       {
-       "claim": "Cuốn sách Tư duy nhanh và chậm tổng hợp nhiều thập kỷ nghiên cứu.",
+       "claim": "Hệ thống hai cần sự nỗ lực.",
        "supported": true,
-       "reason": "Nguồn [1] nêu cuốn sách tổng hợp nhiều thập kỷ nghiên cứu về cách con người suy nghĩ."
+       "reason": "Nguồn ghi Hệ thống 2 hoạt động chậm, có chủ ý và cần nỗ lực."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 4,
+     "section": "body",
+     "narration_vi": "Hiệu ứng mỏ neo làm con số đi trước chi phối phán đoán sau.",
+     "chunk_ids": [
+      "tu-duy-nhanh-va-cham/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Hiệu ứng mỏ neo làm con số đi trước chi phối phán đoán sau.",
+       "supported": true,
+       "reason": "Nguồn ghi hiệu ứng mỏ neo khiến con số đưa ra trước ảnh hưởng đến phán đoán sau."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 5,
+     "section": "body",
+     "narration_vi": "Tâm lý ngại mất mát khiến người ta sợ thua lỗ hơn là thích lợi nhuận.",
+     "chunk_ids": [
+      "tu-duy-nhanh-va-cham/02-noi-dung.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tâm lý ngại mất mát khiến người ta sợ thua lỗ hơn là thích lợi nhuận.",
+       "supported": true,
+       "reason": "Nguồn [1] nêu rõ tâm lý ngại mất mát khiến người ta sợ thua lỗ hơn là thích lợi nhuận tương đương."
+      }
+     ],
+     "ragas": 1.0,
+     "rounds": 0,
+     "vi_final": 1.0,
+     "flags": [],
+     "ragas_final": 1.0
+    },
+    {
+     "id": 6,
+     "section": "review_cta",
+     "narration_vi": "Liệu chúng ta thực sự kiểm soát được các quyết định hàng ngày hay chỉ đang bị chi phối bởi những thiên kiến vô thức?",
+     "chunk_ids": [],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Con người bị chi phối bởi những thiên kiến vô thức trong các quyết định hàng ngày.",
+       "supported": true,
+       "reason": "Nguồn [2] xác nhận sách phân tích nhiều thiên kiến nhận thức ảnh hưởng đến phán đoán và quyết định của con người."
+      }
+     ],
+     "ragas": 0.5
+    },
+    {
+     "id": 7,
+     "section": "review_cta",
+     "narration_vi": "Tư duy nhanh và chậm là cuốn sách của nhà tâm lý học Daniel Kahneman xuất bản năm 2011.",
+     "chunk_ids": [
+      "tu-duy-nhanh-va-cham/01-tong-quan.txt:0"
+     ],
+     "vi": 1.0,
+     "vi_claims": [
+      {
+       "claim": "Tư duy nhanh và chậm là cuốn sách của nhà tâm lý học Daniel Kahneman.",
+       "supported": true,
+       "reason": "Nguồn [1] xác nhận Tư duy nhanh và chậm là cuốn sách của nhà tâm lý học Daniel Kahneman."
+      },
+      {
+       "claim": "Tư duy nhanh và chậm xuất bản năm 2011.",
+       "supported": true,
+       "reason": "Nguồn [1] ghi rõ cuốn sách xuất bản năm 2011."
       }
      ],
      "ragas": 1.0
