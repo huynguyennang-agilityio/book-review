@@ -7,6 +7,7 @@ import { CharacterReview } from "./_components/CharacterReview";
 import { IdentifyConfirm } from "./_components/IdentifyConfirm";
 import { LoginForm } from "./_components/LoginForm";
 import { Progress } from "./_components/Progress";
+import { ResultScreen } from "./_components/ResultScreen";
 import { ScriptReview } from "./_components/ScriptReview";
 import { Sources } from "./_components/Sources";
 import { useReviewRun } from "./_lib/run";
@@ -103,6 +104,9 @@ function ReviewApp({ session }: { session: Session }) {
           <Sources sources={run.sources} />
         </div>
       </div>
+      {run.status === "done" && run.outputs.length > 0 && (
+        <ResultScreen outputs={run.outputs} loadOutput={run.loadOutput} />
+      )}
     </main>
   );
 }

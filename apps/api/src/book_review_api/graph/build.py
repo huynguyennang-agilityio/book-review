@@ -174,7 +174,7 @@ def build_graph(
         nodes["subtitles"] = make_subtitles_node(job_runner)
         nodes["scene_images"] = make_scene_images_node(job_runner)
         nodes["motion"] = make_motion_node(job_runner)
-        nodes["compose_render"] = make_compose_render_node(job_runner)
+        nodes["compose_render"] = make_compose_render_node(job_runner, source_lookup)
     if image_provider is not None and job_runner is not None:
         # Có Fal thì ảnh cảnh thật thay ảnh placeholder của worker.
         nodes["scene_images"] = make_real_scene_images_node(

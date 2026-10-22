@@ -17,12 +17,19 @@ HEIGHT = 1280
 # Dòng phụ đề nằm ở 65% chiều cao (giữa khoảng 60–70%).
 POSITION_RATIO = 0.65
 FONT_SIZE = 46
+# Safe zone của TikTok/Shorts/Reels (mục 1 plan): chừa phần giao diện nền tảng đè lên.
+SAFE_TOP = 0.15
+SAFE_BOTTOM = 0.20
+SAFE_RIGHT = 0.12
+SAFE_LEFT = 0.05
 
 
 class SubtitleCue(BaseModel):
     text: str
     start_s: float
     end_s: float
+    # (từ, start, end) theo thời gian tuyệt đối, dùng cho karaoke.
+    words: list[tuple[str, float, float]] = []
 
 
 def chunk_words(words: list[tuple[str, float, float]]) -> list[tuple[str, float, float]]:
@@ -52,12 +59,21 @@ def build_cues(timeline: Timeline) -> list[SubtitleCue]:
     """Cụm phụ đề cho cả video. Mỗi cụm hiện tới khi cụm kế bắt đầu (cùng cảnh) hoặc hết cảnh."""
     cues: list[SubtitleCue] = []
     for scene in timeline.scenes:
-        chunks = chunk_words([(w.text, w.start_s, w.end_s) for w in scene.words])
+        words = [(w.text, w.start_s, w.end_s) for w in scene.words]
+        chunks = chunk_words(words)
+        used = 0
         for i, (text, start, end) in enumerate(chunks):
             nxt = chunks[i + 1][1] if i + 1 < len(chunks) else scene.end_s
+            n = len(text.split())
             cues.append(
-                SubtitleCue(text=text, start_s=start, end_s=max(min(nxt, scene.end_s), end))
+                SubtitleCue(
+                    text=text,
+                    start_s=start,
+                    end_s=max(min(nxt, scene.end_s), end),
+                    words=words[used : used + n],
+                )
             )
+            used += n
     return cues
 
 
@@ -71,7 +87,21 @@ def _srt_time(t: float) -> str:
     return f"{ms // 3_600_000:02d}:{ms // 60_000 % 60:02d}:{ms // 1000 % 60:02d},{ms % 1000:03d}"
 
 
-def render_ass(cues: list[SubtitleCue], font: str = "Arial") -> str:
+def _karaoke_text(cue: SubtitleCue) -> str:
+    """Văn bản `.ass` có `\\k` (centi-giây) cho từng từ; thiếu word timing thì để nguyên."""
+    if not cue.words:
+        return cue.text
+    parts: list[str] = []
+    cursor = cue.start_s
+    for word, start, end in cue.words:
+        lead = max(start - cursor, 0.0)
+        cs = round((end - start + lead) * 100)
+        parts.append(f"{{\\k{cs}}}{word}")
+        cursor = end
+    return " ".join(parts)
+
+
+def render_ass(cues: list[SubtitleCue], font: str = "Arial", karaoke: bool = False) -> str:
     margin_v = round(HEIGHT * (1 - POSITION_RATIO))
     header = (
         "[Script Info]\nScriptType: v4.00+\n"
@@ -86,7 +116,8 @@ def render_ass(cues: list[SubtitleCue], font: str = "Arial") -> str:
         "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text\n"
     )
     lines = [
-        f"Dialogue: 0,{_ass_time(c.start_s)},{_ass_time(c.end_s)},Default,,0,0,0,,{c.text}"
+        f"Dialogue: 0,{_ass_time(c.start_s)},{_ass_time(c.end_s)},Default,,0,0,0,,"
+        f"{_karaoke_text(c) if karaoke else c.text}"
         for c in cues
     ]
     return header + "\n".join(lines) + "\n"
@@ -99,11 +130,13 @@ def render_srt(cues: list[SubtitleCue]) -> str:
     )
 
 
-def write_subtitles(timeline: Timeline, out_dir: Path) -> tuple[Path, Path, list[SubtitleCue]]:
+def write_subtitles(
+    timeline: Timeline, out_dir: Path, karaoke: bool = False
+) -> tuple[Path, Path, list[SubtitleCue]]:
     out_dir.mkdir(parents=True, exist_ok=True)
     cues = build_cues(timeline)
     ass = out_dir / "subtitles.ass"
     srt = out_dir / "subtitles.srt"
-    ass.write_text(render_ass(cues), encoding="utf-8")
+    ass.write_text(render_ass(cues, karaoke=karaoke), encoding="utf-8")
     srt.write_text(render_srt(cues), encoding="utf-8")
     return ass, srt, cues

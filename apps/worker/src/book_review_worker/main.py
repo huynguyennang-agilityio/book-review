@@ -4,7 +4,7 @@ from typing import Any, ClassVar
 
 from arq.connections import RedisSettings
 
-from book_review_worker.jobs import compose, images, motion, subtitles, timeline, tts
+from book_review_worker.jobs import compose, images, motion, package, subtitles, timeline, tts
 from book_review_worker.providers.tts_edge import EdgeTTS
 from book_review_worker.settings import WorkerConfig
 
@@ -20,7 +20,7 @@ async def shutdown(ctx: dict[str, Any]) -> None:
 
 
 class WorkerSettings:
-    functions: ClassVar[list[Any]] = [tts, timeline, subtitles, images, motion, compose]
+    functions: ClassVar[list[Any]] = [tts, timeline, subtitles, images, motion, compose, package]
     on_startup = startup
     on_shutdown = shutdown
     redis_settings = RedisSettings.from_dsn(WorkerConfig().redis_url)

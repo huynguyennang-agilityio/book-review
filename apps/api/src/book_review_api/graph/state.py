@@ -26,6 +26,8 @@ class RunOptions(TypedDict, total=False):
     no_spoiler: bool
     voice: str
     budget_usd: float
+    # Phụ đề karaoke: tô sáng từng từ đúng lúc được đọc.
+    karaoke: bool
 
 
 def merge_dicts(left: dict[str, Any] | None, right: dict[str, Any] | None) -> dict[str, Any]:

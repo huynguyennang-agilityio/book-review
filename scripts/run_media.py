@@ -25,6 +25,8 @@ from book_review_api.graph.nodes.media import (
 )
 from book_review_api.graph.state import BookReviewState
 from book_review_api.queue import ArqJobRunner
+from book_review_api.storyboard.images import image_plan
+from book_review_api.storyboard.schema import Storyboard
 from book_review_worker.media.ffmpeg import probe_duration
 
 SAMPLES = Path(__file__).resolve().parent.parent / "spikes" / "media" / "samples"
@@ -57,6 +59,11 @@ def main(args: list[str]) -> None:
     storyboard = (
         json.loads(Path(args[0]).read_text(encoding="utf-8")) if args else sample_storyboard()
     )
+    # Số ảnh mỗi cảnh phải khớp `image_plan` (node tts_align dùng nó để chia `image_ref`).
+    counts = image_plan(Storyboard.model_validate(storyboard), settings)
+    for scene in storyboard["scenes"]:
+        if not scene.get("images"):
+            scene["images"] = [{"prompt_en": ""}] * counts[scene["id"]]
     runner = ArqJobRunner(settings.redis_url, settings.job_timeout_s)
     state: BookReviewState = {"storyboard": storyboard}
     out = make_tts_align_node(runner, settings)(state)
@@ -91,8 +98,12 @@ def main(args: list[str]) -> None:
         if "timeline" in upd:
             state["timeline"] = upd["timeline"]
         print(f"{name}: xong")
-    video = (Path(settings.media_dir) / state["asset_refs"]["video:raw"]).resolve()
+    refs = state["asset_refs"]
+    media = Path(settings.media_dir)
+    video = (media / refs["video:final"]).resolve()
     print(f"video {probe_duration(video):.2f}s (timeline {tl['total_duration_s']:.2f}s): {video}")
+    for key in ("video:voice_only", "cover", "caption", "sources", "project"):
+        print(f"{key}: {(media / refs[key]).resolve()}")
 
 
 if __name__ == "__main__":
