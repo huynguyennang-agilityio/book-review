@@ -33,6 +33,7 @@ from book_review_api.graph.nodes.scene_images import make_scene_images_node
 from book_review_api.graph.state import BookReviewState
 from book_review_api.providers.image_fal import FalImageProvider
 from book_review_api.providers.llm_gemini import make_chat_model, make_embeddings
+from book_review_api.providers.llm_writer import make_writer_model
 from book_review_api.rag.golden import load_golden
 from book_review_api.rag.memory import InMemoryRetriever
 from book_review_api.storyboard.images import make_prompt_writer
@@ -96,7 +97,7 @@ def run_manual(book_state: BookReviewState, settings: Any, directory: Path, samp
 
 def run_book_manual(book: Any, settings: Any, directory: Path, samples: bool) -> None:
     media_dir = Path(settings.media_dir)
-    model, embeddings = make_chat_model(settings), make_embeddings(settings)
+    model, embeddings = make_writer_model(settings), make_embeddings(settings)
     runner = make_storyboard_runner(
         model, InMemoryRetriever(book.chunks(), embeddings), settings, spoiler_free=True
     )

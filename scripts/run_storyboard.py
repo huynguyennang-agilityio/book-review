@@ -11,7 +11,8 @@ import sys
 from pathlib import Path
 
 from book_review_api.config import get_settings
-from book_review_api.providers.llm_gemini import make_chat_model, make_embeddings
+from book_review_api.providers.llm_gemini import make_embeddings
+from book_review_api.providers.llm_writer import make_writer_model
 from book_review_api.rag.golden import GoldenBook, load_golden
 from book_review_api.rag.memory import InMemoryRetriever
 from book_review_api.storyboard.runner import make_storyboard_runner
@@ -43,7 +44,7 @@ def run(book: GoldenBook, model, embeddings) -> None:  # type: ignore[no-untyped
 def main(slugs: list[str]) -> None:
     books = [b for b in load_golden(GOLDEN) if not slugs or b.slug in slugs]
     settings = get_settings()
-    model, embeddings = make_chat_model(settings), make_embeddings(settings)
+    model, embeddings = make_writer_model(settings), make_embeddings(settings)
     for book in books:
         run(book, model, embeddings)
 

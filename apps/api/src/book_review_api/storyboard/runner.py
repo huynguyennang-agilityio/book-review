@@ -45,5 +45,5 @@ def make_storyboard_runner(
 
 def _cost(writer: StoryboardWriter, settings: Settings) -> dict[str, float]:
     n_in, n_out = writer.usage.input_tokens, writer.usage.output_tokens
-    usd = (n_in * settings.price_input_per_mtok + n_out * settings.price_output_per_mtok) / 1e6
+    usd = writer.usage.usd_for(settings)
     return {"usd": usd, "input_tokens": float(n_in), "output_tokens": float(n_out)}
