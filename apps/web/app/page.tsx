@@ -5,11 +5,13 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { BookForm } from "./_components/BookForm";
 import { CharacterReview } from "./_components/CharacterReview";
 import { IdentifyConfirm } from "./_components/IdentifyConfirm";
+import { MemorySettings } from "./_components/MemorySettings";
 import { LoginForm } from "./_components/LoginForm";
 import { Progress } from "./_components/Progress";
 import { ResultScreen } from "./_components/ResultScreen";
 import { ScriptReview } from "./_components/ScriptReview";
 import { Sources } from "./_components/Sources";
+import { getMemory, type Memory } from "./_lib/memory";
 import { useReviewRun } from "./_lib/run";
 import { supabase } from "./_lib/supabase";
 
@@ -23,6 +25,22 @@ function ReviewApp({ session }: { session: Session }) {
     return data.session?.access_token ?? session.access_token;
   }, [session.access_token]);
   const run = useReviewRun(getToken);
+  const [showSettings, setShowSettings] = useState(false);
+  const [memory, setMemory] = useState<Memory | null>(null);
+  const defaults = memory
+    ? {
+        minutes: memory.preferences.length_minutes,
+        voice: memory.preferences.voice === "default" ? undefined : memory.preferences.voice,
+        noSpoiler: memory.preferences.no_spoiler,
+      }
+    : undefined;
+  // Tải sở thích đã lưu một lần khi vào trang để điền sẵn form.
+  useEffect(() => {
+    getToken()
+      .then(getMemory)
+      .then(setMemory)
+      .catch(() => setMemory(null));
+  }, [getToken]);
   const busy = run.status === "running";
   const canCancel = run.status === "running" || run.status === "awaiting";
   const endRef = useRef<HTMLDivElement>(null);
@@ -35,6 +53,9 @@ function ReviewApp({ session }: { session: Session }) {
       <header>
         <h1>Book Review AI</h1>
         <span className="muted">{session.user.email}</span>
+        <button type="button" className="link" onClick={() => setShowSettings((s) => !s)}>
+          Bộ nhớ
+        </button>
         <button type="button" className="link" onClick={() => supabase().auth.signOut()}>
           Đăng xuất
         </button>
@@ -53,7 +74,18 @@ function ReviewApp({ session }: { session: Session }) {
       )}
       <div className="grid">
         <div className="col">
-          <BookForm disabled={busy || run.status === "awaiting"} onSubmit={run.start} />
+          {showSettings && (
+            <MemorySettings
+              getToken={getToken}
+              onChange={setMemory}
+              onClose={() => setShowSettings(false)}
+            />
+          )}
+          <BookForm
+            disabled={busy || run.status === "awaiting"}
+            onSubmit={run.start}
+            defaults={defaults}
+          />
           <div className="card chat" aria-live="polite">
             {run.messages.length === 0 && <p className="muted">Nhập tên sách để bắt đầu.</p>}
             {run.messages.map((m, i) => (

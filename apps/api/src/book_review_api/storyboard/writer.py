@@ -9,7 +9,6 @@ import logging
 import re
 import time
 from collections.abc import Callable, Sequence
-from pathlib import Path
 from typing import Literal, TypeVar
 
 from langchain_core.language_models import BaseChatModel
@@ -17,6 +16,7 @@ from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, System
 from pydantic import BaseModel, Field
 
 from book_review_api.config import Settings, get_settings
+from book_review_api.prompt_loader import load_prompt as _load_prompt
 from book_review_api.providers.structured import (
     StructuredOutputError,
     Usage,
@@ -41,7 +41,6 @@ from book_review_api.storyboard.validate import scene_problems
 log = logging.getLogger(__name__)
 
 PROMPT_VERSION = "storyboard_v1"
-_PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / f"{PROMPT_VERSION}.md"
 
 # Số đoạn tối đa đưa cho model viết một phần.
 MAX_PASSAGES = 12
@@ -116,7 +115,7 @@ def trim_quote(quote: str) -> str:
 
 
 def load_prompt() -> str:
-    return _PROMPT_PATH.read_text(encoding="utf-8")
+    return _load_prompt(PROMPT_VERSION)
 
 
 class StoryboardWriter:

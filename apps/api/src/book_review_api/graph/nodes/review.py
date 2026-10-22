@@ -92,10 +92,11 @@ def make_review_script(lookup: SourceLookup | None = None) -> NodeFn:
         )
         if update or not decision.get("edits"):
             return update
+        feedback = [{"type": "script_edit", "scenes": len(decision["edits"])}]
         edited = apply_edits(storyboard, decision["edits"])
         if edited is None:
             return {"status": "failed", "error_code": ErrorCode.VALIDATION_ERROR.value}
-        return {"storyboard": edited}
+        return {"storyboard": edited, "feedback": feedback}
 
     return review_script
 
@@ -173,7 +174,15 @@ def review_characters(state: BookReviewState) -> NodeUpdate:
             if slug in candidates and not candidates[slug].get("reused")
         }
         if notes:
-            return {"character_regen": notes, "character_picks": picks}
+            return {
+                "character_regen": notes,
+                "character_picks": picks,
+                "feedback": [
+                    {"type": "character_regen", "slug": slug, "note": note}
+                    for slug, note in notes.items()
+                    if note
+                ],
+            }
     approved: dict[str, dict[str, Any]] = {}
     for slug, c in candidates.items():
         idx = 0 if c.get("reused") else picks.get(slug)

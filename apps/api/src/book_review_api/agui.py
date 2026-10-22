@@ -20,6 +20,7 @@ from langgraph.graph.state import CompiledStateGraph
 from book_review_api.auth import CurrentUser, current_user
 from book_review_api.db import ensure_local_user, user_transaction
 from book_review_api.errors import AppError, ErrorCode
+from book_review_api.prompt_loader import prompt_version_label, prompt_versions
 
 log = logging.getLogger(__name__)
 
@@ -76,6 +77,14 @@ async def agent_endpoint(
     encoder = EventEncoder(accept=request.headers.get("accept", "text/event-stream"))
     # Mỗi request một bản sao: LangGraphAgent giữ state của run hiện tại trong self.active_run.
     agent = request.app.state.agent.clone()
+    # user_id cho node đọc/ghi bộ nhớ; metadata ghi version prompt vào run LangSmith.
+    agent.config = {
+        "configurable": {"user_id": user.user_id},
+        "metadata": {
+            "prompt_version": prompt_version_label(),
+            "prompt_versions": prompt_versions(),
+        },
+    }
     graph: CompiledStateGraph[Any] = request.app.state.graph
 
     async def stream() -> AsyncIterator[str]:

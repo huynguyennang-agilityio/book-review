@@ -2,13 +2,13 @@
 
 import time
 from collections.abc import Callable
-from pathlib import Path
 from typing import Any
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
 
 from book_review_api.config import Settings, get_settings
+from book_review_api.prompt_loader import load_prompt
 from book_review_api.providers.structured import Usage, call_structured
 from book_review_api.storyboard.faithfulness import (
     FaithfulnessChecker,
@@ -22,7 +22,6 @@ from book_review_api.storyboard.schema import CITED_SECTIONS, Storyboard
 from book_review_api.storyboard.writer import clean_narration
 
 PROMPT_VERSION = "scene_rewrite_instruction_v1"
-_PROMPT = Path(__file__).resolve().parent.parent / "prompts" / f"{PROMPT_VERSION}.md"
 
 
 class SceneNotFound(Exception):
@@ -40,7 +39,7 @@ def make_scene_rewriter(
     settings: Settings | None = None,
 ) -> SceneRewriter:
     settings = settings or get_settings()
-    system = _PROMPT.read_text(encoding="utf-8")
+    system = load_prompt(PROMPT_VERSION)
 
     def run(
         storyboard: dict[str, Any], scene_id: int, instruction: str, narration: str | None
