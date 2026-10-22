@@ -94,6 +94,11 @@ function ReviewApp({ session }: { session: Session }) {
               </p>
             ))}
             {busy && <p className="muted">Đang chạy…</p>}
+            {run.status === "failed" && (
+              <button type="button" onClick={() => void run.retry()}>
+                Thử lại
+              </button>
+            )}
             {run.status === "cancelled" && <p className="muted">Project đã huỷ.</p>}
             <div ref={endRef} />
           </div>
