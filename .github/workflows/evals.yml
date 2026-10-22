@@ -1,0 +1,40 @@
+name: Evals
+
+# Chỉ chạy khi PR đổi prompt, chunking, retrieval, storyboard hoặc model.
+on:
+  pull_request:
+    paths:
+      - "apps/api/src/book_review_api/prompts/**"
+      - "apps/api/src/book_review_api/rag/**"
+      - "apps/api/src/book_review_api/storyboard/**"
+      - "apps/api/src/book_review_api/config.py"
+      - "evals/**"
+  workflow_dispatch:
+
+jobs:
+  faithfulness:
+    runs-on: ubuntu-latest
+    environment: eval # secrets GOOGLE_API_KEY, GEMINI_MODEL, JUDGE_MODEL nằm ở GitHub Environment này
+    env:
+      GOOGLE_API_KEY: ${{ secrets.GOOGLE_API_KEY }}
+      GEMINI_MODEL: ${{ vars.GEMINI_MODEL || 'gemini-3.5-flash-lite' }}
+      JUDGE_MODEL: ${{ vars.JUDGE_MODEL || 'gemini-3.1-flash-lite' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Kiểm tra secret
+        run: |
+          if [ -z "$GOOGLE_API_KEY" ]; then
+            echo "::error::Thiếu secret GOOGLE_API_KEY trong Environment 'eval'"; exit 1
+          fi
+      - uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.12"
+      - run: uv sync --locked --group eval
+      # 5 sách, bộ chấm tiếng Việt (bỏ RAGAS gốc cho đỡ quota).
+      - run: uv run --group eval python evals/run_ragas.py --no-ragas nha-gia-kim sapiens dac-nhan-tam atomic-habits deep-work
+      - run: uv run python scripts/check_eval_gate.py docs/evals/eval_report.json --min 0.9
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: eval-report
+          path: docs/evals/eval_report.json
