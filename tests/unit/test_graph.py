@@ -128,7 +128,7 @@ def test_choose_image_mode_payload_and_manual_branch() -> None:
     assert "character_sheets" not in visited and "review_characters" not in visited
     values = graph.get_state(config()).values
     assert values["options"]["image_mode"] == "manual"
-    assert values["error_code"] == "INVALID_STATE"  # nhánh manual làm ở ngày 4
+    assert values.get("error_code") != "INVALID_STATE"
 
 
 def test_choose_image_mode_skipped_when_preset() -> None:

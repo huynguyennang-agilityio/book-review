@@ -81,7 +81,7 @@ async def agent_endpoint(
     await ensure_local_user(request.app.state.app_pool, user)
     async with user_transaction(request.app.state.app_pool, user) as conn:
         cur = await conn.execute(
-            "select status from public.projects where thread_id = %s", [input_data.thread_id]
+            "select id, status from public.projects where thread_id = %s", [input_data.thread_id]
         )
         row = await cur.fetchone()
         if row is None:
@@ -89,6 +89,7 @@ async def agent_endpoint(
         if row["status"] == "cancelled":
             raise AppError(ErrorCode.CANCELLED)
         failed_before = row["status"] == "failed"
+        project_id = row["id"]
     if failed_before:
         await _rewind_failed(request.app.state.graph, input_data.thread_id)
         # Checkpoint mới còn node chưa chạy; lệnh resume giả buộc ag-ui-langgraph chạy tiếp
@@ -100,7 +101,7 @@ async def agent_endpoint(
     agent = request.app.state.agent.clone()
     # user_id cho node đọc/ghi bộ nhớ; metadata ghi version prompt vào run LangSmith.
     agent.config = {
-        "configurable": {"user_id": user.user_id},
+        "configurable": {"user_id": user.user_id, "project_id": str(project_id)},
         "metadata": {
             "prompt_version": prompt_version_label(),
             "prompt_versions": prompt_versions(),

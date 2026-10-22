@@ -30,6 +30,7 @@ from book_review_api.graph.nodes.faithfulness import (
     make_estimate_cost_node,
     make_faithfulness_node,
 )
+from book_review_api.graph.nodes.manual_images import make_manual_images_node
 from book_review_api.graph.nodes.media import (
     make_build_timeline_node,
     make_compose_render_node,
@@ -53,7 +54,6 @@ from book_review_api.graph.nodes.scene_images import (
 )
 from book_review_api.graph.nodes.storyboard import make_storyboard_node
 from book_review_api.graph.nodes.stubs import (
-    manual_images_stub,
     regen_characters_stub,
     save_memory,
     stub,
@@ -82,7 +82,7 @@ NODES: dict[str, NodeFn] = {
     "character_sheets": stub("character_sheets"),
     "review_characters": review_characters,
     "scene_images": stub("scene_images"),
-    "manual_images": manual_images_stub,
+    "manual_images": make_manual_images_node(),
     "motion": stub("motion"),
     "compose_render": stub("compose_render"),
     "save_memory": save_memory,
@@ -155,6 +155,14 @@ def _after_characters(state: BookReviewState) -> list[str]:
     return ["regen_characters"] if state.get("character_regen") else ["scene_images"]
 
 
+def _skip_when_manual(fn: NodeFn) -> NodeFn:
+    @wraps(fn)
+    def wrapper(state: BookReviewState) -> NodeUpdate:
+        return {} if image_mode_of(state) == "manual" else fn(state)
+
+    return wrapper
+
+
 def build_graph(
     checkpointer: BaseCheckpointSaver[str] | None = None,
     store: BaseStore | None = None,
@@ -196,6 +204,9 @@ def build_graph(
         nodes["scene_images"] = make_real_scene_images_node(
             image_provider, cancel_flags=cancel_flags, prompt_writer=prompt_writer
         )
+    nodes["manual_images"] = make_manual_images_node(prompt_writer=prompt_writer)
+    # Manual: `manual_images` đã ghi ảnh cảnh nên `scene_images` (Fal hoặc ảnh giả) bị bỏ qua.
+    nodes["scene_images"] = _skip_when_manual(nodes["scene_images"])
     builder = StateGraph(BookReviewState)
     for name, fn in nodes.items():
         builder.add_node(name, _announce(name, fn, cancel_flags))
