@@ -88,7 +88,7 @@ def test_review_resume_applies_edits_then_continues() -> None:
     state = graph.get_state(config())
     assert state.values["storyboard"]["scenes"][0]["narration_vi"] == "Mở đầu mới."
     assert state.values["storyboard"]["scenes"][0]["flags"] == [EDITED_FLAG]
-    assert state.next == ("review_characters",)
+    assert state.next == ("choose_image_mode",)
 
 
 def test_review_resume_with_invalid_edits_fails_before_media() -> None:

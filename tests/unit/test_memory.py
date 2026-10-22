@@ -68,9 +68,10 @@ def _cfg(thread_id: str, user: str | None = USER) -> RunnableConfig:
 def _finish(
     graph: CompiledStateGraph[BookReviewState], inp: BookReviewState, cfg: RunnableConfig
 ) -> None:
-    """Chạy graph khung qua hai điểm duyệt (kịch bản, nhân vật) tới `save_memory`."""
+    """Chạy graph khung qua ba điểm dừng (kịch bản, chế độ ảnh, nhân vật) tới `save_memory`."""
     graph.invoke(inp, cfg)
     graph.invoke(Command(resume={"approved": True}), cfg)
+    graph.invoke(Command(resume={"mode": "auto"}), cfg)
     graph.invoke(Command(resume={"approved": True}), cfg)
 
 

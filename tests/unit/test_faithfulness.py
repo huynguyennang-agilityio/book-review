@@ -154,6 +154,9 @@ def test_media_cost_counts_scene_and_character_images() -> None:
     assert cost["tts_chars"] == 5
     assert cost["i2v_clips"] == 1
     assert round(cost["total_usd"], 4) == round(6 * 0.03 + 0.35, 4)
+    assert cost["character_images"] == 4 and cost["scene_images"] == 2
+    assert round(cost["manual_saving_usd"], 4) == round(6 * 0.03, 4)
+    assert round(cost["manual_total_usd"], 4) == 0.35
 
 
 def test_graph_scores_estimates_and_shows_everything_at_review() -> None:

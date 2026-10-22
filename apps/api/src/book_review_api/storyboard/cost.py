@@ -21,12 +21,18 @@ def estimate_media_cost(
     images_usd = images * s.price_image_usd
     tts_usd = tts_chars * s.price_tts_per_mchar / 1e6
     i2v_usd = clips * s.price_i2v_per_clip
+    total = images_usd + tts_usd + i2v_usd
     return {
         "images": float(images),
+        "character_images": float(character_images),
+        "scene_images": float(scene_images),
         "images_usd": images_usd,
         "tts_chars": float(tts_chars),
         "tts_usd": tts_usd,
         "i2v_clips": float(clips),
         "i2v_usd": i2v_usd,
-        "total_usd": images_usd + tts_usd + i2v_usd,
+        "total_usd": total,
+        # Chế độ manual không gọi Fal: tiền ảnh = 0, người dùng tự tải ảnh.
+        "manual_total_usd": total - images_usd,
+        "manual_saving_usd": images_usd,
     }

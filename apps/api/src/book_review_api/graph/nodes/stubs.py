@@ -4,6 +4,7 @@ import logging
 
 from langgraph.config import get_config, get_store
 
+from book_review_api.errors import ErrorCode
 from book_review_api.graph.nodes.common import NodeFn, NodeUpdate, node
 from book_review_api.graph.state import BookReviewState
 from book_review_api.memory.store import record_run
@@ -49,3 +50,9 @@ def save_memory(state: BookReviewState) -> NodeUpdate:
 def regen_characters_stub(state: BookReviewState) -> NodeUpdate:
     # Không có provider ảnh: bỏ yêu cầu tạo lại để graph không lặp mãi ở màn duyệt.
     return {"character_regen": None}
+
+
+@node
+def manual_images_stub(state: BookReviewState) -> NodeUpdate:
+    # Nhánh manual (tải ảnh lên) làm ở ngày 4. Tới lúc đó dừng hẳn để không rơi vào Fal.
+    return {"status": "failed", "error_code": ErrorCode.INVALID_STATE.value}

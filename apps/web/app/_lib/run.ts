@@ -318,7 +318,11 @@ export function useReviewRun(getToken: () => Promise<string>) {
         const agent = new HttpAgent({
           url: "/api/backend/agent",
           threadId: project.thread_id,
-          initialState: { book: author ? { title, author } : { title }, options },
+          // Chưa có màn chọn auto/manual (ngày 5): web luôn chọn auto để graph không dừng ở bước hỏi.
+          initialState: {
+            book: author ? { title, author } : { title },
+            options: { ...options, image_mode: "auto" },
+          },
         });
         agentRef.current = agent;
         await execute(agent, {});
