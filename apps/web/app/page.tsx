@@ -7,6 +7,7 @@ import { CharacterReview } from "./_components/CharacterReview";
 import { IdentifyConfirm } from "./_components/IdentifyConfirm";
 import { MemorySettings } from "./_components/MemorySettings";
 import { LoginForm } from "./_components/LoginForm";
+import { ImageModeChoice } from "./_components/ImageModeChoice";
 import { Progress } from "./_components/Progress";
 import { ResultScreen } from "./_components/ResultScreen";
 import { ScriptReview } from "./_components/ScriptReview";
@@ -109,6 +110,16 @@ function ReviewApp({ session }: { session: Session }) {
               onCancel={run.cancel}
             />
           )}
+          {run.pending?.type === "choose_image_mode" && (
+            <ImageModeChoice
+              key={run.pending.interruptId}
+              pending={run.pending}
+              busy={busy || run.cancelling}
+              onChoose={(mode) => void run.chooseImageMode(mode)}
+              onUpload={run.uploadImage}
+              onCancel={run.cancel}
+            />
+          )}
           {run.pending?.type === "review_characters" && (
             <CharacterReview
               key={run.pending.interruptId}
@@ -124,7 +135,7 @@ function ReviewApp({ session }: { session: Session }) {
         <div className="col">
           <section className="card">
             <h3>Tiến độ</h3>
-            <Progress steps={run.steps} />
+            <Progress steps={run.steps} imageMode={run.imageMode} />
             {run.cost != null && <p className="muted">Chi phí: ${run.cost.toFixed(3)}</p>}
             {canCancel && (
               <button

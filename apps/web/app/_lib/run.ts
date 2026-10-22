@@ -2,6 +2,7 @@
 
 import { HttpAgent, type Interrupt, type RunAgentParameters } from "@ag-ui/client";
 import { useCallback, useRef, useState } from "react";
+import type { ImageMode } from "./images";
 import type { RewriteResult, SceneEdit } from "./script";
 
 // Node của graph theo thứ tự chạy (apps/api/.../graph/build.py). Tiến độ lấy từ event tuỳ biến
@@ -17,13 +18,28 @@ export const NODES = [
   { id: "tts_align", label: "Tạo giọng đọc" },
   { id: "build_timeline", label: "Dựng timeline" },
   { id: "subtitles", label: "Phụ đề" },
-  { id: "review_characters", label: "Chọn ảnh nhân vật" },
-  { id: "scene_images", label: "Ảnh cảnh" },
+  { id: "choose_image_mode", label: "Chọn cách làm ảnh" },
+  { id: "review_characters", label: "Chọn ảnh nhân vật", mode: "auto" },
+  { id: "scene_images", label: "Ảnh cảnh", mode: "auto" },
+  { id: "manual_images", label: "Tải ảnh lên", mode: "manual" },
   { id: "motion", label: "Chuyển động" },
   { id: "compose_render", label: "Ghép video" },
 ] as const;
 
 export type NodeId = (typeof NODES)[number]["id"];
+
+// Bước chỉ thuộc một chế độ ảnh bị ẩn khi chế độ đã chọn là chế độ kia (chưa chọn thì coi là auto).
+export function visibleNodes(mode: ImageMode | null) {
+  return NODES.filter((n) => !("mode" in n) || n.mode === (mode ?? "auto"));
+}
+
+export interface UploadedImage {
+  path: string;
+  width: number;
+  height: number;
+  size: number;
+  warnings: { code: string; message_vi: string }[];
+}
 export type StepState = "pending" | "active" | "done";
 export type SourceStage = "found" | "read" | "ingested";
 
@@ -170,6 +186,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
   const progressRef = useRef({ started: new Set<string>(), finished: new Set<string>() });
   const [cost, setCost] = useState<number | null>(null);
   const [outputs, setOutputs] = useState<OutputFile[]>([]);
+  const [imageMode, setImageMode] = useState<ImageMode | null>(null);
 
   const say = useCallback((role: ChatMessage["role"], text: string) => {
     setMessages((m) => [...m, { role, text }]);
@@ -229,6 +246,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
                   cost?: { usd?: number };
                   status?: string;
                   error_code?: string;
+                  options?: { image_mode?: string };
                   asset_refs?: Record<string, string>;
                 }
               | undefined;
@@ -237,6 +255,8 @@ export function useReviewRun(getToken: () => Promise<string>) {
               costRef.current = usd;
               setCost(usd);
             }
+            const mode = snap?.options?.image_mode;
+            if (mode === "auto" || mode === "manual") setImageMode(mode);
             finalRef.current = {
               status: snap?.status ?? finalRef.current.status,
               errorCode: snap?.error_code ?? finalRef.current.errorCode,
@@ -305,6 +325,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
       costRef.current = null;
       finalRef.current = {};
       setOutputs([]);
+      setImageMode(null);
       cancelledRef.current = false;
       setBudget(options.budget_usd);
       setStatus("running");
@@ -318,10 +339,10 @@ export function useReviewRun(getToken: () => Promise<string>) {
         const agent = new HttpAgent({
           url: "/api/backend/agent",
           threadId: project.thread_id,
-          // Chưa có màn chọn auto/manual (ngày 5): web luôn chọn auto để graph không dừng ở bước hỏi.
+          // Không gửi `image_mode`: sau khi duyệt kịch bản graph dừng ở `choose_image_mode` để hỏi.
           initialState: {
             book: author ? { title, author } : { title },
-            options: { ...options, image_mode: "auto" },
+            options,
           },
         });
         agentRef.current = agent;
@@ -407,6 +428,38 @@ export function useReviewRun(getToken: () => Promise<string>) {
     [getToken],
   );
 
+  const chooseImageMode = useCallback(
+    async (mode: ImageMode) => {
+      setImageMode(mode);
+      await resume({ mode });
+    },
+    [resume],
+  );
+
+  // Tải một ảnh của project lên, trả về đường dẫn dùng khi resume `upload_images`.
+  const uploadImage = useCallback(
+    async (file: File): Promise<UploadedImage> => {
+      const project = projectRef.current;
+      if (!project) throw new ApiError("NOT_FOUND", ERROR_TEXT.NOT_FOUND);
+      const body = new FormData();
+      body.append("file", file);
+      // Không đặt content-type: trình duyệt tự thêm boundary của multipart.
+      const resp = await fetch(`/api/backend/projects/${project.id}/uploads`, {
+        method: "POST",
+        headers: { authorization: `Bearer ${await getToken()}` },
+        body,
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) {
+        const e = data as { code?: string; message_vi?: string };
+        const code = e.code ?? `HTTP_${resp.status}`;
+        throw new ApiError(code, e.message_vi ?? ERROR_TEXT[code] ?? `Lỗi ${resp.status}`);
+      }
+      return data as UploadedImage;
+    },
+    [getToken],
+  );
+
   const approveCharacters = useCallback(
     (selections: Record<string, number>, regenerate: Record<string, string>) =>
       resume(Object.keys(regenerate).length ? { selections, regenerate } : { selections }),
@@ -461,6 +514,9 @@ export function useReviewRun(getToken: () => Promise<string>) {
     approveScript,
     rewriteScene,
     approveCharacters,
+    chooseImageMode,
+    uploadImage,
+    imageMode,
     loadImage,
   };
 }

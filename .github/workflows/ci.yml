@@ -52,6 +52,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm web:lint
       - run: pnpm web:typecheck
+      - run: pnpm web:test
       - run: pnpm web:build
 
   docker:
