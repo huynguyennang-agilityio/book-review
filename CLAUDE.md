@@ -42,6 +42,6 @@ Người dùng chỉ cần kết quả cuối cùng.
 
 1. Tự chạy test và script cần thiết, không nhờ người dùng chạy tay.
 2. Lỗi sửa được (code, test, lint, mypy, CI) thì tự sửa và chạy lại.
-3. Làm trên nhánh riêng, mở PR, đợi CI xanh rồi merge (người dùng đã đồng ý). Không push thẳng `main`.
+3. Làm trên nhánh riêng, mở PR, đợi CI xanh rồi tự merge (`gh pr merge --merge`). Người dùng đã cho phép rõ ràng việc tự merge trên máy Mac, không cần hỏi lại. Không push thẳng `main`.
 4. Chỉ dừng lại báo người dùng khi lỗi do quota, rate limit, giới hạn key, key thiếu/hết hạn, hoặc việc cần họ quyết định.
 5. Báo cáo cuối chỉ nêu kết quả: đã làm gì, PR nào đã merge, script cho ra gì, chi phí nếu có.
