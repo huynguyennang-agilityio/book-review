@@ -14,11 +14,12 @@ export function BookForm({
   defaults,
 }: {
   disabled: boolean;
-  onSubmit: (title: string, options: Options) => void;
+  onSubmit: (title: string, options: Options, author: string | null) => void;
   // Sở thích đã lưu trong bộ nhớ; chỉ dùng làm giá trị ban đầu.
   defaults?: { minutes?: number; voice?: string; noSpoiler?: boolean };
 }) {
   const [title, setTitle] = useState("");
+  const [author, setAuthor] = useState("");
   const [edited, setEdited] = useState({ minutes: false, voice: false, noSpoiler: false });
   const [picked, setPicked] = useState({ minutes: 3, voice: VOICES[0].id, noSpoiler: true });
   // Giá trị đã chọn tay thắng sở thích đã lưu, sở thích thắng mặc định.
@@ -45,12 +46,11 @@ export function BookForm({
       onSubmit={(e) => {
         e.preventDefault();
         if (title.trim()) {
-          onSubmit(title.trim(), {
-            minutes,
-            no_spoiler: noSpoiler,
-            voice,
-            budget_usd: budget,
-          });
+          onSubmit(
+            title.trim(),
+            { minutes, no_spoiler: noSpoiler, voice, budget_usd: budget },
+            author.trim() || null,
+          );
         }
       }}
     >
@@ -62,6 +62,16 @@ export function BookForm({
           value={title}
           maxLength={200}
           onChange={(e) => setTitle(e.target.value)}
+        />
+      </label>
+      <label>
+        Tác giả (không bắt buộc)
+        <input
+          name="book-author"
+          placeholder="Ví dụ: Dale Carnegie"
+          value={author}
+          maxLength={100}
+          onChange={(e) => setAuthor(e.target.value)}
         />
       </label>
       <div className="row">

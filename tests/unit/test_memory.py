@@ -129,3 +129,18 @@ def test_memory_api_get_put_delete() -> None:
     assert body["preferences"]["no_spoiler"] is False
     assert client.delete("/me/memory").json() == {"deleted": 1}
     assert client.get("/me/memory").json()["preferences"] == DEFAULT_PREFERENCES
+
+
+def test_same_title_different_author_are_separate_books() -> None:
+    store = InMemoryStore()
+    for author in ("A", "B"):
+        record_run(
+            store,
+            USER,
+            thread_id="t",
+            book={"title": "Đời", "author": author},
+            options={},
+            characters={},
+            feedback=[],
+        )
+    assert len(export_memory(store, USER)["books"]) == 2

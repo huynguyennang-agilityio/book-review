@@ -288,11 +288,11 @@ export function useReviewRun(getToken: () => Promise<string>) {
     [getToken, say],
   );
 
-  const lastStartRef = useRef<{ title: string; options: Options } | null>(null);
+  const lastStartRef = useRef<{ title: string; options: Options; author: string | null } | null>(null);
 
   const start = useCallback(
-    async (title: string, options: Options) => {
-      lastStartRef.current = { title, options };
+    async (title: string, options: Options, author: string | null = null) => {
+      lastStartRef.current = { title, options, author };
       setMessages([{ role: "user", text: title }]);
       setSources([]);
       setSteps({});
@@ -308,13 +308,13 @@ export function useReviewRun(getToken: () => Promise<string>) {
         const token = await getToken();
         const project = await api<Project>("/projects", token, {
           method: "POST",
-          body: JSON.stringify({ book_title: title }),
+          body: JSON.stringify({ book_title: title, book_author: author }),
         });
         projectRef.current = project;
         const agent = new HttpAgent({
           url: "/api/backend/agent",
           threadId: project.thread_id,
-          initialState: { book: { title }, options },
+          initialState: { book: author ? { title, author } : { title }, options },
         });
         agentRef.current = agent;
         await execute(agent, {});
@@ -349,7 +349,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
       return;
     }
     const last = lastStartRef.current;
-    if (last) await start(last.title, last.options);
+    if (last) await start(last.title, last.options, last.author);
   }, [execute, start]);
 
   // Huỷ: API đặt cờ để node và worker dừng, chi phí đã tiêu vẫn giữ trong state.
