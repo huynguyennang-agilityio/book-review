@@ -169,11 +169,12 @@ class StoryboardWriter:
         limit = self._max_scenes()[section]
         if limit <= SECTION_DEFAULT_MAX[section]:
             return ""
-        low = max(1, round(limit * 0.7))
+        low = max(1, round(limit * 0.9))
         return (
-            f"Video dài ~{self.settings.storyboard_minutes} phút nên phần này viết {low}-{limit} "
-            "cảnh (thay cho số cảnh trong hướng dẫn chung), mỗi cảnh vẫn 1-2 câu, "
-            "không lặp ý, không bịa thêm ngoài nguồn.\n"
+            f"Video dài ~{self.settings.storyboard_minutes} phút nên phần này viết {limit} cảnh "
+            f"(không ít hơn {low}; thay cho số cảnh trong hướng dẫn chung), mỗi cảnh 2-3 câu "
+            "đọc được khoảng 7 giây (thay cho 1-2 câu), không lặp ý, không bịa thêm ngoài nguồn. "
+            "Chia nhỏ ý trong nguồn thành nhiều cảnh thay vì gộp.\n"
         )
 
     def outline(self, book: BookIdentity, kind: str, seed: Sequence[Chunk]) -> Outline:
@@ -193,13 +194,13 @@ class StoryboardWriter:
         outline.sections = [by_section[s] for s in SECTION_ORDER]
         return outline
 
-    def gather(self, queries: Sequence[str]) -> list[Chunk]:
+    def gather(self, queries: Sequence[str], limit: int = MAX_PASSAGES) -> list[Chunk]:
         """Retrieve theo từng query, bỏ trùng, giữ thứ tự xuất hiện đầu tiên."""
         seen: dict[str, Chunk] = {}
         for q in queries:
             for c in self.retrieve(q):
                 seen.setdefault(c.id, c)
-        return list(seen.values())[:MAX_PASSAGES]
+        return list(seen.values())[:limit]
 
     def write_section(
         self,
@@ -290,7 +291,10 @@ class StoryboardWriter:
         outline = self.outline(book, kind, seed)
         scenes: list[Scene] = []
         for part in outline.sections:
-            passages = self.gather(part.queries)
+            # Phần dài cần nhiều đoạn nguồn hơn, nếu không model hết ý và viết ít cảnh.
+            passages = self.gather(
+                part.queries, max(MAX_PASSAGES, 2 * self._max_scenes()[part.section])
+            )
             scenes += self.write_section(book, kind, part, passages, len(scenes) + 1)
         hook = next((s.narration_vi for s in scenes if s.section == "hook"), "")
         return Storyboard(
