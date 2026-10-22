@@ -48,6 +48,16 @@ pnpm web:lint && pnpm web:typecheck && pnpm web:build
 - Deploy: xem mục "Deploy và release" bên dưới.
 - Image: `infra/docker/{api,worker,web}.Dockerfile`, xem [infra/docker/README.md](infra/docker/README.md).
 
+## Chạy toàn bộ bằng Docker (local)
+
+```bash
+docker compose up -d --build   # postgres, redis, api (tự migrate), worker, web
+# mở http://localhost:3000 (đăng nhập Supabase), API http://localhost:8000/health
+docker compose down            # dừng (giữ dữ liệu); thêm -v để xoá DB
+```
+
+`.env` cần khoá Gemini/Tavily, `SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`; nếu cổng 5432 bận thì đặt `POSTGRES_PORT=5433`. Video ra ở `var/media/render/<id>/final_review.mp4`. Chạy thử không cần web/đăng nhập: `uv run python scripts/run_agent.py "Nhà giả kim" --api http://localhost:8001 --approve` (xem docstring).
+
 ## Deploy và release
 
 - **Kiến trúc chạy thật:** Supabase (Postgres + pgvector, Auth) · VPS chạy `infra/deploy/docker-compose.yml` (API + worker + Redis, chung volume media) · web trên Vercel.

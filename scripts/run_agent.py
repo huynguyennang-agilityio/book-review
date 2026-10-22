@@ -56,6 +56,9 @@ def main() -> None:
     parser.add_argument("--api", default="http://localhost:8001")
     parser.add_argument("--pick", type=int, default=0)
     parser.add_argument(
+        "--approve", action="store_true", help="tự duyệt kịch bản (review_script) để dựng video"
+    )
+    parser.add_argument(
         "--print-token", action="store_true", help="chỉ in user_id và JWT thử (để dán vào web)"
     )
     args = parser.parse_args()
@@ -98,15 +101,17 @@ def main() -> None:
             interrupt = outcome["interrupts"][0]
             payload = interrupt.get("payload") or interrupt
             print("interrupt:", json.dumps(payload, ensure_ascii=False)[:600])
-            if payload.get("type") != "identify_confirm":
+            raw = payload.get("metadata", {}).get("langgraph", {}).get("raw", payload)
+            kind = raw.get("type")
+            if kind == "identify_confirm":
+                answer: dict[str, Any] = {"index": args.pick}
+            elif kind == "review_script" and args.approve:
+                answer = {"approved": True}
+            elif kind == "review_characters" and args.approve:
+                answer = {"selections": {slug: 0 for slug in raw.get("characters", {})}}
+            else:
                 break
-            resume = [
-                {
-                    "interruptId": interrupt["id"],
-                    "status": "resolved",
-                    "payload": {"index": args.pick},
-                }
-            ]
+            resume = [{"interruptId": interrupt["id"], "status": "resolved", "payload": answer}]
             events = run(
                 client,
                 headers,
