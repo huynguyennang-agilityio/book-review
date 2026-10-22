@@ -2,7 +2,7 @@
 
 import { HttpAgent, type Interrupt, type RunAgentParameters } from "@ag-ui/client";
 import { useCallback, useRef, useState } from "react";
-import type { ImageMode } from "./images";
+import { emptyDraft, resetDraft, type ImageMode, type UploadDraft } from "./images";
 import type { RewriteResult, SceneEdit } from "./script";
 
 // Node của graph theo thứ tự chạy (apps/api/.../graph/build.py). Tiến độ lấy từ event tuỳ biến
@@ -187,6 +187,8 @@ export function useReviewRun(getToken: () => Promise<string>) {
   const [cost, setCost] = useState<number | null>(null);
   const [outputs, setOutputs] = useState<OutputFile[]>([]);
   const [imageMode, setImageMode] = useState<ImageMode | null>(null);
+  // Ô ảnh manual đã tải, sống qua các lần server hỏi lại (xem `UploadDraft`).
+  const [uploadDraft] = useState<UploadDraft>(emptyDraft);
 
   const say = useCallback((role: ChatMessage["role"], text: string) => {
     setMessages((m) => [...m, { role, text }]);
@@ -328,6 +330,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
       finalRef.current = {};
       setOutputs([]);
       setImageMode(null);
+      resetDraft(uploadDraft);
       cancelledRef.current = false;
       setBudget(options.budget_usd);
       setStatus("running");
@@ -354,7 +357,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
         say("error", errorText(err, "Không bắt đầu được."));
       }
     },
-    [execute, getToken, say],
+    [execute, getToken, say, uploadDraft],
   );
 
   const resume = useCallback(
@@ -396,6 +399,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
         { method: "POST" },
       );
       agentRef.current?.abortRun();
+      resetDraft(uploadDraft);
       setPending(null);
       setStatus("cancelled");
       const usd = result.cost?.usd;
@@ -410,7 +414,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
     } finally {
       setCancelling(false);
     }
-  }, [cancelling, getToken, say]);
+  }, [cancelling, getToken, say, uploadDraft]);
 
   const approveScript = useCallback(
     (edits: SceneEdit[]) => resume({ approved: true, ...(edits.length ? { edits } : {}) }),
@@ -519,6 +523,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
     chooseImageMode,
     uploadImage,
     imageMode,
+    uploadDraft,
     loadImage,
   };
 }

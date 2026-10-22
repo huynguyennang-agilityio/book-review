@@ -79,7 +79,9 @@ START
   → estimate_cost
   → ✋ review_script     (interrupt: duyệt/sửa kịch bản, xem nguồn và chi phí)
   → [song song] tts_align → build_timeline → subtitles
-               character_sheets → ✋ review_characters (interrupt) → scene_images
+               ✋ choose_image_mode (interrupt: auto hoặc manual)
+                 auto:   character_sheets → ✋ review_characters (interrupt) → scene_images
+                 manual: ✋ manual_images (interrupt `upload_images`: tải 1 ảnh cho mỗi prompt)
   → motion              (Ken Burns; Phase 2: I2V cho hook + 3–5 cảnh)
   → compose_render      (gửi job cho render worker, chờ kết quả)
   → save_memory         (cập nhật bộ nhớ dài hạn của người dùng)
@@ -87,6 +89,7 @@ END
 ```
 
 * **Vì sao chỉ có bước research là agent:** Research cần tự quyết định tìm thêm nguồn nào, đọc trang nào. Các bước còn lại có thứ tự cố định, nên làm node xác định sẵn sẽ rẻ hơn, dễ test hơn và dễ resume hơn.
+* **Chọn ảnh auto/manual:** sau khi duyệt kịch bản người dùng chọn cho toàn bộ ảnh. Auto giữ nguyên luồng Fal. Manual không gọi Fal: web hiện mỗi nhân vật 1 prompt và mỗi ảnh cảnh 1 prompt (theo `image_plan`, tối đa `scene_images_max=35`, mỗi cảnh ít nhất 1 ảnh nên video trên 35 cảnh sẽ vượt trần), người dùng tải đủ ảnh mới đi tiếp. Ảnh được chuẩn hoá và crop 9:16 rồi ghi vào đúng chỗ của luồng cũ nên `motion` và `compose_render` không đổi; tiền ảnh = 0. Khi thiếu hoặc sai ảnh, server hỏi lại và web giữ nguyên các ô đã tải. Chạy thử không qua web: `uv run python scripts/run_scene_images.py --manual-dir <thư mục> [--make-samples] <slug>`.
 * Mỗi node đều idempotent: đọc và ghi vào state, và asset đã có thì bỏ qua (cache).
 * **Hủy job:** Mỗi node kiểm tra cờ `cancel_requested` trước khi chạy. Khi hủy, hệ thống gửi lệnh hủy job đang chạy trên Fal và dừng render worker. Trạng thái `cancelled` được lưu lại nên vẫn resume được.
 

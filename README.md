@@ -34,6 +34,13 @@ pnpm install                  # web
 pnpm web:dev                  # http://localhost:3000
 ```
 
+Ảnh video có hai cách (chọn sau khi duyệt kịch bản): **auto** (Fal tạo ảnh, cần `FAL_KEY`) hoặc **manual** (người dùng tải 1 ảnh cho mỗi prompt, không tốn tiền ảnh). Thử manual không qua web, dùng ảnh mẫu rồi dựng video:
+
+```bash
+uv run python scripts/run_scene_images.py --manual-dir var/manual-samples --make-samples nha-gia-kim
+uv run python scripts/run_media.py var/media/images/storyboard_nha-gia-kim.json
+```
+
 Kiểm tra trước khi push (CI chạy y hệt):
 
 ```bash

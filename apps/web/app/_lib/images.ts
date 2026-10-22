@@ -137,3 +137,32 @@ export function applyServerErrors(slots: Slot[], errors: Record<string, string>)
     errors[s.key] ? { ...s, status: "error", path: undefined, error: slotErrorText(errors[s.key]) } : s,
   );
 }
+
+// Bản nháp các ô đã tải, giữ ở cấp trang: khi server hỏi lại, trang tải ảnh bị gỡ rồi dựng lại
+// (pending bị xoá lúc chạy tiếp), nên ô đã tải phải được nạp lại từ đây.
+export interface UploadDraft {
+  paths: Record<string, string>;
+  previews: Record<string, string>;
+}
+
+export const emptyDraft = (): UploadDraft => ({ paths: {}, previews: {} });
+
+export function draftFromSlots(slots: Slot[], previews: Record<string, string>): UploadDraft {
+  const done = slots.filter((s) => s.status === "done" && s.path);
+  return {
+    paths: Object.fromEntries(done.map((s) => [s.key, s.path as string])),
+    previews: Object.fromEntries(done.filter((s) => previews[s.key]).map((s) => [s.key, previews[s.key]])),
+  };
+}
+
+// Nạp bản nháp vào các ô của prompt mới; ô không còn trong prompt thì bỏ.
+export function mergeDraft(slots: Slot[], draft: UploadDraft): Slot[] {
+  return slots.map((s) => (draft.paths[s.key] ? { ...s, status: "done", path: draft.paths[s.key] } : s));
+}
+
+// Xoá bản nháp tại chỗ (dự án mới hoặc huỷ) và giải phóng ảnh xem trước.
+export function resetDraft(draft: UploadDraft): void {
+  for (const u of Object.values(draft.previews)) URL.revokeObjectURL(u);
+  draft.paths = {};
+  draft.previews = {};
+}

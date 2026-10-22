@@ -80,6 +80,26 @@ def test_payload_has_prompt_for_every_image(tmp_path: Path) -> None:
     assert all(i["narration"] for i in payload["scenes"])
 
 
+def test_long_video_prompts_stay_within_scene_images_max(tmp_path: Path) -> None:
+    """Trần 35 ảnh giữ tới khi số cảnh vượt 35 (mỗi cảnh cần ít nhất 1 ảnh); 24 cảnh thì ≤ 35."""
+    graph = make_graph(tmp_path)
+    graph.invoke(
+        {"book": {"title": "Sách dài"}, "storyboard": storyboard(36, long=True),
+         "options": {"image_mode": "manual"}},
+        conf("long"),
+    )  # fmt: skip
+    payload = graph.get_state(conf("long")).interrupts[0].value
+    assert cfg(tmp_path).scene_images_max == 35
+    assert len(payload["scenes"]) == 36  # đã ở sàn 1 ảnh/cảnh nên không thể giảm thêm
+    graph.invoke(
+        {"book": {"title": "Sách 3 phút"}, "storyboard": storyboard(24, long=True),
+         "options": {"image_mode": "manual"}},
+        conf("three"),
+    )  # fmt: skip
+    three = graph.get_state(conf("three")).interrupts[0].value
+    assert 24 <= len(three["scenes"]) <= 35
+
+
 def test_missing_images_ask_again_without_failing(tmp_path: Path) -> None:
     graph = make_graph(tmp_path)
     payload = start(graph)

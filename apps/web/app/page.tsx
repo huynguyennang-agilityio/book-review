@@ -124,6 +124,7 @@ function ReviewApp({ session }: { session: Session }) {
           {run.pending?.type === "upload_images" && (
             <ManualImages
               pending={run.pending}
+              draft={run.uploadDraft}
               busy={busy || run.cancelling}
               onUpload={run.uploadImage}
               onSubmit={(uploads) => void run.resume({ uploads })}
