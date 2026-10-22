@@ -112,6 +112,7 @@ def make_manual_images_node(
                         "key": f"{scene.id}:{k}",
                         "scene_id": scene.id,
                         "ref": k,
+                        "narration": scene.narration_vi,
                         "prompt": compose_prompt(sb.style_prompt_en, body, []),
                         "characters": p.characters,
                     }

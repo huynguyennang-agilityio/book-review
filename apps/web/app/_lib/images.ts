@@ -32,6 +32,8 @@ export interface Slot {
   kind: "character" | "scene";
   label: string;
   prompt: string;
+  // Lời đọc của cảnh (chỉ ô cảnh), để người dùng biết ảnh cần minh hoạ gì.
+  narration?: string;
   status: SlotStatus;
   path?: string;
   error?: string;
@@ -50,6 +52,7 @@ interface RawItem {
   scene_id?: number;
   ref?: number;
   prompt?: string;
+  narration?: string;
 }
 
 export function parseUploadPage(raw: Record<string, unknown>): UploadPage {
@@ -68,6 +71,7 @@ export function parseUploadPage(raw: Record<string, unknown>): UploadPage {
       kind: "scene",
       label: `Cảnh ${s.scene_id} · ảnh ${num(s.ref) + 1}`,
       prompt: s.prompt ?? "",
+      narration: s.narration,
       status: "empty",
     })),
   ];
@@ -110,4 +114,26 @@ export function setSlot(slots: Slot[], key: string, patch: Partial<Slot>): Slot[
 export function progressText(slots: Slot[]): string {
   const done = slots.filter((s) => s.status === "done").length;
   return `${done}/${slots.length} ảnh`;
+}
+
+// Nội dung file prompt tải về: mỗi ô một khối, theo đúng thứ tự gán file.
+export function promptsText(slots: Slot[]): string {
+  return slots.map((s, i) => `#${i + 1} ${s.label}\n${s.prompt}`).join("\n\n");
+}
+
+export function shortText(text: string, max = 120): string {
+  const t = text.trim();
+  return t.length <= max ? t : `${t.slice(0, max).trimEnd()}…`;
+}
+
+// Nhãn mã lỗi server trả khi hỏi lại (`errors` của interrupt `upload_images`).
+export function slotErrorText(code: string): string {
+  return code === "MISSING" ? "Chưa có ảnh cho prompt này." : "Ảnh không hợp lệ, hãy tải lại.";
+}
+
+// Áp lỗi server lên các ô: ô bị báo lỗi chuyển sang `error` để tải lại, ô khác giữ nguyên.
+export function applyServerErrors(slots: Slot[], errors: Record<string, string>): Slot[] {
+  return slots.map((s) =>
+    errors[s.key] ? { ...s, status: "error", path: undefined, error: slotErrorText(errors[s.key]) } : s,
+  );
 }

@@ -1,12 +1,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import {
+  applyServerErrors,
   assignFiles,
   buildUploads,
   canSubmit,
   missingKeys,
   parseModeChoice,
   parseUploadPage,
+  promptsText,
+  shortText,
   setSlot,
 } from "../app/_lib/images.ts";
 
@@ -67,4 +70,22 @@ test("assignFiles gán theo thứ tự vào ô còn thiếu và bỏ file thừa
     ["1:1", "f2"],
   ]);
   assert.deepEqual(assignFiles(slots, []), []);
+});
+
+test("promptsText đánh số theo thứ tự ô và shortText cắt lời đọc dài", () => {
+  const slots = parseUploadPage(page).slots;
+  assert.equal(promptsText(slots), "#1 Nhân vật: Nam\np0\n\n#2 Cảnh 1 · ảnh 1\np1\n\n#3 Cảnh 1 · ảnh 2\np2");
+  assert.equal(shortText("abc", 5), "abc");
+  assert.equal(shortText("abcdefgh", 5), "abcde…");
+});
+
+test("applyServerErrors chuyển ô bị báo lỗi về error và giữ ô khác", () => {
+  let slots = parseUploadPage(page).slots;
+  slots = setSlot(slots, "1:0", { status: "done", path: "a" });
+  slots = setSlot(slots, "1:1", { status: "done", path: "b" });
+  const out = applyServerErrors(slots, { "1:1": "VALIDATION_ERROR" });
+  assert.equal(out[1].status, "done");
+  assert.equal(out[2].status, "error");
+  assert.equal(out[2].path, undefined);
+  assert.equal(canSubmit(out), false);
 });
