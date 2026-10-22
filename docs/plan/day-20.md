@@ -14,17 +14,17 @@ Lần chạy sau tự áp dụng sở thích đã lưu, mỗi run ghi version pr
 
 ### Memory
 
-- [ ] `memory/store.py`: `PostgresStore`, namespace `("users", user_id, ...)`: sở thích, lịch sử sách, nhân vật đã duyệt, phản hồi ở checkpoint.
-- [ ] Node `save_memory` cuối mỗi run. `get_user_preferences` đọc dữ liệu thật.
-- [ ] API `GET /me/memory`, `DELETE /me/memory` và màn cài đặt trên web.
+- [x] `memory/store.py`: `PostgresStore`, namespace `("users", user_id, ...)`: sở thích, lịch sử sách, nhân vật đã duyệt, phản hồi ở checkpoint.
+- [x] Node `save_memory` cuối mỗi run. `get_user_preferences` đọc dữ liệu thật.
+- [x] API `GET /me/memory`, `DELETE /me/memory` và màn cài đặt trên web.
 
 ### Prompts
 
-- [ ] Loader prompt theo version, ghi `prompt_version` vào metadata run LangSmith.
+- [x] Loader prompt theo version, ghi `prompt_version` vào metadata run LangSmith.
 
 ### PII
 
-- [ ] Mask PII trong log và trước khi gửi trace lên LangSmith (hide inputs/outputs hoặc hàm mask).
+- [x] Mask PII trong log và trước khi gửi trace lên LangSmith (hide inputs/outputs hoặc hàm mask).
 
 ## Đầu ra
 
@@ -33,7 +33,7 @@ Lần chạy sau tự áp dụng sở thích đã lưu, mỗi run ghi version pr
 
 ## Tiêu chí hoàn thành
 
-- [ ] Lần chạy thứ 2 tự áp dụng sở thích đã lưu
+- [x] Lần chạy thứ 2 tự áp dụng sở thích đã lưu
 
 ## Ghi chú
 

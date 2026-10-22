@@ -8,7 +8,6 @@ from langchain_core.language_models.fake_chat_models import FakeListChatModel
 from langgraph.store.memory import InMemoryStore
 
 from book_review_api.agents.tools import (
-    DEFAULT_PREFERENCES,
     SearchResult,
     ToolContext,
     check_genre,
@@ -20,6 +19,7 @@ from book_review_api.agents.tools import (
     search_knowledge,
     web_search,
 )
+from book_review_api.memory.store import DEFAULT_PREFERENCES
 from book_review_api.rag.ingest import Document
 from book_review_api.rag.retrieve import Chunk
 

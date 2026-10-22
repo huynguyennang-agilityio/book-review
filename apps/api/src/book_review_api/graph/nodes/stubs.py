@@ -1,7 +1,14 @@
 """Node chưa làm: chỉ kiểm tra huỷ rồi đi tiếp. Mỗi node thay bằng bản thật theo plan từng ngày."""
 
+import logging
+
+from langgraph.config import get_config, get_store
+
 from book_review_api.graph.nodes.common import NodeFn, NodeUpdate, node
 from book_review_api.graph.state import BookReviewState
+from book_review_api.memory.store import record_run
+
+log = logging.getLogger(__name__)
 
 
 def stub(name: str) -> NodeFn:
@@ -14,7 +21,27 @@ def stub(name: str) -> NodeFn:
 
 @node
 def save_memory(state: BookReviewState) -> NodeUpdate:
-    # Node cuối: bản thật ghi Store ở ngày 20.
+    """Node cuối: ghi sở thích, lịch sử sách, nhân vật đã duyệt và phản hồi vào Store."""
+    try:
+        store = get_store()
+    except RuntimeError:  # chạy không có Store (test khung, script)
+        return {"status": "done"}
+    config = get_config()
+    user_id = config.get("configurable", {}).get("user_id")
+    if store is not None and user_id:
+        try:
+            record_run(
+                store,
+                str(user_id),
+                thread_id=str(config.get("configurable", {}).get("thread_id") or ""),
+                book=state.get("book") or {},
+                options=state.get("options") or {},
+                characters=state.get("characters_approved") or {},
+                feedback=state.get("feedback") or [],
+            )
+        except Exception:  # noqa: BLE001
+            # Lỗi bộ nhớ không được làm hỏng video đã dựng xong.
+            log.warning("không ghi được bộ nhớ", exc_info=True)
     return {"status": "done"}
 
 

@@ -25,6 +25,7 @@ from pydantic import BaseModel
 
 from book_review_api.errors import ERROR_SPECS, ErrorCode
 from book_review_api.graph.nodes.precheck import find_excluded_keyword, fold
+from book_review_api.memory.store import DEFAULT_PREFERENCES
 from book_review_api.rag.ingest import Document, IngestError, extract_html, ingest_text
 from book_review_api.rag.retrieve import Chunk
 
@@ -46,13 +47,6 @@ EXCLUDED_GENRES: dict[str, str] = {
     "cultivation": "tu tiên",
 }
 
-DEFAULT_PREFERENCES: dict[str, Any] = {
-    "voice": "default",
-    "image_style": "default",
-    "length_minutes": 3,
-    "no_spoiler": True,
-    "tone": "neutral",
-}
 
 Event = dict[str, Any]
 

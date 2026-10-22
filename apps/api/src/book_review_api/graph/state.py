@@ -46,6 +46,12 @@ def add_costs(left: dict[str, float] | None, right: dict[str, float] | None) -> 
     return total
 
 
+def add_feedback(
+    left: list[dict[str, Any]] | None, right: list[dict[str, Any]] | None
+) -> list[dict[str, Any]]:
+    return [*(left or []), *(right or [])]
+
+
 def merge_status(left: Status | None, right: Status | None) -> Status | None:
     # Một nhánh đã huỷ/lỗi thì nhánh song song không ghi đè lại thành "running".
     if left in TERMINAL_STATUSES and right not in TERMINAL_STATUSES:
@@ -78,3 +84,7 @@ class BookReviewState(TypedDict, total=False):
     # Mã lỗi trong `errors.ErrorCode` khi status là failed/rejected/cancelled.
     error_code: str | None
     cancel_requested: bool
+    # Phản hồi của người dùng ở các điểm duyệt, ghi vào bộ nhớ cuối run (ngày 20).
+    feedback: Annotated[list[dict[str, Any]], add_feedback]
+    # Sở thích đã lưu được áp dụng vào `options` ở đầu run (khoá nào được điền).
+    preferences_applied: list[str]

@@ -12,7 +12,6 @@ chấm trong pipeline; `hook` và `review_cta` đo riêng trong eval.
 import logging
 import time
 from collections.abc import Callable, Mapping, Sequence
-from pathlib import Path
 from typing import Any
 
 from langchain_core.language_models import BaseChatModel
@@ -21,6 +20,7 @@ from pydantic import BaseModel, Field
 
 from book_review_api.config import Settings, get_settings
 from book_review_api.errors import ErrorCode
+from book_review_api.prompt_loader import load_prompt
 from book_review_api.providers.structured import Usage, call_structured
 from book_review_api.rag.retrieve import Chunk
 from book_review_api.storyboard.schema import (
@@ -35,7 +35,6 @@ log = logging.getLogger(__name__)
 
 JUDGE_PROMPT_VERSION = "faithfulness_judge_v1"
 REWRITE_PROMPT_VERSION = "faithfulness_rewrite_v1"
-_PROMPTS = Path(__file__).resolve().parent.parent / "prompts"
 LOW_FAITHFULNESS = ErrorCode.LOW_FAITHFULNESS.value
 
 # Lấy chunk theo id (DB khi chạy thật, dict khi eval).
@@ -69,7 +68,7 @@ class SceneRewrite(BaseModel):
 
 
 def _load(name: str) -> str:
-    return (_PROMPTS / f"{name}.md").read_text(encoding="utf-8")
+    return load_prompt(name)
 
 
 def _numbered(contexts: Sequence[str]) -> str:

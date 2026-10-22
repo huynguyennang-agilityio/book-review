@@ -2,7 +2,6 @@
 
 import logging
 from collections.abc import Callable
-from pathlib import Path
 from typing import Any, Literal
 
 from langchain.agents import create_agent
@@ -15,11 +14,11 @@ from book_review_api.agents.tools import Event, ToolContext, research_tools
 from book_review_api.config import Settings, get_settings
 from book_review_api.errors import ErrorCode
 from book_review_api.graph.state import BookInput
+from book_review_api.prompt_loader import load_prompt as _load_prompt
 
 log = logging.getLogger(__name__)
 
 PROMPT_VERSION = "research_v1"
-_PROMPT_PATH = Path(__file__).resolve().parent.parent / "prompts" / f"{PROMPT_VERSION}.md"
 
 
 class BookCandidate(BaseModel):
@@ -51,9 +50,7 @@ class ResearchResult(BaseModel):
 
 
 def load_prompt(settings: Settings) -> str:
-    return _PROMPT_PATH.read_text(encoding="utf-8").format(
-        min_sources=settings.research_min_sources
-    )
+    return _load_prompt(PROMPT_VERSION).format(min_sources=settings.research_min_sources)
 
 
 def build_research_agent(
