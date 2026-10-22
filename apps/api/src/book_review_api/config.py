@@ -49,6 +49,17 @@ class Settings(BaseSettings):
     research_tool_call_limit: int = 60
     price_input_per_mtok: float = 0.30
     price_output_per_mtok: float = 2.50
+    # Giá riêng theo model (USD/1 triệu token: input, output); model không có ở đây dùng giá trên.
+    model_prices: dict[str, tuple[float, float]] = {
+        "gpt-5.4-mini": (0.75, 4.50),
+        "gpt-5-mini": (0.25, 2.00),
+    }
+
+    # Model viết kịch bản (storyboard, viết lại cảnh): "openai", "gemini" hoặc "auto" (OpenAI khi
+    # có OPENAI_API_KEY, không thì Gemini như cũ).
+    writer_provider: str = "auto"
+    writer_model: str = "gpt-5.4-mini"
+    openai_api_key: str = ""
 
     # Storyboard (ngày 10): độ dài video đích và số lần viết lại một phần khi citation sai.
     storyboard_minutes: int = 3
@@ -94,6 +105,15 @@ class Settings(BaseSettings):
     job_timeout_s: float = 600.0
     # Khoảng nghỉ giữa hai cảnh (0,15–0,3 s).
     scene_gap_s: float = 0.2
+
+    def price_for(self, model: str) -> tuple[float, float]:
+        """Giá (input, output) của model; tên có hậu tố phiên bản (gpt-5.4-mini-2026-...) khớp
+        theo tiền tố dài nhất."""
+        name = model.removeprefix("models/")
+        match = max((k for k in self.model_prices if name.startswith(k)), key=len, default=None)
+        if match is None:
+            return self.price_input_per_mtok, self.price_output_per_mtok
+        return self.model_prices[match]
 
     @property
     def supabase_jwks_url(self) -> str:

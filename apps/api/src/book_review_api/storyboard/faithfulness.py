@@ -184,8 +184,7 @@ class FaithfulnessChecker:
         s = self.settings
         j, w = self.judge_usage, self.writer_usage
         return {
-            "usd": j.usd(s.price_input_per_mtok, s.price_output_per_mtok)
-            + w.usd(s.price_input_per_mtok, s.price_output_per_mtok),
+            "usd": j.usd_for(s) + w.usd_for(s),
             "input_tokens": float(j.input_tokens + w.input_tokens),
             "output_tokens": float(j.output_tokens + w.output_tokens),
         }

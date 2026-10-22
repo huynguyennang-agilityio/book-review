@@ -74,7 +74,7 @@ def make_scene_rewriter(
             judgement = checker.judge(text, contexts)
             score = judgement.score
             unsupported = [c.model_dump() for c in unsupported_claims(judgement)]
-        usd = usage.usd(settings.price_input_per_mtok, settings.price_output_per_mtok)
+        usd = usage.usd_for(settings)
         usd += checker.cost()["usd"]
         return {
             "scene_id": scene_id,

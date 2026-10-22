@@ -31,6 +31,7 @@ from book_review_api.providers.llm_gemini import (
     make_embeddings,
     make_judge_model,
 )
+from book_review_api.providers.llm_writer import make_writer_model
 from book_review_api.queue import ArqJobRunner
 from book_review_api.rag.index import (
     index_chunks,
@@ -104,7 +105,7 @@ def make_live_research_runner(settings: Settings) -> ResearchRunner:
 
 def make_live_storyboard_runner(settings: Settings) -> StoryboardRunner:
     """Storyboard cho sách vừa nghiên cứu: truy xuất đúng kho của `research["book_id"]`."""
-    model = make_chat_model(settings)
+    model = make_writer_model(settings)
     embeddings = make_embeddings(settings)
     engine = make_vector_engine(settings.database_url)
 
@@ -128,7 +129,7 @@ def make_live_storyboard_runner(settings: Settings) -> StoryboardRunner:
 def make_live_scene_rewriter(settings: Settings) -> SceneRewriter:
     engine = make_vector_engine(settings.database_url)
     return make_scene_rewriter(
-        make_chat_model(settings),
+        make_writer_model(settings),
         make_judge_model(settings),
         lambda ids: chunks_by_id(engine, list(ids)),
         settings,
@@ -159,7 +160,7 @@ def build_live_graph(
         storyboard_runner=make_live_storyboard_runner(settings),
         faithfulness_runner=make_faithfulness_runner(
             make_judge_model(settings),
-            make_chat_model(settings),
+            make_writer_model(settings),
             lambda ids: chunks_by_id(engine, list(ids)),
             settings,
         ),
