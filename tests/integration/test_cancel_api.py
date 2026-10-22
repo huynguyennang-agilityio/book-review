@@ -152,7 +152,7 @@ def test_approve_with_edits_continues_graph(
     resp = client.post("/agent", json=body, headers=token(a))
     assert resp.status_code == 200
     last = events(resp.text)[-1]["outcome"]
-    assert last["interrupts"][0]["metadata"]["langgraph"]["raw"]["type"] == "review_characters"
+    assert last["interrupts"][0]["metadata"]["langgraph"]["raw"]["type"] == "choose_image_mode"
     state = thread_state(project["thread_id"])
     assert state.values["storyboard"]["scenes"][0]["narration_vi"] == "Mở đầu đã sửa."
     assert state.values["storyboard"]["scenes"][0]["flags"] == ["EDITED"]
