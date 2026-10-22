@@ -35,6 +35,8 @@ async def test_resume_after_restart(database_url: str) -> None:
         assert state.next == ("review_script",)
         assert state.values["book"]["title"] == "Nhà giả kim"
         await graph.ainvoke(Command(resume={"approved": True}), cfg)
+        assert (await graph.aget_state(cfg)).next == ("choose_image_mode",)
+        await graph.ainvoke(Command(resume={"mode": "auto"}), cfg)
         assert (await graph.aget_state(cfg)).next == ("review_characters",)
         await graph.ainvoke(Command(resume={"approved": True}), cfg)
         final = await graph.aget_state(cfg)

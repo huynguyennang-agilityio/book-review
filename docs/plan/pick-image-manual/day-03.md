@@ -13,15 +13,15 @@ Thêm bước hỏi một lựa chọn duy nhất và định tuyến graph.
 
 ## Công việc
 
-- [ ] **State**: `RunOptions.image_mode: "auto"|"manual"` (mặc định auto).
-- [ ] **Node**: `choose_image_mode` (interrupt) sau `review_script`: payload gồm số nhân vật, số ảnh cảnh theo `image_plan`, giá auto ước tính; resume `{"mode"}` hoặc `{"cancel": true}`.
-- [ ] **Graph**: `build.py`: node mới nằm trước `character_sheets`; nhánh TTS chạy song song như cũ. Auto đi đúng đường cũ.
-- [ ] **Chi phí**: `estimate_cost` hiện phần tiết kiệm nếu manual.
-- [ ] **Test**: Auto không đổi hành vi (test hiện có vẫn xanh); huỷ khi đang chờ chọn.
+- [x] **State**: `RunOptions.image_mode: "auto"|"manual"` (mặc định auto).
+- [x] **Node**: `choose_image_mode` (interrupt) sau `review_script`: payload gồm số nhân vật, số ảnh cảnh theo `image_plan`, giá auto ước tính; resume `{"mode"}` hoặc `{"cancel": true}`.
+- [x] **Graph**: `build.py`: node mới nằm trước `character_sheets`; nhánh TTS chạy song song như cũ. Auto đi đúng đường cũ.
+- [x] **Chi phí**: `estimate_cost` hiện phần tiết kiệm nếu manual.
+- [x] **Test**: Auto không đổi hành vi (test hiện có vẫn xanh); huỷ khi đang chờ chọn.
 
 ## Tiêu chí hoàn thành
 
-- [ ] Chọn auto chạy y như cũ; chọn manual đi vào nhánh manual (chưa cần có UI)
+- [x] Chọn auto chạy y như cũ; chọn manual đi vào nhánh manual (chưa cần có UI)
 
 ---
 

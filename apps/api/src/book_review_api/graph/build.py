@@ -2,8 +2,9 @@
 
 precheck → research_agent → identify_confirm → storyboard → faithfulness_eval
   → estimate_cost → review_script ✋
-  → [tts_align → build_timeline → subtitles] ‖ [character_sheets → review_characters ✋
-     (⟲ regen_characters) → scene_images (Fal)]
+  → [tts_align → build_timeline → subtitles] ‖ [choose_image_mode ✋
+     auto: character_sheets → review_characters ✋ (⟲ regen_characters) → scene_images (Fal)
+     manual: manual_images → scene_images]
   → motion → compose_render → save_memory
 """
 
@@ -41,6 +42,8 @@ from book_review_api.graph.nodes.precheck import precheck
 from book_review_api.graph.nodes.research import identify_confirm, make_research_node
 from book_review_api.graph.nodes.review import (
     SourceLookup,
+    choose_image_mode,
+    image_mode_of,
     make_review_script,
     review_characters,
     review_script,
@@ -49,7 +52,12 @@ from book_review_api.graph.nodes.scene_images import (
     make_scene_images_node as make_real_scene_images_node,
 )
 from book_review_api.graph.nodes.storyboard import make_storyboard_node
-from book_review_api.graph.nodes.stubs import regen_characters_stub, save_memory, stub
+from book_review_api.graph.nodes.stubs import (
+    manual_images_stub,
+    regen_characters_stub,
+    save_memory,
+    stub,
+)
 from book_review_api.graph.state import TERMINAL_STATUSES, BookReviewState
 from book_review_api.providers.image_fal import ImageProvider
 from book_review_api.queue import JobRunner
@@ -67,12 +75,14 @@ NODES: dict[str, NodeFn] = {
     "faithfulness_eval": stub("faithfulness_eval"),
     "estimate_cost": make_estimate_cost_node(),
     "review_script": review_script,
+    "choose_image_mode": choose_image_mode,
     "tts_align": stub("tts_align"),
     "build_timeline": stub("build_timeline"),
     "subtitles": stub("subtitles"),
     "character_sheets": stub("character_sheets"),
     "review_characters": review_characters,
     "scene_images": stub("scene_images"),
+    "manual_images": manual_images_stub,
     "motion": stub("motion"),
     "compose_render": stub("compose_render"),
     "save_memory": save_memory,
@@ -86,7 +96,7 @@ _STEPS: list[tuple[str, Sequence[str]]] = [
     ("storyboard", ["faithfulness_eval"]),
     ("faithfulness_eval", ["estimate_cost"]),
     ("estimate_cost", ["review_script"]),
-    ("review_script", ["tts_align", "character_sheets"]),
+    ("review_script", ["tts_align", "choose_image_mode"]),
     ("tts_align", ["build_timeline"]),
     ("build_timeline", ["subtitles"]),
     ("character_sheets", ["review_characters"]),
@@ -131,6 +141,12 @@ def _route(targets: Sequence[str]) -> Callable[[BookReviewState], list[str]]:
         return [END] if state.get("status") in TERMINAL_STATUSES else list(targets)
 
     return route
+
+
+def _after_image_mode(state: BookReviewState) -> list[str]:
+    if state.get("status") in TERMINAL_STATUSES:
+        return [END]
+    return ["manual_images"] if image_mode_of(state) == "manual" else ["character_sheets"]
 
 
 def _after_characters(state: BookReviewState) -> list[str]:
@@ -188,6 +204,10 @@ def build_graph(
         builder.add_conditional_edges(source, _route(targets), [*targets, END])
     # Hợp hai nhánh: `motion` chờ cả phụ đề và ảnh cảnh. Nếu một nhánh đã huỷ thì `motion`
     # tự bỏ qua (xem `nodes.common.node`) rồi đi về END.
+    builder.add_conditional_edges(
+        "choose_image_mode", _after_image_mode, ["character_sheets", "manual_images", END]
+    )
+    builder.add_conditional_edges("manual_images", _route(["scene_images"]), ["scene_images", END])
     # Sau khi duyệt nhân vật: có yêu cầu tạo lại thì quay về `regen_characters`, không thì đi tiếp.
     builder.add_conditional_edges(
         "review_characters", _after_characters, ["regen_characters", "scene_images", END]

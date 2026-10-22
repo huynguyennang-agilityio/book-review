@@ -18,12 +18,14 @@ PLAN_NODES = [
     "faithfulness_eval",
     "estimate_cost",
     "review_script",
+    "choose_image_mode",
     "tts_align",
     "build_timeline",
     "subtitles",
     "character_sheets",
     "review_characters",
     "scene_images",
+    "manual_images",
     "motion",
     "compose_render",
     "save_memory",
@@ -68,16 +70,21 @@ def test_pause_and_resume_to_end() -> None:
     second = run(graph, Command(resume={"approved": True}))
     assert second[0] == "review_script"
     paused = graph.get_state(config())
-    assert paused.next == ("review_characters",)
+    assert paused.next == ("choose_image_mode",)
+    assert paused.interrupts[0].value["type"] == "choose_image_mode"
 
-    third = run(graph, Command(resume={"approved": True}))
-    assert third[-3:] == ["motion", "compose_render", "save_memory"]
+    third = run(graph, Command(resume={"mode": "auto"}))
+    assert graph.get_state(config()).next == ("review_characters",)
+    assert graph.get_state(config()).values["options"]["image_mode"] == "auto"
+
+    fourth = run(graph, Command(resume={"approved": True}))
+    assert fourth[-3:] == ["motion", "compose_render", "save_memory"]
     done = graph.get_state(config())
     assert done.next == ()
     assert done.values["status"] == "done"
-    # Mọi node của plan đã chạy đúng một lần (node chạy cùng bước với interrupt được lưu
-    # thành pending write nên có thể xuất hiện lại dưới dạng cache).
-    assert set(first + second + third) == set(PLAN_NODES)
+    # Auto đi đúng đường cũ: mọi node của plan chạy, trừ nhánh manual.
+    # (node chạy cùng bước với interrupt được lưu thành pending write nên có thể xuất hiện lại.)
+    assert set(first + second + third + fourth) == set(PLAN_NODES) - {"manual_images"}
 
 
 def test_cancel_while_waiting_for_review() -> None:
@@ -96,6 +103,7 @@ def test_cancel_from_review_in_parallel_branch() -> None:
     graph = build_graph(InMemorySaver())
     run(graph, {"book": {"title": "Nhà giả kim"}})
     run(graph, Command(resume={"approved": True}))
+    run(graph, Command(resume={"mode": "auto"}))
     assert graph.get_state(config()).next == ("review_characters",)
     visited = run(graph, Command(resume={"cancel": True}))
     assert "compose_render" not in visited
@@ -104,6 +112,51 @@ def test_cancel_from_review_in_parallel_branch() -> None:
     assert state.next == ()
     assert state.values["status"] == "cancelled"
     assert state.values["error_code"] == "CANCELLED"
+
+
+def test_choose_image_mode_payload_and_manual_branch() -> None:
+    graph = build_graph(InMemorySaver())
+    run(graph, {"book": {"title": "Nhà giả kim"}})
+    run(graph, Command(resume={"approved": True}))
+    paused = graph.get_state(config())
+    payload = paused.interrupts[0].value
+    assert payload["default"] == "auto"
+    for key in ("characters", "scene_images", "auto_images_usd", "manual_saving_usd"):
+        assert key in payload
+    visited = run(graph, Command(resume={"mode": "manual"}))
+    assert "manual_images" in visited
+    assert "character_sheets" not in visited and "review_characters" not in visited
+    values = graph.get_state(config()).values
+    assert values["options"]["image_mode"] == "manual"
+    assert values["error_code"] == "INVALID_STATE"  # nhánh manual làm ở ngày 4
+
+
+def test_choose_image_mode_skipped_when_preset() -> None:
+    graph = build_graph(InMemorySaver())
+    run(graph, {"book": {"title": "Nhà giả kim"}, "options": {"image_mode": "auto"}})
+    run(graph, Command(resume={"approved": True}))
+    assert graph.get_state(config()).next == ("review_characters",)
+
+
+def test_cancel_while_choosing_image_mode() -> None:
+    graph = build_graph(InMemorySaver())
+    run(graph, {"book": {"title": "Nhà giả kim"}})
+    run(graph, Command(resume={"approved": True}))
+    assert graph.get_state(config()).next == ("choose_image_mode",)
+    visited = run(graph, Command(resume={"cancel": True}))
+    assert "character_sheets" not in visited and "compose_render" not in visited
+    state = graph.get_state(config())
+    assert state.next == ()
+    assert state.values["status"] == "cancelled"
+    assert state.values["error_code"] == "CANCELLED"
+
+
+def test_invalid_image_mode_fails_validation() -> None:
+    graph = build_graph(InMemorySaver())
+    run(graph, {"book": {"title": "Nhà giả kim"}})
+    run(graph, Command(resume={"approved": True}))
+    run(graph, Command(resume={"mode": "bogus"}))
+    assert graph.get_state(config()).values["error_code"] == "VALIDATION_ERROR"
 
 
 def test_status_reducer_keeps_terminal() -> None:

@@ -242,7 +242,7 @@ def test_select_characters_and_continue_to_scene_images(tmp_path: Path) -> None:
     state = candidates_state(tmp_path)
     run_graph(graph, {"book": {"title": "Nhà giả kim", "series": "Bộ thử"}})
     graph.update_state(config(), state, as_node="review_script")
-    run_graph(graph, Command(resume={"approved": True}))
+    run_graph(graph, Command(resume={"mode": "auto"}))
     paused = graph.get_state(config())
     assert paused.next == ("review_characters",)
     payload = paused.interrupts[0].value
@@ -263,7 +263,7 @@ def test_missing_selection_fails_validation(tmp_path: Path) -> None:
     graph = build_graph(InMemorySaver())
     run_graph(graph, {"book": {"title": "Nhà giả kim"}})
     graph.update_state(config(), candidates_state(tmp_path), as_node="review_script")
-    run_graph(graph, Command(resume={"approved": True}))
+    run_graph(graph, Command(resume={"mode": "auto"}))
     visited = run_graph(graph, Command(resume={"selections": {"nhan-vat-0": 1}}))
     assert "scene_images" not in visited
     values = graph.get_state(config()).values
@@ -276,7 +276,7 @@ def test_regenerate_loops_back_to_review(tmp_path: Path) -> None:
     state = candidates_state(tmp_path)
     run_graph(graph, {"book": {"title": "Nhà giả kim"}})
     graph.update_state(config(), state, as_node="review_script")
-    run_graph(graph, Command(resume={"approved": True}))
+    run_graph(graph, Command(resume={"mode": "auto"}))
     visited = run_graph(
         graph,
         Command(resume={"selections": {"nhan-vat-1": 3}, "regenerate": {"nhan-vat-0": "đội mũ"}}),

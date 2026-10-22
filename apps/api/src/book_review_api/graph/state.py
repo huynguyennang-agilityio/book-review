@@ -8,6 +8,9 @@ from typing import Annotated, Any, Literal, NotRequired, TypedDict
 
 Status = Literal["running", "done", "failed", "cancelled", "rejected"]
 
+ImageMode = Literal["auto", "manual"]
+IMAGE_MODES: tuple[str, ...] = ("auto", "manual")
+
 # Trạng thái kết thúc: node sau không chạy nữa.
 TERMINAL_STATUSES: frozenset[str] = frozenset({"done", "failed", "cancelled", "rejected"})
 
@@ -28,6 +31,9 @@ class RunOptions(TypedDict, total=False):
     budget_usd: float
     # Phụ đề karaoke: tô sáng từng từ đúng lúc được đọc.
     karaoke: bool
+    # Cách có ảnh nhân vật và ảnh cảnh: "auto" (Fal tạo) hoặc "manual" (người dùng tải lên).
+    # Chưa có thì `choose_image_mode` hỏi sau khi duyệt kịch bản; mặc định auto.
+    image_mode: ImageMode
 
 
 def merge_dicts(left: dict[str, Any] | None, right: dict[str, Any] | None) -> dict[str, Any]:

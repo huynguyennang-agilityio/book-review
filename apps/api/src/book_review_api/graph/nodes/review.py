@@ -17,7 +17,7 @@ from langgraph.types import interrupt
 from book_review_api.errors import ErrorCode
 from book_review_api.graph.nodes.characters import MAX_REGEN_ROUNDS, slugify
 from book_review_api.graph.nodes.common import NodeFn, NodeUpdate, node
-from book_review_api.graph.state import BookReviewState
+from book_review_api.graph.state import IMAGE_MODES, BookReviewState
 
 log = logging.getLogger(__name__)
 
@@ -62,6 +62,45 @@ def apply_edits(storyboard: dict[str, Any], edits: Any) -> dict[str, Any] | None
         }
     scenes = [updated[s["id"]] for s in storyboard.get("scenes", [])]
     return {**storyboard, "scenes": scenes}
+
+
+def image_mode_of(state: BookReviewState) -> str:
+    """Chế độ ảnh của run; chưa chọn thì auto."""
+    mode = (state.get("options") or {}).get("image_mode")
+    return mode if mode in IMAGE_MODES else "auto"
+
+
+@node
+def choose_image_mode(state: BookReviewState) -> NodeUpdate:
+    """Hỏi một lần: toàn bộ ảnh nhân vật và ảnh cảnh làm auto (Fal) hay manual (tự tải lên).
+    Resume `{"mode": "auto"|"manual"}` hoặc `{"cancel": true}`. Đã có `options.image_mode`
+    (chọn trước ở màn nhập sách) thì không hỏi lại."""
+    options = state.get("options") or {}
+    if options.get("image_mode") in IMAGE_MODES:
+        return {}
+    estimate = state.get("cost_estimate") or {}
+    update, decision = _wait_for_user(
+        {
+            "type": "choose_image_mode",
+            "message": "Chọn cách có ảnh nhân vật và ảnh cảnh.",
+            "default": "auto",
+            "characters": int(estimate.get("character_images", 0)),
+            "character_count": len((state.get("storyboard") or {}).get("characters") or []),
+            "scene_images": int(estimate.get("scene_images", 0)),
+            "auto_images_usd": estimate.get("images_usd", 0.0),
+            "manual_saving_usd": estimate.get("manual_saving_usd", 0.0),
+            "cost_estimate": estimate,
+        }
+    )
+    if update:
+        return update
+    mode = decision.get("mode")
+    if mode not in IMAGE_MODES:
+        return {"status": "failed", "error_code": ErrorCode.VALIDATION_ERROR.value}
+    return {
+        "options": {**options, "image_mode": mode},
+        "feedback": [{"type": "image_mode", "mode": mode}],
+    }
 
 
 # Từ id chunk trả `{source_id: {"url", "title"}}` (DB khi chạy thật) để màn duyệt có link nguồn.

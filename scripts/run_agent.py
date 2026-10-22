@@ -107,6 +107,8 @@ def main() -> None:
                 answer: dict[str, Any] = {"index": args.pick}
             elif kind == "review_script" and args.approve:
                 answer = {"approved": True}
+            elif kind == "choose_image_mode" and args.approve:
+                answer = {"mode": "auto"}
             elif kind == "review_characters" and args.approve:
                 answer = {"selections": {slug: 0 for slug in raw.get("characters", {})}}
             else:
