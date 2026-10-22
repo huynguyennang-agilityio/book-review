@@ -288,8 +288,11 @@ export function useReviewRun(getToken: () => Promise<string>) {
     [getToken, say],
   );
 
+  const lastStartRef = useRef<{ title: string; options: Options } | null>(null);
+
   const start = useCallback(
     async (title: string, options: Options) => {
+      lastStartRef.current = { title, options };
       setMessages([{ role: "user", text: title }]);
       setSources([]);
       setSteps({});
@@ -333,6 +336,12 @@ export function useReviewRun(getToken: () => Promise<string>) {
     },
     [execute, pending],
   );
+
+  // Chạy lại sách vừa lỗi (lỗi tạm thời của nhà cung cấp) mà không phải nhập lại.
+  const retry = useCallback(async () => {
+    const last = lastStartRef.current;
+    if (last) await start(last.title, last.options);
+  }, [start]);
 
   // Huỷ: API đặt cờ để node và worker dừng, chi phí đã tiêu vẫn giữ trong state.
   const cancel = useCallback(async () => {
@@ -429,6 +438,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
     budget,
     cancelling,
     start,
+    retry,
     resume,
     cancel,
     approveScript,
