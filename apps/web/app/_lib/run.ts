@@ -338,10 +338,19 @@ export function useReviewRun(getToken: () => Promise<string>) {
   );
 
   // Chạy lại sách vừa lỗi (lỗi tạm thời của nhà cung cấp) mà không phải nhập lại.
+  // Có project rồi thì chạy tiếp từ bước vừa lỗi (API tua checkpoint); chưa có thì bắt đầu lại.
   const retry = useCallback(async () => {
+    const agent = agentRef.current;
+    if (agent && projectRef.current) {
+      cancelledRef.current = false;
+      finalRef.current = {};
+      setStatus("running");
+      await execute(agent, {});
+      return;
+    }
     const last = lastStartRef.current;
     if (last) await start(last.title, last.options);
-  }, [start]);
+  }, [execute, start]);
 
   // Huỷ: API đặt cờ để node và worker dừng, chi phí đã tiêu vẫn giữ trong state.
   const cancel = useCallback(async () => {

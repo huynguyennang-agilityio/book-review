@@ -54,7 +54,11 @@ class EdgeTTS:
         last: Exception | None = None
         for attempt in range(1, self._attempts + 1):
             try:
-                return await self._stream(text, out_path)
+                # WordBoundary hay bị edge-tts từ chối với một số câu; 2 lần cuối bỏ nó đi
+                # (mất word timing thật, aligner dự phòng ước lượng) còn hơn hỏng cả video.
+                return await self._stream(
+                    text, out_path, word_boundary=attempt <= self._attempts - 2
+                )
             except Exception as exc:  # edge-tts ném nhiều loại lỗi mạng/websocket
                 last = exc
                 log.warning("edge-tts lần %d/%d lỗi: %s", attempt, self._attempts, exc)
@@ -62,8 +66,12 @@ class EdgeTTS:
                     await asyncio.sleep(2**attempt)
         raise EdgeTTSError(str(last)) from last
 
-    async def _stream(self, text: str, out_path: Path) -> list[Word]:
-        comm = edge_tts.Communicate(text, self.voice, boundary="WordBoundary")
+    async def _stream(self, text: str, out_path: Path, word_boundary: bool = True) -> list[Word]:
+        comm = (
+            edge_tts.Communicate(text, self.voice, boundary="WordBoundary")
+            if word_boundary
+            else edge_tts.Communicate(text, self.voice)
+        )
         words: list[Word] = []
         got_audio = False
         with out_path.open("wb") as f:

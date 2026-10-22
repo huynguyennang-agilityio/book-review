@@ -15,6 +15,7 @@ from ag_ui.encoder import EventEncoder
 from ag_ui_langgraph import LangGraphAgent
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
+from langchain_core.runnables import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
 
 from book_review_api.auth import CurrentUser, current_user
@@ -49,6 +50,20 @@ async def _set_status(request: Request, user: CurrentUser, thread_id: str, statu
         )
 
 
+_TERMINAL = {"done", "failed", "cancelled", "rejected"}
+
+
+async def _rewind_failed(graph: CompiledStateGraph[Any], thread_id: str) -> None:
+    """Chạy lại project lỗi từ node vừa lỗi: tạo checkpoint mới từ lần checkpoint cuối cùng còn
+    đang chạy (trước khi status chuyển sang `failed`), nên các bước đã xong không chạy lại."""
+    config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
+    async for snap in graph.aget_state_history(config):
+        if snap.next and str(snap.values.get("status") or "") not in _TERMINAL:
+            await graph.aupdate_state(snap.config, {})
+            return
+    raise AppError(ErrorCode.NOT_FOUND)
+
+
 async def _final_status(graph: CompiledStateGraph[Any], thread_id: str) -> str:
     snap = await graph.aget_state({"configurable": {"thread_id": thread_id}})
     if snap.next and any(t.interrupts for t in snap.tasks):
@@ -73,6 +88,12 @@ async def agent_endpoint(
             raise AppError(ErrorCode.NOT_FOUND)
         if row["status"] == "cancelled":
             raise AppError(ErrorCode.CANCELLED)
+        failed_before = row["status"] == "failed"
+    if failed_before:
+        await _rewind_failed(request.app.state.graph, input_data.thread_id)
+        # Checkpoint mới còn node chưa chạy; lệnh resume giả buộc ag-ui-langgraph chạy tiếp
+        # chúng thay vì bắt đầu run mới từ đầu.
+        input_data.forwarded_props = {"command": {"resume": "true"}}
     await _set_status(request, user, input_data.thread_id, "running")
     encoder = EventEncoder(accept=request.headers.get("accept", "text/event-stream"))
     # Mỗi request một bản sao: LangGraphAgent giữ state của run hiện tại trong self.active_run.
