@@ -53,3 +53,8 @@ Giả định: 1 người full-time, đã quen Python. Nếu mới dùng LangGra
 | [33](day-33.md) | Release Phase 2 | Phase 2 hoàn tất |
 
 **Nếu cần rút ngắn:** bỏ bộ nhớ dài hạn ở bản đầu (ngày 20, tiết kiệm ~1 ngày), dùng Supabase hosted ngay từ đầu, Phase 2 chỉ animate hook (tiết kiệm ~3 ngày).
+
+## Tính năng thêm
+
+- [Chọn ảnh auto/manual](pick-image-manual/README.md)
+- [Viết kịch bản bằng OpenAI, dự phòng Gemini](openai-writer/README.md)
