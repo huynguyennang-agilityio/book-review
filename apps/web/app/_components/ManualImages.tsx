@@ -6,12 +6,15 @@ import {
   assignFiles,
   buildUploads,
   canSubmit,
+  draftFromSlots,
+  mergeDraft,
   parseUploadPage,
   progressText,
   promptsText,
   setSlot,
   shortText,
   type Slot,
+  type UploadDraft,
 } from "../_lib/images";
 import { errorText, type Pending, type UploadedImage } from "../_lib/run";
 
@@ -20,19 +23,21 @@ const ACCEPT = "image/jpeg,image/png,image/webp";
 export function ManualImages({
   pending,
   busy,
+  draft,
   onUpload,
   onSubmit,
   onCancel,
 }: {
   pending: Pending;
   busy: boolean;
+  draft: UploadDraft;
   onUpload: (file: File) => Promise<UploadedImage>;
   onSubmit: (uploads: Record<string, string>) => void;
   onCancel: () => void;
 }) {
   const page = useMemo(() => parseUploadPage(pending.raw), [pending.raw]);
-  const [slots, setSlots] = useState<Slot[]>(page.slots);
-  const [previews, setPreviews] = useState<Record<string, string>>({});
+  const [slots, setSlots] = useState<Slot[]>(() => mergeDraft(page.slots, draft));
+  const [previews, setPreviews] = useState<Record<string, string>>(() => ({ ...draft.previews }));
   const [copied, setCopied] = useState<string | null>(null);
   // Nhiều file kéo thả/chọn một lượt: chờ người dùng xác nhận thứ tự gán.
   const [batch, setBatch] = useState<File[] | null>(null);
@@ -45,12 +50,12 @@ export function ManualImages({
   useEffect(() => {
     if (Object.keys(page.errors).length) setSlots((s) => applyServerErrors(s, page.errors));
   }, [page.errors]);
-  useEffect(
-    () => () => {
-      for (const u of Object.values(previewsRef.current)) URL.revokeObjectURL(u);
-    },
-    [],
-  );
+  // Lưu ô đã tải lên trang cha; ảnh xem trước do trang cha giải phóng khi dự án mới/huỷ.
+  useEffect(() => {
+    const d = draftFromSlots(slots, previews);
+    draft.paths = d.paths;
+    draft.previews = d.previews;
+  }, [slots, previews, draft]);
 
   const uploadTo = async (key: string, file: File) => {
     setSlots((s) => setSlot(s, key, { status: "uploading", error: undefined }));

@@ -5,6 +5,9 @@ import {
   assignFiles,
   buildUploads,
   canSubmit,
+  draftFromSlots,
+  emptyDraft,
+  mergeDraft,
   missingKeys,
   parseModeChoice,
   parseUploadPage,
@@ -88,4 +91,18 @@ test("applyServerErrors chuyển ô bị báo lỗi về error và giữ ô khá
   assert.equal(out[2].status, "error");
   assert.equal(out[2].path, undefined);
   assert.equal(canSubmit(out), false);
+});
+
+test("bản nháp giữ ô đã tải qua lần hỏi lại, ô mới của prompt vẫn trống", () => {
+  let slots = parseUploadPage(page).slots;
+  slots = setSlot(slots, "1:0", { status: "done", path: "uploads/p/a.jpg" });
+  slots = setSlot(slots, "1:1", { status: "error", error: "x" });
+  const draft = draftFromSlots(slots, { "1:0": "blob:a", "1:1": "blob:b" });
+  assert.deepEqual(draft.paths, { "1:0": "uploads/p/a.jpg" });
+  assert.deepEqual(draft.previews, { "1:0": "blob:a" });
+  const again = mergeDraft(parseUploadPage(page).slots, draft);
+  assert.equal(again[1].status, "done");
+  assert.equal(again[1].path, "uploads/p/a.jpg");
+  assert.equal(again[0].status, "empty");
+  assert.deepEqual(mergeDraft(parseUploadPage(page).slots, emptyDraft()).map((s) => s.status), ["empty", "empty", "empty"]);
 });
