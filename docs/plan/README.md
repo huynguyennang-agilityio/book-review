@@ -58,3 +58,4 @@ Giả định: 1 người full-time, đã quen Python. Nếu mới dùng LangGra
 
 - [Chọn ảnh auto/manual](pick-image-manual/README.md)
 - [Viết kịch bản bằng OpenAI, dự phòng Gemini](openai-writer/README.md)
+- [Tab "Từ bài review có sẵn"](review-text/README.md)
