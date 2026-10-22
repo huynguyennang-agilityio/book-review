@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Annotated, Any, Literal
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, Request
+from fastapi import APIRouter, Depends, Request, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field, StringConstraints
 
@@ -17,6 +17,14 @@ from book_review_api.db import UserDB
 from book_review_api.errors import AppError, ErrorCode
 from book_review_api.graph.nodes.precheck import MAX_AUTHOR_LEN, find_excluded_keyword
 from book_review_api.storyboard.rewrite import SceneNotFound
+from book_review_api.uploads import (
+    MAX_BYTES,
+    MAX_PER_PROJECT,
+    is_upload_path,
+    process_image,
+    upload_dir,
+    upload_rel_path,
+)
 
 log = logging.getLogger(__name__)
 
@@ -187,16 +195,67 @@ async def get_media(
     """Ảnh ứng viên nhân vật của project (cho `<img>` trên màn duyệt). Chỉ phục vụ file mà graph
     của chính project này đã tạo (nằm trong `character_candidates`), không đọc đường dẫn tuỳ ý."""
     project = await _load(project_id, db)
-    snap = await request.app.state.graph.aget_state(
-        {"configurable": {"thread_id": project.thread_id}}
-    )
-    candidates = snap.values.get("character_candidates") or {}
-    allowed = {p for c in candidates.values() for p in c.get("images", [])}
     media_dir = Path(settings.media_dir).resolve()
     file = (media_dir / path).resolve()
-    if path not in allowed or not file.is_relative_to(media_dir) or not file.is_file():
+    if is_upload_path(project_id, path):
+        allowed = True  # ảnh người dùng tự tải lên cho chính project này
+    else:
+        snap = await request.app.state.graph.aget_state(
+            {"configurable": {"thread_id": project.thread_id}}
+        )
+        candidates = snap.values.get("character_candidates") or {}
+        allowed = path in {p for c in candidates.values() for p in c.get("images", [])}
+    if not allowed or not file.is_relative_to(media_dir) or not file.is_file():
         raise AppError(ErrorCode.NOT_FOUND)
     return FileResponse(file, media_type="image/jpeg", headers={"cache-control": "private"})
+
+
+class UploadWarning(BaseModel):
+    code: str
+    message_vi: str
+
+
+class UploadResult(BaseModel):
+    path: str = Field(description="Đường dẫn tương đối trong media_dir, dùng với GET /media")
+    width: int
+    height: int
+    size: int
+    warnings: list[UploadWarning] = Field(default_factory=list)
+
+
+_upload_lock = asyncio.Lock()
+
+
+@router.post("/{project_id}/uploads", status_code=201)
+async def upload_image(
+    project_id: UUID,
+    file: UploadFile,
+    db: UserDB,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> UploadResult:
+    """Nhận một ảnh (web gọi song song nhiều lần), chuẩn hoá thành JPEG không EXIF và lưu ở
+    `uploads/<project_id>/<hash>.jpg`. Ảnh nhỏ hoặc lệch tỉ lệ vẫn nhận kèm cảnh báo."""
+    await _load(project_id, db)  # chủ project; người khác nhận 404
+    raw = await file.read(MAX_BYTES + 1)
+    processed = await asyncio.to_thread(process_image, raw)
+    folder = upload_dir(settings.media_dir, project_id)
+    target = folder / processed.name
+    async with _upload_lock:
+        if not target.exists():
+            existing = len(list(folder.glob("*.jpg"))) if folder.is_dir() else 0
+            if existing >= MAX_PER_PROJECT:
+                raise AppError(ErrorCode.UPLOAD_LIMIT)
+            folder.mkdir(parents=True, exist_ok=True)
+            tmp = target.with_suffix(".tmp")
+            tmp.write_bytes(processed.data)
+            tmp.replace(target)
+    return UploadResult(
+        path=upload_rel_path(project_id, processed.name),
+        width=processed.width,
+        height=processed.height,
+        size=len(processed.data),
+        warnings=[UploadWarning(code=w.code, message_vi=w.message_vi) for w in processed.warnings],
+    )
 
 
 # Đầu ra tải được: khoá trong `asset_refs` -> (tên file khi tải, nhãn, media type).
