@@ -41,6 +41,7 @@ from book_review_api.rag.index import (
 )
 from book_review_api.rag.retrieve import Chunk, chunks_by_id, retrieve
 from book_review_api.storyboard.faithfulness import make_faithfulness_runner
+from book_review_api.storyboard.images import make_prompt_writer
 from book_review_api.storyboard.rewrite import SceneRewriter, make_scene_rewriter
 from book_review_api.storyboard.runner import StoryboardRunner, make_storyboard_runner
 
@@ -170,4 +171,5 @@ def build_live_graph(
             if settings.fal_key
             else None
         ),
+        prompt_writer=make_prompt_writer(make_chat_model(settings)),
     )

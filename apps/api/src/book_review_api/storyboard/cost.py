@@ -1,10 +1,11 @@
 """Ước tính chi phí media theo storyboard, hiện ở checkpoint duyệt kịch bản (mục 14 plan v5).
 
-Chỉ là ước lượng trước khi chạy: số ảnh lấy từ `scene.images` nếu đã có, không thì
-`images_per_scene`; TTS tính theo số ký tự lời đọc; I2V theo số clip định animate.
+Chỉ là ước lượng trước khi chạy: số ảnh theo `image_plan` (25-35 ảnh/video);
+TTS tính theo số ký tự lời đọc; I2V theo số clip định animate.
 """
 
 from book_review_api.config import Settings, get_settings
+from book_review_api.storyboard.images import image_plan
 from book_review_api.storyboard.schema import Storyboard
 
 
@@ -12,7 +13,7 @@ def estimate_media_cost(
     storyboard: Storyboard, settings: Settings | None = None
 ) -> dict[str, float]:
     s = settings or get_settings()
-    scene_images = sum(len(sc.images) or s.images_per_scene for sc in storyboard.scenes)
+    scene_images = sum(image_plan(storyboard, s).values())
     character_images = len(storyboard.characters) * s.character_sheet_images
     images = scene_images + character_images
     tts_chars = sum(len(sc.narration_vi) for sc in storyboard.scenes)

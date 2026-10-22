@@ -8,7 +8,7 @@ khi người dùng huỷ, request đang chạy được `cancel` bên Fal.
 import logging
 import threading
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from typing import Any, Protocol
 
 import fal_client
@@ -20,6 +20,8 @@ from book_review_api.graph.nodes.common import Cancelled
 log = logging.getLogger(__name__)
 
 SEEDREAM_T2I = "fal-ai/bytedance/seedream/v4/text-to-image"
+# Chỉnh theo ảnh tham chiếu (ADR 0003): dùng cho ảnh cảnh có nhân vật đã duyệt (ngày 18).
+SEEDREAM_EDIT = "fal-ai/bytedance/seedream/v4/edit"
 POLL_S = 1.0
 
 
@@ -43,6 +45,7 @@ class ImageProvider(Protocol):
         height: int,
         on_submit: Callable[[str], None] | None = None,
         cancelled: Callable[[], bool] | None = None,
+        reference_images: Sequence[bytes] = (),
     ) -> GeneratedImage: ...
 
 
@@ -51,11 +54,13 @@ class FalImageProvider:
         self,
         api_key: str,
         endpoint: str = SEEDREAM_T2I,
+        edit_endpoint: str = SEEDREAM_EDIT,
         concurrency: int = 4,
         timeout_s: float = 240.0,
     ) -> None:
         self._client = fal_client.SyncClient(key=api_key)
         self._endpoint = endpoint
+        self._edit_endpoint = edit_endpoint
         self._sem = threading.BoundedSemaphore(concurrency)
         self._timeout_s = timeout_s
 
@@ -68,9 +73,12 @@ class FalImageProvider:
         height: int,
         on_submit: Callable[[str], None] | None = None,
         cancelled: Callable[[], bool] | None = None,
+        reference_images: Sequence[bytes] = (),
     ) -> GeneratedImage:
         with self._sem:
-            return self._generate(prompt, seed, width, height, on_submit, cancelled)
+            return self._generate(
+                prompt, seed, width, height, on_submit, cancelled, reference_images
+            )
 
     def _generate(
         self,
@@ -80,7 +88,9 @@ class FalImageProvider:
         height: int,
         on_submit: Callable[[str], None] | None,
         cancelled: Callable[[], bool] | None,
+        reference_images: Sequence[bytes] = (),
     ) -> GeneratedImage:
+        endpoint = self._endpoint
         arguments: dict[str, Any] = {
             "prompt": prompt,
             "seed": seed,
@@ -88,8 +98,16 @@ class FalImageProvider:
             "num_images": 1,
             "enable_safety_checker": True,
         }
+        if reference_images:
+            endpoint = self._edit_endpoint
+            try:
+                arguments["image_urls"] = [
+                    self._client.upload(data, "image/jpeg") for data in reference_images
+                ]
+            except Exception as exc:  # noqa: BLE001
+                raise ImageError(f"không tải được ảnh tham chiếu lên Fal: {exc}") from exc
         try:
-            handle = self._client.submit(self._endpoint, arguments=arguments)
+            handle = self._client.submit(endpoint, arguments=arguments)
         except Exception as exc:  # noqa: BLE001
             raise ImageError(f"không gửi được yêu cầu tới Fal: {exc}") from exc
         if on_submit:

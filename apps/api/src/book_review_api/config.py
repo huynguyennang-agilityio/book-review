@@ -71,6 +71,14 @@ class Settings(BaseSettings):
     character_max: int = 3
     character_sheet_width: int = 1920
     character_sheet_height: int = 1080
+    # Ảnh cảnh (ngày 18): 25-35 ảnh mỗi video, tạo ở ~9:16 (bội số 16) rồi crop ra 720x1280.
+    scene_images_min: int = 25
+    scene_images_max: int = 35
+    scene_image_width: int = 1088
+    scene_image_height: int = 1920
+    scene_out_width: int = 720
+    scene_out_height: int = 1280
+    scene_max_characters: int = 2
     fal_key: str = ""
     fal_concurrency: int = 4
     price_tts_per_mchar: float = 0.0
