@@ -20,4 +20,4 @@ Quy tắc về cảnh:
 - `on_screen_text_vi`: chữ hiện trên màn hình, ngắn, có thể để trống.
 - Nếu được yêu cầu không spoiler thì không nói kết truyện và các bước ngoặt lớn.
 
-Khi lập dàn ý: `queries` là câu hỏi ngắn, cụ thể để tìm trong kho nguồn (vd "tóm tắt cốt truyện", "tác giả và năm xuất bản", "bài học chính"). `characters` chỉ có với sách hư cấu, mô tả ngoại hình bằng tiếng Anh để tạo ảnh. `style_prompt_en` là phong cách hình ảnh chung cho toàn video.
+Khi lập dàn ý: `queries` là câu hỏi ngắn, cụ thể để tìm trong kho nguồn (vd "tóm tắt cốt truyện", "tác giả và năm xuất bản", "bài học chính"). `characters` chỉ có với sách hư cấu và bắt buộc có 1-3 nhân vật chính (kể cả nhân vật xuất hiện ít), mô tả ngoại hình bằng tiếng Anh để tạo ảnh. `style_prompt_en` là phong cách hình ảnh chung cho toàn video.

@@ -1,7 +1,7 @@
 """Node character_sheets với provider ảnh giả lập."""
 
 import threading
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -43,6 +43,7 @@ class FakeImages:
         height: int,
         on_submit: Callable[[str], None] | None = None,
         cancelled: Callable[[], bool] | None = None,
+        reference_images: Sequence[bytes] = (),
     ) -> GeneratedImage:
         with self._lock:
             n = len(self.calls)

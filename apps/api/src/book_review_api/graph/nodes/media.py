@@ -10,6 +10,7 @@ from book_review_api.errors import ErrorCode
 from book_review_api.graph.nodes.common import NodeFn, NodeUpdate, node
 from book_review_api.graph.state import BookReviewState
 from book_review_api.queue import JobFailed, JobRunner
+from book_review_api.storyboard.images import image_plan
 from book_review_api.storyboard.schema import SceneImage, Storyboard
 
 
@@ -37,7 +38,8 @@ def make_tts_align_node(runner: JobRunner, settings: Settings | None = None) -> 
         except JobFailed:
             return {"status": "failed", "error_code": ErrorCode.PROVIDER_UNAVAILABLE.value}
         audio: list[dict[str, Any]] = result["audio"]
-        image_counts = {s.id: max(len(s.images), 1) for s in sb.scenes}
+        # Cùng kế hoạch với node `scene_images` để `Shot.image_ref` luôn trỏ tới ảnh có thật.
+        image_counts = image_plan(sb, cfg)
         for item in audio:
             item["image_count"] = image_counts[item["scene_id"]]
         return {

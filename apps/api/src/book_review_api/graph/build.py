@@ -3,7 +3,7 @@
 precheck → research_agent → identify_confirm → storyboard → faithfulness_eval
   → estimate_cost → review_script ✋
   → [tts_align → build_timeline → subtitles] ‖ [character_sheets → review_characters ✋
-     (⟲ regen_characters) → scene_images]
+     (⟲ regen_characters) → scene_images (Fal)]
   → motion → compose_render → save_memory
 """
 
@@ -45,12 +45,16 @@ from book_review_api.graph.nodes.review import (
     review_characters,
     review_script,
 )
+from book_review_api.graph.nodes.scene_images import (
+    make_scene_images_node as make_real_scene_images_node,
+)
 from book_review_api.graph.nodes.storyboard import make_storyboard_node
 from book_review_api.graph.nodes.stubs import regen_characters_stub, save_memory, stub
 from book_review_api.graph.state import TERMINAL_STATUSES, BookReviewState
 from book_review_api.providers.image_fal import ImageProvider
 from book_review_api.queue import JobRunner
 from book_review_api.storyboard.faithfulness import FaithfulnessRunner
+from book_review_api.storyboard.images import PromptWriter
 from book_review_api.storyboard.runner import StoryboardRunner
 
 GRAPH_NAME = "book_review"
@@ -145,6 +149,7 @@ def build_graph(
     cancel_flags: CancelFlags | None = None,
     source_lookup: SourceLookup | None = None,
     image_provider: ImageProvider | None = None,
+    prompt_writer: PromptWriter | None = None,
 ) -> CompiledStateGraph[BookReviewState]:
     """Runner (LLM, job worker) thiếu thì node tương ứng là node rỗng (test khung)."""
     nodes = {**NODES, "regen_characters": regen_characters_stub}
@@ -170,6 +175,11 @@ def build_graph(
         nodes["scene_images"] = make_scene_images_node(job_runner)
         nodes["motion"] = make_motion_node(job_runner)
         nodes["compose_render"] = make_compose_render_node(job_runner)
+    if image_provider is not None and job_runner is not None:
+        # Có Fal thì ảnh cảnh thật thay ảnh placeholder của worker.
+        nodes["scene_images"] = make_real_scene_images_node(
+            image_provider, cancel_flags=cancel_flags, prompt_writer=prompt_writer
+        )
     builder = StateGraph(BookReviewState)
     for name, fn in nodes.items():
         builder.add_node(name, _announce(name, fn, cancel_flags))
