@@ -24,16 +24,25 @@ def test_auto_uses_openai_only_with_key() -> None:
         writer_uses_openai(Settings(writer_provider="openai", openai_api_key=""))
 
 
-def test_make_writer_model_picks_provider() -> None:
+def test_make_writer_model_picks_provider_with_gemini_fallback() -> None:
+    from langchain_core.runnables import RunnableWithFallbacks
     from langchain_google_genai import ChatGoogleGenerativeAI
     from langchain_openai import ChatOpenAI
 
     s = Settings(google_api_key="g", openai_api_key="sk-test", writer_model="gpt-5.4-mini")
     model = make_writer_model(s)
-    assert isinstance(model, ChatOpenAI)
-    assert model.model_name == "gpt-5.4-mini"
+    assert isinstance(model, RunnableWithFallbacks)
+    assert isinstance(model.runnable, ChatOpenAI)
+    assert model.runnable.model_name == "gpt-5.4-mini"
+    assert isinstance(model.fallbacks[0], ChatGoogleGenerativeAI)
+    assert model.fallbacks[0].model == s.writer_fallback_model
+    # Không có key Gemini thì không có dự phòng.
+    alone = make_writer_model(Settings(google_api_key="", openai_api_key="sk-test"))
+    assert isinstance(alone, ChatOpenAI)
     gem = make_writer_model(Settings(google_api_key="g", openai_api_key=""))
-    assert isinstance(gem, ChatGoogleGenerativeAI)
+    assert isinstance(gem, RunnableWithFallbacks)
+    assert getattr(gem.runnable, "model", None) == s.gemini_model
+    assert getattr(gem.fallbacks[0], "model", None) == s.gemini_fallback_model
 
 
 def test_price_for_matches_versioned_names_and_falls_back() -> None:

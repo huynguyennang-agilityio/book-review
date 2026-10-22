@@ -59,6 +59,12 @@ class Settings(BaseSettings):
     # có OPENAI_API_KEY, không thì Gemini như cũ).
     writer_provider: str = "auto"
     writer_model: str = "gpt-5.4-mini"
+    # Dự phòng khi model chính quá tải (503, 429, timeout). Rỗng = không dự phòng.
+    # Model viết (OpenAI) rơi về Gemini `writer_fallback_model`; giám khảo và các bước Gemini
+    # khác (rerank, prompt ảnh) rơi về `judge_fallback_model` / `gemini_fallback_model`.
+    writer_fallback_model: str = "gemini-3.5-flash-lite"
+    judge_fallback_model: str = "gemini-3.5-flash-lite"
+    gemini_fallback_model: str = "gemini-3.1-flash-lite"
     openai_api_key: str = ""
 
     # Storyboard (ngày 10): độ dài video đích và số lần viết lại một phần khi citation sai.
