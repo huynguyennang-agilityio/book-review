@@ -512,3 +512,23 @@ button.danger {
     grid-template-columns: 1fr;
   }
 }
+
+.mode-options {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.75rem 0;
+}
+.mode-option {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  cursor: pointer;
+}
+.mode-option.picked {
+  border-color: var(--accent);
+}
+.trial {
+  margin: 0.5rem 0;
+}

@@ -6,6 +6,7 @@
     "web:dev": "pnpm --filter @book-review/web dev",
     "web:build": "pnpm --filter @book-review/web build",
     "web:lint": "pnpm --filter @book-review/web lint",
+    "web:test": "pnpm --filter @book-review/web test",
     "web:typecheck": "pnpm --filter @book-review/web typecheck"
   },
   "pnpm": {

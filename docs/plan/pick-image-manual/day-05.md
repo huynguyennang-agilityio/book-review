@@ -13,14 +13,14 @@ Màn chọn auto/manual và hook tải ảnh.
 
 ## Công việc
 
-- [ ] **`run.ts`**: Nhận `Pending.type` mới `choose_image_mode` và `upload_images`, thêm bước tiến độ; hàm `uploadImage(file) → path`.
-- [ ] **`ImageModeChoice.tsx`**: Thẻ hỏi auto/manual, nêu ~N ảnh và giá ~$X cho auto, ~M ảnh phải chuẩn bị cho manual; nút Tiếp tục.
-- [ ] **Logic**: `_lib/images.ts`: parse payload, kiểm tra đủ ảnh, gán nhiều file theo thứ tự, trạng thái từng ô.
-- [ ] **Test**: Test logic `_lib` như `characters.ts` hiện có.
+- [x] **`run.ts`**: Nhận `Pending.type` mới `choose_image_mode` và `upload_images`, thêm bước tiến độ; hàm `uploadImage(file) → path`.
+- [x] **`ImageModeChoice.tsx`**: Thẻ hỏi auto/manual, nêu ~N ảnh và giá ~$X cho auto, ~M ảnh phải chuẩn bị cho manual; nút Tiếp tục.
+- [x] **Logic**: `_lib/images.ts`: parse payload, kiểm tra đủ ảnh, gán nhiều file theo thứ tự, trạng thái từng ô.
+- [x] **Test**: Test logic `_lib` bằng `node --test` (`apps/web/tests/images.test.ts`, chạy `pnpm web:test`, CI có bước này).
 
 ## Tiêu chí hoàn thành
 
-- [ ] Trên web chọn được chế độ và tải thử một ảnh lên
+- [x] Trên web chọn được chế độ và tải thử một ảnh lên
 
 ---
 
