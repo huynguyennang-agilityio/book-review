@@ -86,9 +86,12 @@ def make_research_runner(
     def run(book: BookInput) -> dict[str, Any]:
         events: list[Event] = []
         agent = build_research_agent(model, make_ctx(events.append), settings)
-        ask = f"Sách: {book['title']}" + (
-            f"\nTác giả: {book['author']}" if book.get("author") else ""
-        )
+        ask = f"Sách: {book['title']}"
+        if author := book.get("author"):
+            ask += (
+                f"\nTác giả: {author}\nKhi gọi web_search, dùng dạng "
+                f'"{book["title"]}" {author} để ra đúng cuốn. Ưu tiên cuốn đúng tác giả này.'
+            )
         state: dict[str, Any] = {"messages": [HumanMessage(ask)]}
 
         def ingested() -> set[str]:

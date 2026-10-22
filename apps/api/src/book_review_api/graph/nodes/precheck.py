@@ -69,11 +69,23 @@ def _saved_preferences() -> dict[str, object]:
         return {}
 
 
+MAX_AUTHOR_LEN = 100
+
+
+def clean_author(author: str | None) -> str | None:
+    """Cắt khoảng trắng thừa, giới hạn độ dài; rỗng thì coi như không nhập."""
+    cleaned = " ".join((author or "").split())[:MAX_AUTHOR_LEN].strip()
+    return cleaned or None
+
+
 @node
 def precheck(state: BookReviewState) -> NodeUpdate:
     if find_excluded_keyword(state["book"]["title"]):
         return {"status": "rejected", "error_code": ErrorCode.GENRE_EXCLUDED.value}
     update: NodeUpdate = {"status": "running", "error_code": None}
+    book = state["book"]
+    if "author" in book and clean_author(book["author"]) != book["author"]:
+        update["book"] = {**book, "author": clean_author(book["author"])}
     options = dict(state.get("options") or {})
     prefs = _saved_preferences()
     if prefs:

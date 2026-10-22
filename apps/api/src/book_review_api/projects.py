@@ -15,7 +15,7 @@ from pydantic import BaseModel, Field, StringConstraints
 from book_review_api.config import Settings, get_settings
 from book_review_api.db import UserDB
 from book_review_api.errors import AppError, ErrorCode
-from book_review_api.graph.nodes.precheck import find_excluded_keyword
+from book_review_api.graph.nodes.precheck import MAX_AUTHOR_LEN, find_excluded_keyword
 from book_review_api.storyboard.rewrite import SceneNotFound
 
 log = logging.getLogger(__name__)
@@ -31,6 +31,10 @@ class ProjectCreate(BaseModel):
     book_title: Annotated[
         str, StringConstraints(strip_whitespace=True, min_length=1, max_length=200)
     ]
+    # Không lưu vào DB; chỉ kiểm độ dài như tên sách, tác giả đi theo state của graph.
+    book_author: Annotated[
+        str | None, StringConstraints(strip_whitespace=True, max_length=MAX_AUTHOR_LEN)
+    ] = None
 
 
 class Project(BaseModel):

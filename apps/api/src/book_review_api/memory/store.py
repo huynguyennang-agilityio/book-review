@@ -85,7 +85,8 @@ def record_run(
     if title:
         store.put(
             namespace(user_id, "books"),
-            slugify(title)[:80] or "book",
+            # Cùng tên khác tác giả là hai sách khác nhau.
+            slugify(f"{title} {book.get('author') or ''}")[:80] or "book",
             {"title": title, "author": book.get("author"), "thread_id": thread_id},
         )
     for slug, value in characters.items():

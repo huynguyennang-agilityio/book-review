@@ -47,3 +47,13 @@ def test_precheck_node() -> None:
     assert precheck({"book": {"title": "Nhà giả kim"}})["status"] == "running"
     rejected = precheck({"book": {"title": "Truyện kiếm hiệp"}})
     assert rejected == {"status": "rejected", "error_code": "GENRE_EXCLUDED"}
+
+
+def test_precheck_cleans_author() -> None:
+    out = precheck({"book": {"title": "Nhà giả kim", "author": "  Paulo   Coelho "}})
+    assert out["book"]["author"] == "Paulo Coelho"
+    assert precheck({"book": {"title": "X", "author": "  "}})["book"]["author"] is None
+    long = precheck({"book": {"title": "X", "author": "a" * 300}})
+    assert len(long["book"]["author"]) == 100
+    assert "book" not in precheck({"book": {"title": "X"}})
+    assert "book" not in precheck({"book": {"title": "X", "author": "Ok"}})

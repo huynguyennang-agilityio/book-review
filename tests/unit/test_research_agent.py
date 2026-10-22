@@ -14,6 +14,7 @@ from book_review_api.agents.research import ResearchResult, make_research_runner
 from book_review_api.agents.tools import Event, SearchResult, ToolContext
 from book_review_api.config import Settings
 from book_review_api.graph.build import build_graph
+from book_review_api.graph.state import BookInput
 from book_review_api.rag.ingest import Document
 
 PAGE = (
@@ -195,3 +196,56 @@ def test_gives_up_after_max_nudges_and_reports_shortfall() -> None:
     out = runner_for(script, research_nudges=2)({"title": "X"})
     assert out["research"]["ingested_sources"] == 0
     assert out["research"]["meets_min_sources"] is False
+
+
+TWO_SAME_TITLE = [
+    {"title": "Đời", "author": "Nguyễn An"},
+    {"title": "Đời", "author": "Trần Bình"},
+]
+
+
+def run_graph(book: BookInput, thread: str, **final_kw: Any) -> Any:
+    runner = runner_for([usage(final(book["title"], **final_kw))])
+    graph = build_graph(InMemorySaver(), research_runner=runner)
+    graph.invoke({"book": book}, cfg(thread))
+    return graph, graph.get_state(cfg(thread))
+
+
+def test_author_picks_matching_candidate_without_asking() -> None:
+    _, state = run_graph(
+        {"title": "Đời", "author": "tran binh"},
+        "a1",
+        candidates=TWO_SAME_TITLE,
+        low_confidence=True,
+    )
+    assert state.next == ("review_script",)
+    assert state.values["research"]["book"]["author"] == "Trần Bình"
+    assert state.values["research"]["low_confidence"] is False
+
+
+def test_wrong_author_asks_with_warning() -> None:
+    _, state = run_graph({"title": "Đời", "author": "Lê Cường"}, "a2", candidates=TWO_SAME_TITLE)
+    assert state.next == ("identify_confirm",)
+    assert "Lê Cường" in state.tasks[0].interrupts[0].value["message"]
+
+
+def test_without_author_behaviour_unchanged() -> None:
+    _, state = run_graph({"title": "Đời"}, "a3", candidates=TWO_SAME_TITLE)
+    assert state.next == ("identify_confirm",)
+    assert "tác giả" not in state.tasks[0].interrupts[0].value["message"]
+
+
+def test_author_goes_into_search_hint() -> None:
+    seen: list[str] = []
+    model = ScriptedModel(messages=iter([usage(final("Đời"))]))
+    orig = model.invoke
+
+    def spy(inp: Any, *a: Any, **k: Any) -> Any:
+        seen.append(str(inp))
+        return orig(inp, *a, **k)
+
+    object.__setattr__(model, "invoke", spy)
+    make_research_runner(model, lambda emit: make_ctx(emit), Settings(research_nudges=0))(
+        {"title": "Đời", "author": "Nguyễn An"}
+    )
+    assert any('"Đời" Nguyễn An' in s for s in seen)
