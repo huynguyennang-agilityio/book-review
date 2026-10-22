@@ -59,6 +59,13 @@ export interface ChatMessage {
   text: string;
 }
 
+export interface OutputFile {
+  key: string;
+  name: string;
+  label: string;
+  size: number;
+}
+
 export type RunStatus = "idle" | "running" | "awaiting" | "done" | "failed" | "cancelled";
 
 // Câu hiển thị theo mã lỗi của API (`errors.ErrorCode`); ưu tiên `message_vi` server trả về.
@@ -158,6 +165,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
   // Node đã bắt đầu/kết thúc, giữ qua các lần resume của cùng một project.
   const progressRef = useRef({ started: new Set<string>(), finished: new Set<string>() });
   const [cost, setCost] = useState<number | null>(null);
+  const [outputs, setOutputs] = useState<OutputFile[]>([]);
 
   const say = useCallback((role: ChatMessage["role"], text: string) => {
     setMessages((m) => [...m, { role, text }]);
@@ -254,7 +262,14 @@ export function useReviewRun(getToken: () => Promise<string>) {
             } else {
               setStatus("done");
               setSteps(Object.fromEntries(NODES.map((n) => [n.id, "done" as StepState])));
-              say("assistant", video ? `Xong. Video: ${video}` : "Xong.");
+              say("assistant", video ? "Xong. Xem và tải video ở mục Kết quả." : "Xong.");
+              const project = projectRef.current;
+              if (project) {
+                getToken()
+                  .then((token) => api<OutputFile[]>(`/projects/${project.id}/outputs`, token))
+                  .then(setOutputs)
+                  .catch((err) => say("error", errorText(err, "Không tải được danh sách file.")));
+              }
             }
           },
           onRunErrorEvent: ({ event }) => {
@@ -282,6 +297,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
       setCost(null);
       costRef.current = null;
       finalRef.current = {};
+      setOutputs([]);
       cancelledRef.current = false;
       setBudget(options.budget_usd);
       setStatus("running");
@@ -386,9 +402,26 @@ export function useReviewRun(getToken: () => Promise<string>) {
     [getToken],
   );
 
+  // File đầu ra nằm sau JWT: tải về thành Blob để phát/tải bằng object URL.
+  const loadOutput = useCallback(
+    async (key: string) => {
+      const project = projectRef.current;
+      if (!project) throw new ApiError("NOT_FOUND", ERROR_TEXT.NOT_FOUND);
+      const resp = await fetch(
+        `/api/backend/projects/${project.id}/outputs/${encodeURIComponent(key)}`,
+        { headers: { authorization: `Bearer ${await getToken()}` } },
+      );
+      if (!resp.ok) throw new ApiError(`HTTP_${resp.status}`, "Không tải được file.");
+      return resp.blob();
+    },
+    [getToken],
+  );
+
   return {
     status,
     messages,
+    outputs,
+    loadOutput,
     steps,
     sources,
     pending,

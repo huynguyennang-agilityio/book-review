@@ -3,11 +3,7 @@
 import subprocess
 from pathlib import Path
 
-from PIL import Image, ImageDraw
-
-from book_review_worker.media.kenburns import FPS, H, W, kenburns_filter
-from book_review_worker.media.placeholder import find_font, wrap
-from book_review_worker.media.subtitles import FONT_SIZE, POSITION_RATIO, SubtitleCue
+from book_review_worker.media.kenburns import FPS, kenburns_filter
 from book_review_worker.media.timeline import Timeline
 
 XFADE_S = 0.2
@@ -77,64 +73,56 @@ def concat_xfade(clips: list[Path], starts: list[float], ends: list[float], out:
     )
 
 
-def render_subtitle_pngs(cues: list[SubtitleCue], out_dir: Path, total_s: float) -> Path:
-    """Dựng danh sách ảnh PNG trong suốt (concat demuxer) phủ kín `total_s` giây."""
-    out_dir.mkdir(parents=True, exist_ok=True)
-    font = find_font(FONT_SIZE)
-    blank = out_dir / "blank.png"
-    Image.new("RGBA", (W, H), (0, 0, 0, 0)).save(blank)
-    lines: list[str] = ["ffconcat version 1.0"]
-    cursor = 0.0
-
-    def add(path: Path, dur: float) -> None:
-        if dur > 1e-6:
-            lines.append(f"file '{path.resolve().as_posix()}'")
-            lines.append(f"duration {dur:.4f}")
-
-    for i, cue in enumerate(cues):
-        start = max(cue.start_s, cursor)
-        add(blank, start - cursor)
-        img = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(img)
-        rows = wrap(cue.text, draw, font, W - 80)
-        y = int(H * POSITION_RATIO) - len(rows) * FONT_SIZE // 2
-        for row in rows:
-            x = (W - draw.textlength(row, font=font)) / 2
-            draw.text(
-                (x, y),
-                row,
-                font=font,
-                fill=(255, 255, 255, 255),
-                stroke_width=3,
-                stroke_fill=(0, 0, 0, 255),
-            )
-            y += int(FONT_SIZE * 1.25)
-        png = out_dir / f"cue_{i:04d}.png"
-        img.save(png)
-        add(png, max(cue.end_s - start, 0.04))
-        cursor = max(cue.end_s, start + 0.04)
-    add(blank, total_s - cursor + 1.0)
-    # concat demuxer cần lặp file cuối để duration cuối có hiệu lực.
-    lines.append(lines[-2])
-    listing = out_dir / "subs.ffconcat"
-    listing.write_text("\n".join(lines) + "\n", encoding="utf-8")
-    return listing
+def burn_overlay(video: Path, listing: Path, total_s: float, out: Path) -> None:
+    """Pass cuối phần hình: phủ chuỗi PNG (phụ đề + chữ nổi bật), xuất mp4 không tiếng."""
+    out.parent.mkdir(parents=True, exist_ok=True)
+    run_ffmpeg(
+        [
+            *("-i", str(video)),
+            *("-f", "concat", "-safe", "0", "-i", str(listing)),
+            *("-filter_complex", f"[1:v]fps={FPS},format=rgba[ov];"
+              "[0:v][ov]overlay=format=auto:shortest=0,format=yuv420p[vout]"),
+            *("-map", "[vout]", "-t", f"{total_s:.3f}"),
+            *("-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-preset", "veryfast"),
+            str(out),
+        ]
+    )  # fmt: skip
 
 
-def compose_final(
-    video: Path,
-    timeline: Timeline,
-    media_dir: Path,
-    subs_listing: Path,
-    out: Path,
+MUSIC_VOLUME = 0.45
+DUCK_FILTER = "sidechaincompress=threshold=0.02:ratio=10:attack=20:release=600"
+# Hợp âm La thứ (A2, A3, C4, E4) làm nền ambient; tự tổng hợp nên không vướng bản quyền.
+_CHORD_HZ = (110.0, 220.0, 261.63, 329.63)
+
+
+def make_music(path: Path, duration_s: float) -> Path:
+    """Nhạc nền ambient tổng hợp bằng ffmpeg (royalty-free vì tự tạo), dài `duration_s` giây."""
+    if path.exists():
+        return path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    inputs: list[str] = []
+    for hz in _CHORD_HZ:
+        inputs += ["-f", "lavfi", "-i", f"sine=frequency={hz}:duration={duration_s:.2f}"]
+    fade = min(2.0, duration_s / 4)
+    graph = (
+        f"amix=inputs={len(_CHORD_HZ)}:normalize=0,lowpass=f=900,"
+        f"tremolo=f=0.2:d=0.5,volume=0.5,afade=t=in:d={fade:.2f},"
+        f"afade=t=out:st={duration_s - fade:.2f}:d={fade:.2f},aformat=channel_layouts=stereo"
+    )
+    run_ffmpeg([*inputs, *("-filter_complex", graph), *("-c:a", "aac", "-b:a", "96k"), str(path)])
+    return path
+
+
+def mux_audio(
+    video: Path, timeline: Timeline, media_dir: Path, out: Path, music: Path | None = None
 ) -> None:
-    """Pass cuối: đặt audio từng cảnh theo offset tuyệt đối, burn phụ đề, mux ra mp4."""
+    """Đặt audio từng cảnh theo offset tuyệt đối rồi mux vào video (không encode lại hình).
+
+    Có `music` thì trộn nhạc nền, nhạc được hạ xuống khi có lời đọc (sidechaincompress)."""
     out.parent.mkdir(parents=True, exist_ok=True)
     inputs: list[str] = ["-i", str(video)]
     for scene in timeline.scenes:
         inputs += ["-i", str(media_dir / scene.audio_path)]
-    inputs += ["-f", "concat", "-safe", "0", "-i", str(subs_listing)]
-    sub_idx = len(timeline.scenes) + 1
     parts: list[str] = []
     labels: list[str] = []
     for i, scene in enumerate(timeline.scenes, 1):
@@ -144,20 +132,27 @@ def compose_final(
             f"adelay={ms}|{ms},aresample=44100[a{i}]"
         )
         labels.append(f"[a{i}]")
-    parts.append(
+    total = timeline.total_duration_s
+    voice = (
         f"{''.join(labels)}amix=inputs={len(labels)}:normalize=0:duration=longest,"
-        f"apad=whole_dur={timeline.total_duration_s:.3f}[aout]"
+        f"apad=whole_dur={total:.3f},atrim=0:{total:.3f}"
     )
-    parts.append(f"[{sub_idx}:v]fps={FPS},format=rgba[subs]")
-    parts.append("[0:v][subs]overlay=format=auto:shortest=0,format=yuv420p[vout]")
+    if music is None:
+        parts.append(f"{voice}[aout]")
+    else:
+        inputs += ["-i", str(music)]
+        m = len(timeline.scenes) + 1
+        parts.append(f"{voice},aformat=channel_layouts=stereo,asplit=2[vs][vm]")
+        parts.append(f"[{m}:a]aresample=44100,volume={MUSIC_VOLUME},apad,atrim=0:{total:.3f}[mq]")
+        parts.append(f"[mq][vm]{DUCK_FILTER}[duck]")
+        parts.append("[vs][duck]amix=inputs=2:normalize=0:duration=first[aout]")
     run_ffmpeg(
         [
             *inputs,
             *("-filter_complex", ";".join(parts)),
-            *("-map", "[vout]", "-map", "[aout]"),
-            *("-t", f"{timeline.total_duration_s:.3f}"),
-            *("-c:v", "libx264", "-pix_fmt", "yuv420p", "-crf", "20", "-preset", "veryfast"),
-            *("-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart"),
+            *("-map", "0:v", "-map", "[aout]"),
+            *("-t", f"{total:.3f}"),
+            *("-c:v", "copy", "-c:a", "aac", "-b:a", "128k", "-movflags", "+faststart"),
             str(out),
         ]
     )

@@ -475,3 +475,40 @@ button.danger {
   display: block;
   width: 100%;
 }
+
+/* Màn kết quả (ngày 19) */
+.result-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 280px) minmax(0, 1fr);
+  gap: 1rem;
+}
+.result-video {
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  background: #000;
+  border-radius: 8px;
+}
+.downloads {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.downloads li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+.caption {
+  white-space: pre-wrap;
+  margin: 0 0 0.5rem;
+  font: inherit;
+}
+@media (max-width: 640px) {
+  .result-grid {
+    grid-template-columns: 1fr;
+  }
+}

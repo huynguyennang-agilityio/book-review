@@ -4,15 +4,18 @@ import json
 from pathlib import Path
 from typing import Any
 
+from book_review_worker.media.cover import make_cover
 from book_review_worker.media.ffmpeg import (
     XFADE_S,
-    compose_final,
+    burn_overlay,
     concat_xfade,
+    make_music,
+    mux_audio,
     probe_duration,
     render_clip,
-    render_subtitle_pngs,
 )
 from book_review_worker.media.kenburns import DIRECTIONS
+from book_review_worker.media.overlay import Highlight, render_overlay_track
 from book_review_worker.media.placeholder import make_placeholder
 from book_review_worker.media.subtitles import build_cues, write_subtitles
 from book_review_worker.media.timeline import SceneAudio, Timeline, build_timeline
@@ -64,10 +67,12 @@ def _render_dir(ctx: dict[str, Any], payload: dict[str, Any]) -> Path:
 
 
 async def subtitles(ctx: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
-    """payload: {"job_key", "timeline"}. Ghi `subtitles.ass` và `subtitles.srt`."""
+    """payload: {"job_key", "timeline", "karaoke"?}. Ghi `subtitles.ass` và `subtitles.srt`."""
     media_dir = Path(ctx["media_dir"])
     tl = Timeline.model_validate(payload["timeline"])
-    ass, srt, cues = write_subtitles(tl, _render_dir(ctx, payload))
+    ass, srt, cues = write_subtitles(
+        tl, _render_dir(ctx, payload), karaoke=bool(payload.get("karaoke"))
+    )
     return {"ass": _rel(media_dir, ass), "srt": _rel(media_dir, srt), "cues": len(cues)}
 
 
@@ -108,9 +113,17 @@ async def motion(ctx: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]
     return {"clips": clips}
 
 
+FINAL_NAME = "final_review.mp4"
+VOICE_ONLY_NAME = "final_review_voice_only.mp4"
+COVER_NAME = "cover.jpg"
+
+
 async def compose(ctx: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
-    """Ghép clip (xfade), đặt audio theo offset, burn phụ đề. payload: {"job_key", "timeline",
-    "clips": [...]}. Trả `video` (đường dẫn tương đối) và độ dài đo bằng ffprobe."""
+    """Ghép clip (xfade), burn phụ đề + chữ nổi bật trong safe zone, đặt audio theo offset.
+
+    payload: {"job_key", "timeline", "clips", "title"?, "hook"?, "highlights"?: [{text, start_s,
+    end_s}], "karaoke"?: bool, "music"?: bool}. Xuất bản có nhạc nền (ducking), bản voice-only
+    (không nhạc, để gắn nhạc trong app TikTok) và `cover.jpg`. Đường dẫn trả về tương đối."""
     media_dir = Path(ctx["media_dir"])
     tl = Timeline.model_validate(payload["timeline"])
     work = _render_dir(ctx, payload)
@@ -122,14 +135,64 @@ async def compose(ctx: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any
         [c["end_s"] for c in clips],
         raw,
     )
-    await report_progress(ctx, 1, 3, "ghép shot")
+    await report_progress(ctx, 1, 4, "ghép shot")
     cues = build_cues(tl)
-    listing = render_subtitle_pngs(cues, work / "subs", tl.total_duration_s)
-    await report_progress(ctx, 2, 3, "phụ đề")
-    final = work / "video.mp4"
-    compose_final(raw, tl, media_dir, listing, final)
-    await report_progress(ctx, 3, 3, "xong")
-    return {"video": _rel(media_dir, final), "duration_s": probe_duration(final)}
+    highlights = [Highlight.model_validate(h) for h in payload.get("highlights", [])]
+    listing = render_overlay_track(
+        cues,
+        highlights,
+        work / "overlay",
+        tl.total_duration_s,
+        karaoke=bool(payload.get("karaoke")),
+    )
+    burned = work / "burned.mp4"
+    burn_overlay(raw, listing, tl.total_duration_s, burned)
+    await report_progress(ctx, 2, 4, "phụ đề và chữ nổi bật")
+    voice_only = work / VOICE_ONLY_NAME
+    mux_audio(burned, tl, media_dir, voice_only)
+    final = work / FINAL_NAME
+    if payload.get("music", True):
+        music = make_music(
+            media_dir / "music" / f"ambient_{int(tl.total_duration_s) + 2}s.m4a",
+            tl.total_duration_s + 2,
+        )
+        mux_audio(burned, tl, media_dir, final, music)
+    else:
+        final.write_bytes(voice_only.read_bytes())
+    await report_progress(ctx, 3, 4, "âm thanh")
+    cover = work / COVER_NAME
+    make_cover(raw, payload.get("title", ""), payload.get("hook", ""), cover)
+    await report_progress(ctx, 4, 4, "xong")
+    return {
+        "video": _rel(media_dir, final),
+        "voice_only": _rel(media_dir, voice_only),
+        "cover": _rel(media_dir, cover),
+        "duration_s": probe_duration(final),
+    }
 
 
-__all__ = ["compose", "images", "motion", "subtitles", "timeline", "tts"]
+async def package(ctx: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
+    """Ghi các file văn bản đầu ra. payload: {"job_key", "caption_vi", "hashtags", "sources_md",
+    "project": {...}}. Trả đường dẫn tương đối của `caption.txt`, `sources.md`, `project.json`."""
+    media_dir = Path(ctx["media_dir"])
+    work = _render_dir(ctx, payload)
+    work.mkdir(parents=True, exist_ok=True)
+    tags = " ".join(h if h.startswith("#") else f"#{h}" for h in payload.get("hashtags", []))
+    caption = work / "caption.txt"
+    caption.write_text(
+        f"{payload.get('caption_vi', '').strip()}\n\n{tags}\n".rstrip() + "\n", encoding="utf-8"
+    )
+    sources = work / "sources.md"
+    sources.write_text(payload.get("sources_md", ""), encoding="utf-8")
+    project = work / "project.json"
+    project.write_text(
+        json.dumps(payload.get("project", {}), ensure_ascii=False, indent=2), encoding="utf-8"
+    )
+    return {
+        "caption": _rel(media_dir, caption),
+        "sources": _rel(media_dir, sources),
+        "project": _rel(media_dir, project),
+    }
+
+
+__all__ = ["compose", "images", "motion", "package", "subtitles", "timeline", "tts"]

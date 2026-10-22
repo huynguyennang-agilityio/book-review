@@ -193,3 +193,80 @@ async def get_media(
     if path not in allowed or not file.is_relative_to(media_dir) or not file.is_file():
         raise AppError(ErrorCode.NOT_FOUND)
     return FileResponse(file, media_type="image/jpeg", headers={"cache-control": "private"})
+
+
+# Đầu ra tải được: khoá trong `asset_refs` -> (tên file khi tải, nhãn, media type).
+OUTPUTS: dict[str, tuple[str, str, str]] = {
+    "video:final": ("final_review.mp4", "Video có nhạc nền", "video/mp4"),
+    "video:voice_only": ("final_review_voice_only.mp4", "Video chỉ giọng đọc", "video/mp4"),
+    "subtitles:srt": ("subtitles.srt", "Phụ đề (.srt)", "application/x-subrip"),
+    "subtitles:ass": ("subtitles.ass", "Phụ đề (.ass)", "text/plain; charset=utf-8"),
+    "caption": ("caption.txt", "Caption và hashtag", "text/plain; charset=utf-8"),
+    "cover": ("cover.jpg", "Ảnh bìa", "image/jpeg"),
+    "sources": ("sources.md", "Nguồn và trích dẫn", "text/markdown; charset=utf-8"),
+    "project": ("project.json", "Dữ liệu project", "application/json"),
+}
+
+
+class OutputFile(BaseModel):
+    key: str
+    name: str
+    label: str
+    size: int
+
+
+async def _output_refs(project_id: UUID, request: Request, db: UserDB) -> dict[str, str]:
+    project = await _load(project_id, db)
+    snap = await request.app.state.graph.aget_state(
+        {"configurable": {"thread_id": project.thread_id}}
+    )
+    refs: dict[str, str] = snap.values.get("asset_refs") or {}
+    return refs
+
+
+def _resolve_output(media_dir: str, ref: str) -> Path | None:
+    root = Path(media_dir).resolve()
+    file = (root / ref).resolve()
+    return file if file.is_relative_to(root) and file.is_file() else None
+
+
+@router.get("/{project_id}/outputs")
+async def list_outputs(
+    project_id: UUID,
+    request: Request,
+    db: UserDB,
+    settings: Annotated[Settings, Depends(get_settings)],
+) -> list[OutputFile]:
+    """Các file đầu ra của project đã dựng xong (video, voice-only, phụ đề, caption, bìa...)."""
+    refs = await _output_refs(project_id, request, db)
+    result: list[OutputFile] = []
+    for key, (name, label, _type) in OUTPUTS.items():
+        file = _resolve_output(settings.media_dir, refs[key]) if key in refs else None
+        if file is not None:
+            result.append(OutputFile(key=key, name=name, label=label, size=file.stat().st_size))
+    return result
+
+
+@router.get("/{project_id}/outputs/{key}")
+async def download_output(
+    project_id: UUID,
+    key: str,
+    request: Request,
+    db: UserDB,
+    settings: Annotated[Settings, Depends(get_settings)],
+    download: bool = False,
+) -> FileResponse:
+    """Tải một file đầu ra. Chỉ phục vụ khoá trong `OUTPUTS` mà graph của project này đã tạo."""
+    refs = await _output_refs(project_id, request, db)
+    if key not in OUTPUTS or key not in refs:
+        raise AppError(ErrorCode.NOT_FOUND)
+    file = _resolve_output(settings.media_dir, refs[key])
+    if file is None:
+        raise AppError(ErrorCode.NOT_FOUND)
+    name, _label, media_type = OUTPUTS[key]
+    return FileResponse(
+        file,
+        media_type=media_type,
+        filename=name if download else None,
+        headers={"cache-control": "private"},
+    )
