@@ -45,7 +45,17 @@ pnpm web:lint && pnpm web:typecheck && pnpm web:build
 
 - `ci.yml`: ruff, mypy, pytest (Postgres + pgvector), eslint/typecheck/build web, build 3 image Docker.
 - `evals.yml`: khi PR đổi prompt, RAG, storyboard hoặc config, chạy eval 5 sách và chặn merge nếu faithfulness < 0.9. Cần secret `GOOGLE_API_KEY` trong GitHub Environment `eval`.
+- Deploy: xem mục "Deploy và release" bên dưới.
 - Image: `infra/docker/{api,worker,web}.Dockerfile`, xem [infra/docker/README.md](infra/docker/README.md).
+
+## Deploy và release
+
+- **Kiến trúc chạy thật:** Supabase (Postgres + pgvector, Auth) · VPS chạy `infra/deploy/docker-compose.yml` (API + worker + Redis, chung volume media) · web trên Vercel.
+- `deploy.yml`: merge vào `main` → build image `api`/`worker` đẩy lên GHCR → smoke test (`scripts/smoke_test.py`: 1 video ngắn, ảnh placeholder, TTS thật) → deploy **staging**. Push tag `vX.Y.Z` → deploy **production** (Environment `production`, nên bật required reviewers).
+- Mỗi Environment (`staging`, `production`) cần secret `SSH_HOST`, `SSH_USER`, `SSH_KEY`, biến `API_URL` (và tuỳ chọn `DEPLOY_PATH`). Thiếu `SSH_HOST` thì bước deploy được bỏ qua.
+- Trên VPS: cài Docker, đặt `.env` (xem `.env.example`: `DATABASE_URL`, `SUPABASE_URL`, `GOOGLE_API_KEY`, `TAVILY_API_KEY`...) cạnh `docker-compose.yml`, `docker login ghcr.io` nếu package private. `deploy.sh` chạy migration rồi `docker compose up -d`.
+- Web: kết nối repo với Vercel (root `apps/web`), đặt `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `API_URL` trỏ tới API của từng môi trường.
+- Phát hành: `git tag v0.1.0 && git push origin v0.1.0`.
 
 ## Database và migration
 

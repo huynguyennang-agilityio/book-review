@@ -1,0 +1,44 @@
+# Chạy trên VPS (staging/production). API và worker dùng chung volume media.
+# Biến cần có trong .env cạnh file này: IMAGE_TAG, REGISTRY (ghcr.io/<owner>/<repo>), DATABASE_URL,
+# SUPABASE_URL, GOOGLE_API_KEY, TAVILY_API_KEY, ... (xem .env.example).
+services:
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    volumes:
+      - redisdata:/data
+
+  api:
+    image: ${REGISTRY}/api:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      REDIS_URL: redis://redis:6379
+      MEDIA_DIR: /data/media
+    volumes:
+      - media:/data/media
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request as u; u.urlopen('http://localhost:8000/health', timeout=5)"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
+  worker:
+    image: ${REGISTRY}/worker:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      REDIS_URL: redis://redis:6379
+      MEDIA_DIR: /data/media
+    volumes:
+      - media:/data/media
+    depends_on:
+      - redis
+
+volumes:
+  redisdata:
+  media:
