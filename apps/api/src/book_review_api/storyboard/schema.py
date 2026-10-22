@@ -13,6 +13,23 @@ SECTION_ORDER: tuple[Section, ...] = ("hook", "context", "body", "review_cta")
 MAX_QUOTE_CHARS = 200
 # Số cảnh tối đa mỗi phần (khớp prompt storyboard). Model đôi khi dồn cả kịch bản vào `hook`.
 SECTION_MAX_SCENES: dict[str, int] = {"hook": 1, "context": 2, "body": 4, "review_cta": 2}
+# Một cảnh đọc ~7,5 giây; suy ra số cảnh theo số phút người dùng chọn.
+SECONDS_PER_SCENE = 7.5
+
+
+def section_max_scenes(minutes: int) -> dict[str, int]:
+    """Số cảnh tối đa mỗi phần cho video ~`minutes` phút. `hook` luôn 1 cảnh; ba phần còn lại chia
+    theo tỉ lệ 2:4:2 của bản gốc."""
+    total = max(sum(SECTION_MAX_SCENES.values()), round(minutes * 60 / SECONDS_PER_SCENE))
+    rest = total - 1
+    context = round(rest * 2 / 8)
+    review_cta = round(rest * 2 / 8)
+    return {
+        "hook": 1,
+        "context": context,
+        "body": rest - context - review_cta,
+        "review_cta": review_cta,
+    }
 
 
 class Citation(BaseModel):
