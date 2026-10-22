@@ -226,3 +226,34 @@ def test_rewrite_without_llm_is_unavailable(
     )
     assert resp.status_code == 503
     assert resp.json()["code"] == "PROVIDER_UNAVAILABLE"
+
+
+def test_media_serves_only_candidate_images(
+    client: TestClient,  # noqa: F811
+    make_user: Callable[[str], str],
+    tmp_path: Any,
+) -> None:
+    from book_review_api.config import Settings, get_settings
+
+    a, b = make_user("a@example.com"), make_user("b@example.com")
+    settings: Settings = app.dependency_overrides[get_settings]()
+    settings = settings.model_copy(update={"media_dir": str(tmp_path)})
+    app.dependency_overrides[get_settings] = lambda: settings
+    (tmp_path / "characters").mkdir()
+    (tmp_path / "characters" / "a_0.jpg").write_bytes(b"jpg")
+    (tmp_path / "secret.txt").write_text("x")
+    project = create(client, a).json()
+    body = run_body(project["thread_id"])
+    body["state"]["storyboard"] = STORYBOARD
+    body["state"]["character_candidates"] = {"a": {"name": "A", "images": ["characters/a_0.jpg"]}}
+    client.post("/agent", json=body, headers=token(a))
+
+    url = f"/projects/{project['id']}/media"
+    ok = client.get(url, params={"path": "characters/a_0.jpg"}, headers=token(a))
+    assert ok.status_code == 200 and ok.content == b"jpg"
+    assert ok.headers["content-type"] == "image/jpeg"
+    for bad in ["secret.txt", "../secret.txt", "characters/../secret.txt"]:
+        assert client.get(url, params={"path": bad}, headers=token(a)).status_code == 404
+    assert (
+        client.get(url, params={"path": "characters/a_0.jpg"}, headers=token(b)).status_code == 404
+    )
