@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Gabriel García Márquez",
+    "needle": "Gabriel García Márquez"
+  },
+  {
+    "id": "f2",
+    "fact": "Xuất bản năm 1967",
+    "needle": "năm 1967"
+  },
+  {
+    "id": "f3",
+    "fact": "Bối cảnh là thị trấn Macondo",
+    "needle": "Macondo"
+  },
+  {
+    "id": "f4",
+    "fact": "Truyện kể về dòng họ Buendía",
+    "needle": "dòng họ Buendía"
+  },
+  {
+    "id": "f5",
+    "fact": "Tác phẩm thuộc chủ nghĩa hiện thực huyền ảo",
+    "needle": "hiện thực huyền ảo"
+  },
+  {
+    "id": "f6",
+    "fact": "García Márquez nhận Nobel năm 1982",
+    "needle": "năm 1982"
+  }
+]

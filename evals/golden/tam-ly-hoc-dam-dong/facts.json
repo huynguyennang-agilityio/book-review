@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Gustave Le Bon",
+    "needle": "Gustave Le Bon"
+  },
+  {
+    "id": "f2",
+    "fact": "Xuất bản năm 1895",
+    "needle": "năm 1895"
+  },
+  {
+    "id": "f3",
+    "fact": "Cá nhân đánh mất ý thức riêng trong đám đông",
+    "needle": "đánh mất ý thức riêng"
+  },
+  {
+    "id": "f4",
+    "fact": "Có cơ chế lây lan cảm xúc",
+    "needle": "lây lan cảm xúc"
+  },
+  {
+    "id": "f5",
+    "fact": "Đám đông dễ bị ám thị",
+    "needle": "dễ bị ám thị"
+  },
+  {
+    "id": "f6",
+    "fact": "Đám đông suy nghĩ bằng hình ảnh",
+    "needle": "bằng hình ảnh"
+  }
+]

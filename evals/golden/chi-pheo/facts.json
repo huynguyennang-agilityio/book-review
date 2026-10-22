@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Nam Cao",
+    "needle": "Nam Cao"
+  },
+  {
+    "id": "f2",
+    "fact": "Truyện in lần đầu năm 1941",
+    "needle": "năm 1941"
+  },
+  {
+    "id": "f3",
+    "fact": "Bối cảnh là làng Vũ Đại",
+    "needle": "làng Vũ Đại"
+  },
+  {
+    "id": "f4",
+    "fact": "Chí Phèo bị bỏ rơi ở một cái lò gạch cũ",
+    "needle": "lò gạch cũ"
+  },
+  {
+    "id": "f5",
+    "fact": "Thị Nở cho Chí Phèo bát cháo hành",
+    "needle": "cháo hành"
+  },
+  {
+    "id": "f6",
+    "fact": "Chí Phèo đâm chết Bá Kiến rồi tự sát",
+    "needle": "đâm chết Bá Kiến"
+  }
+]

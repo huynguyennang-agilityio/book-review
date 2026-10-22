@@ -1,4 +1,4 @@
-"""Dataset golden: đủ 10 sách, mỗi dữ kiện có căn cứ trong nguồn."""
+"""Dataset golden: đủ 20 sách, mỗi dữ kiện có căn cứ trong nguồn."""
 
 from pathlib import Path
 
@@ -8,11 +8,11 @@ from book_review_api.storyboard.validate import fold_quote
 ROOT = Path(__file__).resolve().parents[2] / "evals" / "golden"
 
 
-def test_ten_books_five_fiction_five_non_fiction() -> None:
+def test_twenty_books_ten_fiction_ten_non_fiction() -> None:
     books = load_golden(ROOT)
-    assert len(books) == 10
-    assert sum(b.kind == "fiction" for b in books) == 5
-    assert sum(b.kind == "non_fiction" for b in books) == 5
+    assert len(books) == 20
+    assert sum(b.kind == "fiction" for b in books) == 10
+    assert sum(b.kind == "non_fiction" for b in books) == 10
 
 
 def test_every_fact_has_support_in_sources() -> None:

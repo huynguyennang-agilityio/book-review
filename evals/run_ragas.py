@@ -1,6 +1,6 @@
 """Eval faithfulness trên dataset golden: RAGAS gốc và bộ chấm tiếng Việt của pipeline.
 
-    uv run --group eval python evals/run_ragas.py                 # cả 10 sách
+    uv run --group eval python evals/run_ragas.py                 # cả 20 sách
     uv run --group eval python evals/run_ragas.py nha-gia-kim     # một vài slug
     uv run --group eval python evals/run_ragas.py --no-ragas      # chỉ bộ chấm tiếng Việt
 

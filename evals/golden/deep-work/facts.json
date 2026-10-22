@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Cal Newport",
+    "needle": "Cal Newport"
+  },
+  {
+    "id": "f2",
+    "fact": "Xuất bản năm 2016",
+    "needle": "năm 2016"
+  },
+  {
+    "id": "f3",
+    "fact": "Làm việc sâu là tập trung cao độ không bị phân tâm",
+    "needle": "không bị phân tâm"
+  },
+  {
+    "id": "f4",
+    "fact": "Đối lập là làm việc nông",
+    "needle": "làm việc nông"
+  },
+  {
+    "id": "f5",
+    "fact": "Có bốn triết lý sắp xếp làm việc sâu",
+    "needle": "bốn triết lý"
+  },
+  {
+    "id": "f6",
+    "fact": "Newport khuyên giảm mạng xã hội",
+    "needle": "mạng xã hội"
+  }
+]

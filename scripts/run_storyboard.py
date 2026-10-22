@@ -3,7 +3,7 @@
     uv run python scripts/run_storyboard.py nha-gia-kim sapiens
 
 Cần GOOGLE_API_KEY trong .env. Nguồn lấy từ `evals/golden/<slug>/sources`, truy xuất trong bộ
-nhớ (embeddings Gemini), không cần DB. Không có tên thì chạy cả 10 sách.
+nhớ (embeddings Gemini), không cần DB. Không có tên thì chạy cả 20 sách.
 """
 
 import json

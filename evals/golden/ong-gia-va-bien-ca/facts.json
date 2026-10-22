@@ -1,0 +1,32 @@
+[
+  {
+    "id": "f1",
+    "fact": "Tác giả là Ernest Hemingway",
+    "needle": "Ernest Hemingway"
+  },
+  {
+    "id": "f2",
+    "fact": "Xuất bản năm 1952",
+    "needle": "năm 1952"
+  },
+  {
+    "id": "f3",
+    "fact": "Nhân vật chính là ngư dân Santiago",
+    "needle": "Santiago"
+  },
+  {
+    "id": "f4",
+    "fact": "Santiago tám mươi tư ngày không bắt được cá",
+    "needle": "tám mươi tư ngày"
+  },
+  {
+    "id": "f5",
+    "fact": "Cậu bé Manolin chăm sóc ông",
+    "needle": "Manolin"
+  },
+  {
+    "id": "f6",
+    "fact": "Santiago câu được con cá kiếm marlin",
+    "needle": "cá kiếm marlin"
+  }
+]
