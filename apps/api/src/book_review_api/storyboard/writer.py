@@ -135,6 +135,22 @@ def load_prompt() -> str:
     return _load_prompt(PROMPT_VERSION)
 
 
+def salvage_scenes(scenes: Sequence[Scene], by_id: dict[str, Chunk], next_id: int) -> list[Scene]:
+    """Giữ các trích dẫn hợp lệ; cảnh phần context/body không còn trích nào thì bỏ. Đánh số lại."""
+    kept: list[Scene] = []
+    for scene in scenes:
+        good = [
+            c
+            for c in scene.citations
+            if not scene_problems(scene.model_copy(update={"citations": [c]}), by_id)
+        ]
+        fixed = scene.model_copy(update={"citations": good})
+        if scene_problems(fixed, by_id):
+            continue
+        kept.append(fixed.model_copy(update={"id": next_id + len(kept)}))
+    return kept
+
+
 class StoryboardWriter:
     def __init__(
         self,
@@ -269,6 +285,7 @@ class StoryboardWriter:
         problems: list[str] = []
         # Bản hợp lệ dài nhất; viết lại vẫn thiếu cảnh thì dùng bản này thay vì thất bại.
         best: list[Scene] | None = None
+        scenes: list[Scene] = []
         for _ in range(self.settings.storyboard_retries + 1):
             draft = self._call(SectionDraft, messages)
             scenes, problems = self._resolve(draft, part.section, passages, by_id, next_id)
@@ -287,6 +304,12 @@ class StoryboardWriter:
             ]
         if best is not None:
             return best
+        # Viết lại hết lượt vẫn còn trích sai: bỏ trích sai, bỏ cảnh không còn trích nào, giữ phần
+        # còn lại thay vì huỷ cả kịch bản.
+        kept = salvage_scenes(scenes, by_id, next_id)
+        if kept:
+            log.warning("storyboard: phần %s bỏ cảnh trích sai: %s", part.section, problems)
+            return kept
         raise StoryboardError(f"Phần {part.section} không qua kiểm tra citation", problems)
 
     def _resolve(

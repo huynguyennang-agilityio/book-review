@@ -67,7 +67,7 @@ export const ERROR_TEXT: Record<string, string> = {
   GENRE_EXCLUDED: "Thể loại sách này chưa được hỗ trợ.",
   BUDGET_EXCEEDED: "Đã vượt hạn mức chi phí cho phép.",
   PROVIDER_UNAVAILABLE: "Dịch vụ AI tạm thời không phản hồi, vui lòng thử lại sau.",
-  LOW_FAITHFULNESS: "Kịch bản chưa bám sát nguồn, cần tạo lại.",
+  LOW_FAITHFULNESS: "Kịch bản có trích dẫn không khớp nguồn. Bấm Thử lại để viết lại.",
   RENDER_FAILED: "Dựng video thất bại.",
   CANCELLED: "Yêu cầu đã bị huỷ.",
   INVALID_STATE: "Project không ở trạng thái cho phép thao tác này.",

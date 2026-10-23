@@ -328,6 +328,32 @@ def test_writer_drops_uncited_scenes_in_cited_sections() -> None:
     assert [s.id for s in sb.scenes] == [1, 2, 3, 4]
 
 
+def test_writer_drops_scene_with_bad_quote_after_retries() -> None:
+    """Hết lượt viết lại vẫn một cảnh trích sai: bỏ cảnh đó, giữ cảnh đúng, không huỷ kịch bản."""
+    mixed = SectionDraft(
+        scenes=[
+            SceneDraft(
+                narration_vi="trích sai",
+                scene_type="title",
+                mood="m",
+                citations=[CitationDraft(passage=1, quote="câu không có trong nguồn")],
+            ),
+            SceneDraft(
+                narration_vi="trích đúng",
+                scene_type="title",
+                mood="m",
+                citations=[CitationDraft(passage=1, quote="Paulo Coelho")],
+            ),
+        ]
+    )
+    w, _ = make_writer(
+        [outline(), draft(cited=False), mixed, mixed, mixed, draft(), draft(cited=False)]
+    )
+    sb = w.write(w_book(), "fiction")
+    assert [s.narration_vi for s in sb.scenes if s.section == "context"] == ["trích đúng"]
+    assert [s.id for s in sb.scenes] == [1, 2, 3, 4]
+
+
 def test_bad_citation_in_cta_is_dropped_not_retried() -> None:
     """hook/review_cta không cần citation: model tự trích sai thì bỏ trích, không thất bại."""
     w, model = make_writer(
