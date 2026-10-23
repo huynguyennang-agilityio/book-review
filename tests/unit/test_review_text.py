@@ -115,11 +115,10 @@ def test_review_seconds_counts_all_fields() -> None:
 def test_review_seconds_matches_storyboard_estimate() -> None:
     from book_review_api.graph.nodes.review_text import make_ingest_review_node
 
-    raw = review(hook="Năm 1988 có 3 lý do.", comment="Sách hay. Nên đọc 1 lần.")
-    checked = precheck(state(raw))
-    out = make_ingest_review_node()({**state(raw), **checked})
+    st = ingest_state(hook="Năm 1988 có 3 lý do.", comment="Sách hay. Nên đọc 1 lần.")
+    out = make_ingest_review_node()(st)
     # Chia cảnh và đọc số thành chữ như node nên khớp tới một chữ số thập phân.
-    assert review_seconds(checked["user_review"]) == pytest.approx(
+    assert review_seconds(st["user_review"]) == pytest.approx(
         out["storyboard"]["estimated_seconds"], abs=0.05
     )
 
