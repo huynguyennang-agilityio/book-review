@@ -49,4 +49,4 @@ Người dùng chỉ cần kết quả cuối cùng.
 
 ## Skills
 
-`.claude/skills/`: `create-tasks` (chia plan artifact thành task), `doing-tasks` (làm hết list task, tự PR + merge, không chạy eval trừ khi được bảo, cuối cùng gom issue thành artifact).
+`.claude/skills/`: `create-plan` (lên plan thành artifact, chưa code khi chưa duyệt), `create-tasks` (chia plan artifact thành task), `doing-tasks` (làm hết list task, tự PR + merge, không chạy eval trừ khi được bảo, cuối cùng gom issue thành artifact).
