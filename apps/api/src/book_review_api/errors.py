@@ -15,6 +15,7 @@ class ErrorCode(StrEnum):
     GENRE_EXCLUDED = "GENRE_EXCLUDED"
     BUDGET_EXCEEDED = "BUDGET_EXCEEDED"
     PROVIDER_UNAVAILABLE = "PROVIDER_UNAVAILABLE"
+    PROVIDER_QUOTA = "PROVIDER_QUOTA"
     LOW_FAITHFULNESS = "LOW_FAITHFULNESS"
     RENDER_FAILED = "RENDER_FAILED"
     CANCELLED = "CANCELLED"
@@ -60,6 +61,14 @@ ERROR_SPECS: dict[ErrorCode, ErrorSpec] = {
     ErrorCode.PROVIDER_UNAVAILABLE: ErrorSpec(
         status_code=503,
         message_vi="Dịch vụ AI tạm thời không phản hồi, vui lòng thử lại sau.",
+        retryable=True,
+    ),
+    ErrorCode.PROVIDER_QUOTA: ErrorSpec(
+        status_code=402,
+        message_vi=(
+            "Tài khoản tạo ảnh (Fal) hết tiền hoặc đang bị giới hạn. "
+            "Nạp thêm hoặc đợi vài phút rồi bấm Thử lại."
+        ),
         retryable=True,
     ),
     ErrorCode.LOW_FAITHFULNESS: ErrorSpec(

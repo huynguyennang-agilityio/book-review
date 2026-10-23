@@ -8,11 +8,12 @@ với `BUDGET_EXCEEDED`. Ảnh ghi vào `<media_dir>/characters/<job_key>/`, fil
 import hashlib
 import logging
 import re
+import threading
 import unicodedata
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import Any
+from typing import Any, TypeVar
 
 from langgraph.config import get_config, get_store
 
@@ -21,7 +22,7 @@ from book_review_api.config import Settings, get_settings
 from book_review_api.errors import ErrorCode
 from book_review_api.graph.nodes.common import Cancelled, NodeFn, NodeUpdate, node
 from book_review_api.graph.state import BookReviewState
-from book_review_api.providers.image_fal import ImageError, ImageProvider
+from book_review_api.providers.image_fal import ImageAccountError, ImageError, ImageProvider
 from book_review_api.storyboard.schema import Character, Storyboard
 
 log = logging.getLogger(__name__)
@@ -84,6 +85,8 @@ def generate_sheet(
                 on_submit=job.append,
                 cancelled=cancelled,
             )
+        except ImageAccountError:
+            raise  # đổi sang mô tả trung tính không giúp gì khi tài khoản bị từ chối
         except ImageError:
             log.warning("ảnh nhân vật %s lỗi (safe=%s)", character.name, safe)
             continue
@@ -91,6 +94,29 @@ def generate_sheet(
         path.write_bytes(img.data)
         return path.relative_to(media_dir).as_posix(), img.job_id, True
     return None, job[-1] if job else "", False
+
+
+T = TypeVar("T")
+
+
+class AccountStop:
+    """Một job gặp lỗi tài khoản Fal thì các job chưa gửi bỏ qua luôn, không gọi Fal thêm."""
+
+    def __init__(self) -> None:
+        self._event = threading.Event()
+
+    @property
+    def hit(self) -> bool:
+        return self._event.is_set()
+
+    def guard(self, fn: Callable[[], T]) -> T:
+        if self.hit:
+            raise ImageAccountError("bỏ qua: tài khoản Fal đã bị từ chối")
+        try:
+            return fn()
+        except ImageAccountError:
+            self._event.set()
+            raise
 
 
 def job_key(storyboard: Storyboard, cfg: Settings) -> str:
@@ -178,13 +204,15 @@ def make_character_sheets_node(
                 allowed = {(t[1], t[2]) for t in pending[:affordable]}
                 todo = [t for t in todo if (t[1], t[2]) in allowed or t not in pending]
 
+        stop = AccountStop()
+
         def make(item: tuple[Character, str, int]) -> tuple[str, int, str | None, str, bool]:
             ch, slug, i = item
             path = out_dir / f"{slug}_{i}.jpg"
-            rel, jid, billed = generate_sheet(
+            rel, jid, billed = stop.guard(lambda: generate_sheet(
                 provider, cfg, ch, sb.style_prompt_en, path, base_seed(ch.name) + i, i + 1,
                 media_dir, cancelled,
-            )  # fmt: skip
+            ))  # fmt: skip
             return slug, i, rel, jid, billed
 
         cancel_hit = False
@@ -195,6 +223,8 @@ def make_character_sheets_node(
                     slug, i, rel, jid, billed = fut.result()
                 except Cancelled:
                     cancel_hit = True
+                    continue
+                except ImageAccountError:
                     continue
                 if rel:
                     candidates[slug]["images"][i] = rel
@@ -214,6 +244,8 @@ def make_character_sheets_node(
         }
         if cancel_hit:
             return {**update, "status": "cancelled", "error_code": ErrorCode.CANCELLED.value}
+        if stop.hit:
+            return {**update, "status": "failed", "error_code": ErrorCode.PROVIDER_QUOTA.value}
         if over_budget:
             return {**update, "status": "failed", "error_code": ErrorCode.BUDGET_EXCEEDED.value}
         if any(not e["images"] for e in candidates.values()):
@@ -279,14 +311,16 @@ def make_regen_characters_node(
 
         jobs = [(slug, ch, rnd, note, i) for slug, ch, rnd, note in todo for i in range(n)]
 
+        stop = AccountStop()
+
         def make(
             job: tuple[str, Character, int, str, int],
         ) -> tuple[str, int, str | None, str, bool]:
             slug, ch, rnd, note, i = job
-            rel, jid, billed = generate_sheet(
+            rel, jid, billed = stop.guard(lambda: generate_sheet(
                 provider, cfg, ch, sb.style_prompt_en, out_dir / f"{slug}_r{rnd}_{i}.jpg",
                 base_seed(ch.name) + 100 * rnd + i, i + 1, media_dir, cancelled, note,
-            )  # fmt: skip
+            ))  # fmt: skip
             return slug, i, rel, jid, billed
 
         images: dict[str, list[str | None]] = {slug: [None] * n for slug, *_ in todo}
@@ -301,6 +335,8 @@ def make_regen_characters_node(
                     slug, i, rel, jid, billed = fut.result()
                 except Cancelled:
                     cancel_hit = True
+                    continue
+                except ImageAccountError:
                     continue
                 images[slug][i] = rel
                 if rel:
@@ -327,6 +363,8 @@ def make_regen_characters_node(
         }
         if cancel_hit:
             return {**update, "status": "cancelled", "error_code": ErrorCode.CANCELLED.value}
+        if stop.hit:
+            return {**update, "status": "failed", "error_code": ErrorCode.PROVIDER_QUOTA.value}
         if over_budget:
             return {**update, "status": "failed", "error_code": ErrorCode.BUDGET_EXCEEDED.value}
         return update

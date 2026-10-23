@@ -16,6 +16,7 @@ from book_review_api.config import Settings
 from book_review_api.errors import ErrorCode
 from book_review_api.graph.build import build_graph
 from book_review_api.graph.nodes.characters import (
+    SAFE_DESCRIPTION,
     base_seed,
     make_character_sheets_node,
     make_regen_characters_node,
@@ -23,7 +24,7 @@ from book_review_api.graph.nodes.characters import (
     slugify,
 )
 from book_review_api.graph.state import BookReviewState
-from book_review_api.providers.image_fal import GeneratedImage, ImageError
+from book_review_api.providers.image_fal import GeneratedImage, ImageAccountError, ImageError
 from book_review_api.storyboard.schema import Character
 
 
@@ -291,3 +292,32 @@ def test_regenerate_loops_back_to_review(tmp_path: Path) -> None:
     assert paused.values["cost"]["usd"] == pytest.approx(4 * 0.03)
     visited = run_graph(graph, Command(resume={"selections": {"nhan-vat-0": 0, "nhan-vat-1": 3}}))
     assert "scene_images" in visited
+
+
+class AccountDown(FakeImages):
+    def generate(self, prompt: str, **kw: Any) -> GeneratedImage:
+        with self._lock:
+            self.calls.append({"prompt": prompt})
+        raise ImageAccountError("tài khoản Fal bị từ chối (429)")
+
+
+def test_account_error_stops_with_quota_code(tmp_path: Path) -> None:
+    fake = AccountDown()
+    node = make_character_sheets_node(fake, cfg(tmp_path), approved_lookup=no_store)
+    out = run(node, {"storyboard": storyboard(2)})
+    assert out["status"] == "failed"
+    assert out["error_code"] == ErrorCode.PROVIDER_QUOTA.value
+    # Không thử lại bằng mô tả trung tính, và dừng gửi các ảnh còn lại (8 ảnh, 2 luồng).
+    assert not any(SAFE_DESCRIPTION in c["prompt"] for c in fake.calls)
+    assert len(fake.calls) <= 2
+
+
+def test_regen_account_error_stops_with_quota_code(tmp_path: Path) -> None:
+    state = candidates_state(tmp_path, 1)
+    out = run(
+        make_regen_characters_node(AccountDown(), cfg(tmp_path)),
+        {**state, "character_regen": {"nhan-vat-0": ""}},
+    )
+    assert out["status"] == "failed"
+    assert out["error_code"] == ErrorCode.PROVIDER_QUOTA.value
+    assert out["character_candidates"] == {}
