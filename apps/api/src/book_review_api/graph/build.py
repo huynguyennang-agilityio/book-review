@@ -50,7 +50,11 @@ from book_review_api.graph.nodes.review import (
     review_characters,
     review_script,
 )
-from book_review_api.graph.nodes.review_text import is_user_review, make_ingest_review_node
+from book_review_api.graph.nodes.review_text import (
+    IndexDocs,
+    is_user_review,
+    make_ingest_review_node,
+)
 from book_review_api.graph.nodes.scene_images import (
     make_scene_images_node as make_real_scene_images_node,
 )
@@ -65,6 +69,7 @@ from book_review_api.providers.image_fal import ImageProvider
 from book_review_api.queue import JobRunner
 from book_review_api.storyboard.faithfulness import FaithfulnessRunner
 from book_review_api.storyboard.images import PromptWriter
+from book_review_api.storyboard.review_meta import MetaWriter
 from book_review_api.storyboard.runner import StoryboardRunner
 
 GRAPH_NAME = "book_review"
@@ -183,11 +188,15 @@ def build_graph(
     source_lookup: SourceLookup | None = None,
     image_provider: ImageProvider | None = None,
     prompt_writer: PromptWriter | None = None,
+    review_meta_writer: MetaWriter | None = None,
+    review_index: IndexDocs | None = None,
 ) -> CompiledStateGraph[BookReviewState]:
     """Runner (LLM, job worker) thiếu thì node tương ứng là node rỗng (test khung)."""
     nodes = {**NODES, "regen_characters": regen_characters_stub}
     if research_runner is not None:
         nodes["research_agent"] = make_research_node(research_runner)
+    if review_meta_writer is not None or review_index is not None:
+        nodes["ingest_review"] = make_ingest_review_node(review_meta_writer, review_index)
     if storyboard_runner is not None:
         nodes["storyboard"] = make_storyboard_node(storyboard_runner)
     if faithfulness_runner is not None:
