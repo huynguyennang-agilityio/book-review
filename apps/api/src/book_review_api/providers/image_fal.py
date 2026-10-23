@@ -29,6 +29,21 @@ class ImageError(Exception):
     """Fal lỗi, quá hạn hoặc không trả ảnh (vd bộ lọc an toàn chặn)."""
 
 
+class ImageAccountError(ImageError):
+    """Tài khoản Fal hết tiền, bị khoá, sai key hoặc bị giới hạn (429). Thử prompt khác không
+    giúp gì: node dừng hẳn để người dùng nạp tiền rồi chạy lại."""
+
+
+# Mã HTTP của Fal nghĩa là lỗi tài khoản chứ không phải lỗi của ảnh.
+ACCOUNT_STATUS = {401, 402, 403, 429}
+
+
+def _wrap(exc: Exception, message: str) -> ImageError:
+    if isinstance(exc, fal_client.FalClientHTTPError) and exc.status_code in ACCOUNT_STATUS:
+        return ImageAccountError(f"tài khoản Fal bị từ chối ({exc.status_code}): {exc}")
+    return ImageError(f"{message}: {exc}")
+
+
 class GeneratedImage(BaseModel):
     data: bytes
     seed: int | None = None
@@ -105,11 +120,11 @@ class FalImageProvider:
                     self._client.upload(data, "image/jpeg") for data in reference_images
                 ]
             except Exception as exc:  # noqa: BLE001
-                raise ImageError(f"không tải được ảnh tham chiếu lên Fal: {exc}") from exc
+                raise _wrap(exc, "không tải được ảnh tham chiếu lên Fal") from exc
         try:
             handle = self._client.submit(endpoint, arguments=arguments)
         except Exception as exc:  # noqa: BLE001
-            raise ImageError(f"không gửi được yêu cầu tới Fal: {exc}") from exc
+            raise _wrap(exc, "không gửi được yêu cầu tới Fal") from exc
         if on_submit:
             on_submit(handle.request_id)
         deadline = time.monotonic() + self._timeout_s
@@ -128,7 +143,7 @@ class FalImageProvider:
         except (Cancelled, ImageError):
             raise
         except Exception as exc:  # noqa: BLE001
-            raise ImageError(f"Fal lỗi: {exc}") from exc
+            raise _wrap(exc, "Fal lỗi") from exc
         images = result.get("images") or []
         if not images:
             raise ImageError("Fal không trả ảnh (có thể bị bộ lọc an toàn chặn)")

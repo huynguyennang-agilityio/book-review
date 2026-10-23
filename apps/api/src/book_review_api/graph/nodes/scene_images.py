@@ -6,6 +6,8 @@
 - Cảnh có nhân vật: tối đa 2 nhân vật, truyền sheet đã duyệt làm ảnh tham chiếu (Seedream edit).
 - Bị bộ lọc chặn thì đổi sang cảnh ẩn dụ (`metaphor_en`, không người, không tham chiếu) và tạo lại.
   Vẫn hỏng thì dùng lại ảnh gần nhất đã có, để video không bị kẹt.
+- Tài khoản Fal bị từ chối (hết tiền, 429...) thì dừng hẳn với `PROVIDER_QUOTA`: không đánh dấu
+  `.blocked`, không mượn ảnh, không gửi thêm ảnh nào; nạp tiền xong chạy lại tạo nốt ảnh còn thiếu.
 - Cache theo hash(prompt + seed + tham chiếu + kích thước): chạy lại không tạo và không tính tiền
   ảnh đã có.
 """
@@ -15,6 +17,7 @@ import io
 import logging
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
+from functools import partial
 from pathlib import Path
 
 from PIL import Image
@@ -22,10 +25,10 @@ from PIL import Image
 from book_review_api.cancel import CancelFlags
 from book_review_api.config import Settings, get_settings
 from book_review_api.errors import ErrorCode
-from book_review_api.graph.nodes.characters import _thread_id, base_seed, slugify
+from book_review_api.graph.nodes.characters import AccountStop, _thread_id, base_seed, slugify
 from book_review_api.graph.nodes.common import Cancelled, NodeFn, NodeUpdate, node
 from book_review_api.graph.state import BookReviewState
-from book_review_api.providers.image_fal import ImageError, ImageProvider
+from book_review_api.providers.image_fal import ImageAccountError, ImageError, ImageProvider
 from book_review_api.storyboard.images import (
     ImagePrompt,
     PromptWriter,
@@ -160,6 +163,8 @@ def make_scene_images_node(
                     reference_images=data,
                 )
                 payload = fit_9_16(img.data, cfg.scene_out_width, cfg.scene_out_height)
+            except ImageAccountError:
+                raise  # không phải lỗi của ảnh: không đánh dấu `.blocked`, không đổi ẩn dụ
             except (ImageError, OSError):
                 return False, False
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -214,20 +219,24 @@ def make_scene_images_node(
 
         results: dict[tuple[int, int], Result] = {}
         cancel_hit = False
+        stop = AccountStop()
         with ThreadPoolExecutor(max_workers=cfg.fal_concurrency) as pool:
-            futures = [(j, pool.submit(make, j)) for j in todo]
+            futures = [(j, pool.submit(stop.guard, partial(make, j))) for j in todo]
             for job, fut in futures:
                 try:
                     results[(job.scene_id, job.ref)] = fut.result()
                 except Cancelled:
                     cancel_hit = True
+                except ImageAccountError:
+                    pass
 
         # Ảnh hỏng cả hai lần thì mượn ảnh gần nhất đã có (cùng cảnh trước, rồi các cảnh khác).
         order = [(j.scene_id, j.ref) for j in jobs]
         paths_by_slot: dict[tuple[int, int], str] = {
             slot: r.rel for slot, r in results.items() if r.rel
         }
-        for i, slot in enumerate(order):
+        # Tài khoản Fal bị từ chối thì không mượn: node dừng để chạy lại sau khi nạp tiền.
+        for i, slot in enumerate(order if not stop.hit else []):
             if slot in paths_by_slot or slot not in results:
                 continue
             near = sorted(paths_by_slot, key=lambda s: abs(order.index(s) - i))
@@ -259,6 +268,8 @@ def make_scene_images_node(
         }
         if cancel_hit:
             return {**update, "status": "cancelled", "error_code": ErrorCode.CANCELLED.value}
+        if stop.hit:
+            return {**update, "status": "failed", "error_code": ErrorCode.PROVIDER_QUOTA.value}
         if over_budget:
             return {**update, "status": "failed", "error_code": ErrorCode.BUDGET_EXCEEDED.value}
         if len(paths_by_slot) < len(jobs):

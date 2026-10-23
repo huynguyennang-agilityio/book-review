@@ -15,7 +15,7 @@ from book_review_api.graph.nodes.scene_images import (
     fit_9_16,
     make_scene_images_node,
 )
-from book_review_api.providers.image_fal import GeneratedImage, ImageError
+from book_review_api.providers.image_fal import GeneratedImage, ImageAccountError, ImageError
 from book_review_api.storyboard.images import default_prompts, image_plan
 from book_review_api.storyboard.schema import Storyboard
 
@@ -205,3 +205,42 @@ def test_compose_prompt_names_reference_images() -> None:
     assert "image 1 is An" in p and "image 2 is Bình" in p
     assert p.endswith("no logo.") and "watercolor. Vertical" in p
     assert "Reference" not in compose_prompt("s", "x", [])
+
+
+class BrokeAfter(FakeImages):
+    """Tài khoản Fal hết tiền từ lần gọi thứ `ok + 1`."""
+
+    def __init__(self, ok: int) -> None:
+        super().__init__()
+        self.ok = ok
+
+    def generate(self, prompt: str, **kw: Any) -> GeneratedImage:
+        with self._lock:
+            broke = len(self.calls) >= self.ok
+        if broke:
+            with self._lock:
+                self.calls.append({"prompt": prompt, "refs": 0})
+            raise ImageAccountError("tài khoản Fal bị từ chối (403): Exhausted balance")
+        return super().generate(prompt, **kw)
+
+
+def test_account_error_stops_without_blocked_or_borrowing(tmp_path: Path) -> None:
+    c = Settings(media_dir=str(tmp_path), fal_concurrency=1)
+    sbd = storyboard(6)
+    broke = BrokeAfter(ok=2)
+    out = make_scene_images_node(broke, c)({"storyboard": sbd})
+    assert out["status"] == "failed"
+    assert out["error_code"] == ErrorCode.PROVIDER_QUOTA.value
+    assert len(broke.calls) == 3  # 2 ảnh xong, 1 lần bị từ chối, sau đó không gọi Fal nữa
+    assert not any("symbolic still life" in call["prompt"] for call in broke.calls)
+    assert not list(tmp_path.rglob("*.blocked"))
+    assert len(out["asset_refs"]) == 2  # không mượn ảnh cho các ô còn thiếu
+    assert out["cost"]["images"] == 2
+
+    # Nạp tiền xong chạy lại: chỉ tạo các ảnh còn thiếu, ảnh cũ lấy từ cache.
+    total = sum(image_plan(Storyboard.model_validate(sbd), c).values())
+    good = FakeImages()
+    again = make_scene_images_node(good, c)({"storyboard": sbd})
+    assert "status" not in again
+    assert len(good.calls) == total - 2
+    assert again["cost"]["images"] == total - 2
