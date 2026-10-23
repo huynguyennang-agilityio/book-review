@@ -627,3 +627,10 @@ textarea {
   text-decoration: underline dotted;
   text-underline-offset: 3px;
 }
+
+.budget-retry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 320px;
+}

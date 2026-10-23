@@ -3,6 +3,7 @@
 import type { Session } from "@supabase/supabase-js";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { BookForm } from "./_components/BookForm";
+import { BudgetRetry } from "./_components/BudgetRetry";
 import { CharacterReview } from "./_components/CharacterReview";
 import { IdentifyConfirm } from "./_components/IdentifyConfirm";
 import { MemorySettings } from "./_components/MemorySettings";
@@ -14,6 +15,7 @@ import { ResultScreen } from "./_components/ResultScreen";
 import { ReviewTextForm } from "./_components/ReviewTextForm";
 import { ScriptReview } from "./_components/ScriptReview";
 import { Sources } from "./_components/Sources";
+import { suggestBudget } from "./_lib/budget";
 import { getMemory, type Memory } from "./_lib/memory";
 import type { RunSource } from "./_lib/reviewText";
 import { useReviewRun } from "./_lib/run";
@@ -143,11 +145,19 @@ function ReviewApp({ session }: { session: Session }) {
               </p>
             ))}
             {busy && <p className="muted">Đang chạy…</p>}
-            {run.status === "failed" && (
-              <button type="button" onClick={() => void run.retry()}>
-                Thử lại
-              </button>
-            )}
+            {run.status === "failed" &&
+              (run.errorCode === "BUDGET_EXCEEDED" ? (
+                <BudgetRetry
+                  spent={run.cost ?? 0}
+                  budget={run.budget}
+                  suggested={suggestBudget(run.cost ?? 0, run.imagesBought, run.costEstimate)}
+                  onRetry={(usd) => void run.retry(usd)}
+                />
+              ) : (
+                <button type="button" onClick={() => void run.retry()}>
+                  Thử lại
+                </button>
+              ))}
             {run.status === "cancelled" && <p className="muted">Project đã huỷ.</p>}
             <div ref={endRef} />
           </div>
