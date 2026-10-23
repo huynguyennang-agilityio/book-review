@@ -10,9 +10,13 @@ Nếu graph dừng ở `identify_confirm` thì chọn ứng viên `--pick` và c
 
 Tab "Từ bài review có sẵn": `--review evals/review-text/nha-gia-kim.md` gửi bài (`.md` có
 `## Hook` / `## Ý chính` / `## Nhận xét` thì tách 3 ô) thay cho research.
+`--mode manual` (cùng `--approve`) chọn ảnh manual và tự tải ảnh mẫu 9:16 cho mọi prompt qua API
+như web, không gọi Fal. In thời lượng ước tính ở màn duyệt kịch bản để so với video thật.
 """
 
 import argparse
+import colorsys
+import io
 import json
 import time
 import uuid
@@ -22,6 +26,7 @@ from typing import Any
 import httpx
 import jwt
 import psycopg
+from PIL import Image, ImageDraw
 from run_review_text import split_fields
 
 from book_review_api.config import get_settings
@@ -55,6 +60,34 @@ def run(
     return events
 
 
+def sample_image(label: str, index: int) -> bytes:
+    """Ảnh mẫu 720x1280 một màu, ghi nhãn ô, thay ảnh người dùng tải lên ở chế độ manual."""
+    r, g, b = colorsys.hsv_to_rgb((index * 0.13) % 1.0, 0.45, 0.85)
+    img = Image.new("RGB", (720, 1280), (int(r * 255), int(g * 255), int(b * 255)))
+    ImageDraw.Draw(img).text((40, 600), label, fill=(20, 20, 20))
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=85)
+    return buf.getvalue()
+
+
+def upload_samples(
+    client: httpx.Client, headers: dict[str, str], project_id: str, raw: dict[str, Any]
+) -> dict[str, str]:
+    """Tải một ảnh mẫu cho mỗi ô của interrupt `upload_images`, trả `{khoá ô: đường dẫn}`."""
+    keys = [str(i["key"]) for i in [*raw.get("characters", []), *raw.get("scenes", [])]]
+    uploads: dict[str, str] = {}
+    for n, key in enumerate(keys):
+        resp = client.post(
+            f"/projects/{project_id}/uploads",
+            files={"file": (f"{n}.jpg", sample_image(key, n), "image/jpeg")},
+            headers=headers,
+        )
+        resp.raise_for_status()
+        uploads[key] = resp.json()["path"]
+    print(f"  · đã tải {len(uploads)} ảnh mẫu")
+    return uploads
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("title")
@@ -64,6 +97,7 @@ def main() -> None:
         "--approve", action="store_true", help="tự duyệt kịch bản (review_script) để dựng video"
     )
     parser.add_argument("--review", type=Path, help="file bài review (.txt/.md) cho tab review")
+    parser.add_argument("--mode", choices=["auto", "manual"], default="auto", help="chế độ ảnh")
     parser.add_argument(
         "--print-token", action="store_true", help="chỉ in user_id và JWT thử (để dán vào web)"
     )
@@ -120,9 +154,16 @@ def main() -> None:
             if kind == "identify_confirm":
                 answer: dict[str, Any] = {"index": args.pick}
             elif kind == "review_script" and args.approve:
+                sb = raw.get("storyboard") or {}
+                print(
+                    f"  · {len(sb.get('scenes', []))} cảnh, ước tính "
+                    f"{sb.get('estimated_seconds')}s, nguồn {sb.get('source', 'book')}"
+                )
                 answer = {"approved": True}
             elif kind == "choose_image_mode" and args.approve:
-                answer = {"mode": "auto"}
+                answer = {"mode": args.mode}
+            elif kind == "upload_images" and args.approve:
+                answer = {"uploads": upload_samples(client, headers, project["id"], raw)}
             elif kind == "review_characters" and args.approve:
                 answer = {"selections": {slug: 0 for slug in raw.get("characters", {})}}
             else:
