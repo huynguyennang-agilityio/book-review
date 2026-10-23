@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+from collections.abc import Awaitable, Callable
 from pathlib import Path
 
 import edge_tts
@@ -21,24 +22,40 @@ class EdgeTTSError(Exception):
     """edge-tts lỗi mạng hoặc không trả audio sau khi thử lại."""
 
 
+def text_variants(text: str) -> list[tuple[str, bool]]:
+    """Các cách gửi cùng một câu cho edge-tts, theo thứ tự thử: (câu gửi đi, có WordBoundary).
+
+    edge-tts (giọng HoaiMy) từ chối hẳn một số câu ("No audio was received") dù gửi lại bao
+    nhiêu lần, nhưng nhận cùng câu đó khi viết thường hoặc thêm "… " ở đầu (đo trên 15 câu lỗi:
+    13/15 qua). Các biến thể không lấy WordBoundary vì chữ đã đổi; aligner dự phòng chia thời
+    gian theo câu gốc nên phụ đề vẫn đúng chữ hoa."""
+    return [
+        (text, True),
+        (text, True),
+        (f"… {text}", False),
+        (text.lower(), False),
+        (f"… {text.lower()}", False),
+        (text, False),
+    ]
+
+
 class EdgeTTS:
     """Giới hạn 2 request song song tới edge-tts (plan v5, mục Rate limit).
 
-    edge-tts thỉnh thoảng trả "No audio was received" vài lần liền rồi lại chạy bình thường,
-    nên thử lại 5 lần, chờ 2, 4, 8, 16 s.
+    Mỗi câu thử lần lượt các biến thể của `text_variants`, chờ 2, 4, 8, 8, 8 s giữa các lần.
     """
 
     def __init__(
         self,
         voice: str = DEFAULT_VOICE,
         concurrency: int = 2,
-        attempts: int = 5,
         fallback_aligner: Aligner | None = None,
+        sleep: Callable[[float], Awaitable[None]] = asyncio.sleep,
     ) -> None:
         self.voice = voice
         self._sem = asyncio.Semaphore(concurrency)
-        self._attempts = attempts
         self._fallback = fallback_aligner or ProportionalAligner()
+        self._sleep = sleep
 
     async def synthesize(self, text: str, out_path: Path) -> TTSResult:
         out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -52,18 +69,15 @@ class EdgeTTS:
 
     async def _stream_with_retry(self, text: str, out_path: Path) -> list[Word]:
         last: Exception | None = None
-        for attempt in range(1, self._attempts + 1):
+        variants = text_variants(text)
+        for attempt, (sent, word_boundary) in enumerate(variants, start=1):
             try:
-                # WordBoundary hay bị edge-tts từ chối với một số câu; 2 lần cuối bỏ nó đi
-                # (mất word timing thật, aligner dự phòng ước lượng) còn hơn hỏng cả video.
-                return await self._stream(
-                    text, out_path, word_boundary=attempt <= self._attempts - 2
-                )
+                return await self._stream(sent, out_path, word_boundary=word_boundary)
             except Exception as exc:  # edge-tts ném nhiều loại lỗi mạng/websocket
                 last = exc
-                log.warning("edge-tts lần %d/%d lỗi: %s", attempt, self._attempts, exc)
-                if attempt < self._attempts:
-                    await asyncio.sleep(2**attempt)
+                log.warning("edge-tts lần %d/%d lỗi: %s", attempt, len(variants), exc)
+                if attempt < len(variants):
+                    await self._sleep(min(2**attempt, 8))
         raise EdgeTTSError(str(last)) from last
 
     async def _stream(self, text: str, out_path: Path, word_boundary: bool = True) -> list[Word]:
