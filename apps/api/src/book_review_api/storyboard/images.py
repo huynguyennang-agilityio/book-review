@@ -4,14 +4,17 @@
 `scene_images` cùng tính ra một kết quả. Ảnh cảnh nào đã có `scene.images` thì giữ nguyên số đó.
 """
 
+import hashlib
+import json
 import logging
 import math
 import time
 from collections.abc import Callable
+from pathlib import Path
 
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import HumanMessage, SystemMessage
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, TypeAdapter, ValidationError
 
 from book_review_api.config import Settings
 from book_review_api.providers.structured import StructuredOutputError, Usage, call_structured
@@ -43,6 +46,43 @@ class ImagePrompt(BaseModel):
 
 ImagePrompts = dict[int, list[ImagePrompt]]
 PromptWriter = Callable[[Storyboard, dict[int, int]], ImagePrompts]
+
+
+_PROMPTS = TypeAdapter(ImagePrompts)
+
+
+def prompts_key(storyboard: Storyboard, plan: dict[int, int]) -> str:
+    """Khoá cache prompt: chỉ gồm phần storyboard mà prompt ảnh dựa vào, cộng số ảnh mỗi cảnh."""
+    data = {
+        "book": storyboard.book.title,
+        "style": storyboard.style_prompt_en,
+        "characters": [[c.name, c.description_en] for c in storyboard.characters],
+        "scenes": [[s.id, s.narration_vi, s.scene_type, s.mood] for s in storyboard.scenes],
+        "plan": sorted(plan.items()),
+    }
+    return hashlib.sha1(json.dumps(data, ensure_ascii=False).encode()).hexdigest()[:20]
+
+
+def cached_prompts(
+    writer: PromptWriter, storyboard: Storyboard, plan: dict[int, int], cache_dir: Path
+) -> ImagePrompts:
+    """Prompt ảnh của cùng storyboard và kế hoạch ảnh thì đọc lại từ đĩa thay vì gọi lại model.
+
+    Model viết prompt khác nhau mỗi lần; ảnh cảnh cache theo prompt, nên chạy lại (sau lỗi ngân
+    sách, Fal hết tiền...) mà viết prompt mới thì ảnh đã tạo bị tạo và tính tiền lại."""
+    path = cache_dir / f"{prompts_key(storyboard, plan)}.json"
+    if path.exists():
+        try:
+            saved = _PROMPTS.validate_json(path.read_bytes())
+        except ValidationError:
+            log.warning("file prompt ảnh hỏng, viết lại: %s", path)
+        else:
+            if all(len(saved.get(sid, [])) == n for sid, n in plan.items()):
+                return saved
+    prompts = writer(storyboard, plan)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(_PROMPTS.dump_json(prompts, indent=1))
+    return prompts
 
 
 def _estimated_shots(scene: Scene) -> int:
