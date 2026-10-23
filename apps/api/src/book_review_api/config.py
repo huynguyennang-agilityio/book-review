@@ -100,6 +100,8 @@ class Settings(BaseSettings):
     scene_image_height: int = 1920
     scene_out_width: int = 720
     scene_out_height: int = 1280
+    # Kiểm tra ảnh cảnh mới có bị vẽ nằm ngang không (Gemini), xoay thì tạo lại một lần.
+    scene_orientation_check: bool = True
     scene_max_characters: int = 2
     fal_key: str = ""
     fal_concurrency: int = 4

@@ -69,6 +69,7 @@ from book_review_api.providers.image_fal import ImageProvider
 from book_review_api.queue import JobRunner
 from book_review_api.storyboard.faithfulness import FaithfulnessRunner
 from book_review_api.storyboard.images import PromptWriter
+from book_review_api.storyboard.orientation import OrientationCheck
 from book_review_api.storyboard.review_meta import MetaWriter
 from book_review_api.storyboard.runner import StoryboardRunner
 
@@ -188,6 +189,7 @@ def build_graph(
     source_lookup: SourceLookup | None = None,
     image_provider: ImageProvider | None = None,
     prompt_writer: PromptWriter | None = None,
+    orientation_check: OrientationCheck | None = None,
     review_meta_writer: MetaWriter | None = None,
     review_index: IndexDocs | None = None,
 ) -> CompiledStateGraph[BookReviewState]:
@@ -220,7 +222,10 @@ def build_graph(
     if image_provider is not None and job_runner is not None:
         # Có Fal thì ảnh cảnh thật thay ảnh placeholder của worker.
         nodes["scene_images"] = make_real_scene_images_node(
-            image_provider, cancel_flags=cancel_flags, prompt_writer=prompt_writer
+            image_provider,
+            cancel_flags=cancel_flags,
+            prompt_writer=prompt_writer,
+            orientation_check=orientation_check,
         )
     nodes["manual_images"] = make_manual_images_node(prompt_writer=prompt_writer)
     # Manual: `manual_images` đã ghi ảnh cảnh nên `scene_images` (Fal hoặc ảnh giả) bị bỏ qua.

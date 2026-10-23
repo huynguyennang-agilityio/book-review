@@ -46,6 +46,7 @@ from book_review_api.rag.ingest import Document
 from book_review_api.rag.retrieve import Chunk, chunks_by_id, retrieve
 from book_review_api.storyboard.faithfulness import make_faithfulness_runner
 from book_review_api.storyboard.images import make_prompt_writer
+from book_review_api.storyboard.orientation import make_orientation_checker
 from book_review_api.storyboard.review_meta import make_meta_writer
 from book_review_api.storyboard.rewrite import SceneRewriter, make_scene_rewriter
 from book_review_api.storyboard.runner import StoryboardRunner, make_storyboard_runner
@@ -190,6 +191,7 @@ def build_live_graph(
             else None
         ),
         prompt_writer=make_prompt_writer(make_gemini_with_fallback(settings)),
+        orientation_check=make_orientation_checker(make_judge_model(settings)),
         review_meta_writer=make_meta_writer(make_gemini_with_fallback(settings)),
         review_index=make_live_review_index(settings),
     )

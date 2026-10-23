@@ -299,3 +299,77 @@ def test_prompt_cache_is_per_storyboard_and_survives_bad_file(tmp_path: Path) ->
         f.write_text("{hỏng")
     cached_prompts(writer, sb, plan, cache)
     assert len(calls) == 3
+
+
+def scripted_check(answers: list[str]) -> tuple[Any, list[str]]:
+    """Trả lần lượt các câu trả lời; hết danh sách thì `upright`."""
+    seen: list[str] = []
+
+    def check(data: bytes) -> Any:
+        answer = answers[len(seen)] if len(seen) < len(answers) else "upright"
+        seen.append(answer)
+        return answer
+
+    return check, seen
+
+
+def one_scene(tmp_path: Path, **kw: Any) -> tuple[Settings, dict[str, Any], int]:
+    c = Settings(media_dir=str(tmp_path), fal_concurrency=1, **kw)
+    sbd = storyboard(1)
+    return c, sbd, sum(image_plan(Storyboard.model_validate(sbd), c).values())
+
+
+def test_rotated_image_is_regenerated_once_with_new_seed(tmp_path: Path) -> None:
+    c, sbd, total = one_scene(tmp_path)
+    check, seen = scripted_check(["rotated"])
+    provider = FakeImages()
+    out = make_scene_images_node(provider, c, orientation_check=check)({"storyboard": sbd})
+    assert "status" not in out
+    assert out["cost"]["images"] == total + 1
+    assert out["cost"]["rotated_images"] == 1
+    assert provider.calls[0]["seed"] + 1 == provider.calls[1]["seed"]
+    assert provider.calls[0]["prompt"] == provider.calls[1]["prompt"]
+    # Chạy lại: ảnh đúng nằm ở khoá của seed gốc nên dùng cache, không kiểm tra lại.
+    n, checks = len(provider.calls), len(seen)
+    make_scene_images_node(provider, c, orientation_check=check)({"storyboard": sbd})
+    assert len(provider.calls) == n and len(seen) == checks
+
+
+def test_rotated_twice_falls_back_to_metaphor_without_blocking(tmp_path: Path) -> None:
+    c, sbd, _ = one_scene(tmp_path)
+    check, _ = scripted_check(["rotated", "rotated"])
+    provider = FakeImages()
+    out = make_scene_images_node(provider, c, orientation_check=check)({"storyboard": sbd})
+    assert "status" not in out
+    assert "symbolic still life" in provider.calls[2]["prompt"]
+    assert out["cost"]["rotated_images"] == 2
+    assert not list(tmp_path.rglob("*.blocked"))  # lần sau vẫn thử prompt chính
+
+
+def test_unsure_keeps_image(tmp_path: Path) -> None:
+    c, sbd, total = one_scene(tmp_path)
+    check, _ = scripted_check(["unsure"])
+    out = make_scene_images_node(FakeImages(), c, orientation_check=check)({"storyboard": sbd})
+    assert out["cost"]["images"] == total and out["cost"]["rotated_images"] == 0
+
+
+def test_no_budget_for_retry_keeps_rotated_image(tmp_path: Path) -> None:
+    c, sbd, total = one_scene(tmp_path)
+    check, _ = scripted_check(["rotated"])
+    provider = FakeImages()
+    state: Any = {
+        "storyboard": sbd,
+        "options": {"budget_usd": total * 0.03},
+        "cost": {"usd": 0.0},
+    }
+    out = make_scene_images_node(provider, c, orientation_check=check)(state)
+    assert "status" not in out
+    assert len(provider.calls) == total
+    assert out["cost"]["rotated_images"] == 1
+
+
+def test_orientation_check_can_be_turned_off(tmp_path: Path) -> None:
+    c, sbd, _ = one_scene(tmp_path, scene_orientation_check=False)
+    check, seen = scripted_check(["rotated"])
+    make_scene_images_node(FakeImages(), c, orientation_check=check)({"storyboard": sbd})
+    assert seen == []
