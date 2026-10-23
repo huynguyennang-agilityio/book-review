@@ -3,6 +3,7 @@
 import { HttpAgent, type Interrupt, type RunAgentParameters } from "@ag-ui/client";
 import { useCallback, useRef, useState } from "react";
 import { emptyDraft, resetDraft, type ImageMode, type UploadDraft } from "./images";
+import { keepPending } from "./interrupts";
 import { NODES } from "./nodes";
 import type { RunSource } from "./reviewText";
 import type { RewriteResult, SceneEdit } from "./script";
@@ -355,13 +356,24 @@ export function useReviewRun(getToken: () => Promise<string>) {
     [execute, getToken, say, uploadDraft],
   );
 
+  // Chặn bấm hai lần: hai lần resume cùng interrupt chạy song song trên một thread làm client
+  // AG-UI giữ lại interrupt đã trả lời và từ chối các lần resume sau.
+  const resumingRef = useRef(false);
   const resume = useCallback(
     async (payload: Record<string, unknown>) => {
       const agent = agentRef.current;
-      if (!agent || !pending) return;
-      await execute(agent, {
-        resume: [{ interruptId: pending.interruptId, status: "resolved", payload }],
-      });
+      if (!agent || !pending || resumingRef.current) return;
+      resumingRef.current = true;
+      // Graph chỉ chờ một interrupt mỗi lúc (cái đang hiện trên màn hình). Interrupt cũ còn trong
+      // sổ của client là thừa, bỏ đi để client không chặn lần resume này.
+      agent.pendingInterrupts = keepPending(agent.pendingInterrupts, pending.interruptId);
+      try {
+        await execute(agent, {
+          resume: [{ interruptId: pending.interruptId, status: "resolved", payload }],
+        });
+      } finally {
+        resumingRef.current = false;
+      }
     },
     [execute, pending],
   );
