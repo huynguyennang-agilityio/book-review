@@ -79,16 +79,21 @@ async def _rewind_failed(
     Checkpoint mới giữ chi phí đã tiêu trong lần lỗi (tua lại không làm mất tiền đã trả) và, nếu
     có, ngân sách mới người dùng nhập."""
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
+    latest: Any = None
     failed: Any = None
     async for snap in graph.aget_state_history(config):
-        failed = failed or snap
+        latest = latest or snap
+        # Chi phí cần giữ lấy từ state lỗi mới nhất: checkpoint mới nhất có thể là bản chép do một
+        # lần chạy lại hỏng để lại, mang chi phí cũ hơn.
+        if failed is None and snap.values.get("status") == "failed":
+            failed = snap
         if not snap.next or str(snap.values.get("status") or "") in _TERMINAL:
             continue
         # Bỏ qua checkpoint do các lần chạy lại trước ghi (`update`, `fork`): node nào ghi ra
         # chúng không còn trong `parent.next`, và chạy lại lần hai phải tua về đúng chỗ graph dừng.
         if (snap.metadata or {}).get("source") not in (None, "loop"):
             continue
-        spent = dict(failed.values.get("cost") or {})
+        spent = dict((failed or latest).values.get("cost") or {})
         update: dict[str, Any] = {}
         if budget_usd is not None:
             budget = _check_budget(budget_usd, float(spent.get("usd", 0.0)))
