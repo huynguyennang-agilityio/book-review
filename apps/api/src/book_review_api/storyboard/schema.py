@@ -50,6 +50,8 @@ class BookIdentity(BaseModel):
 class Character(BaseModel):
     name: str
     description_en: str = Field(description="Mô tả ngoại hình bằng tiếng Anh, dùng để tạo ảnh")
+    # Tab review có sẵn: bài không tả ngoại hình nên AI tự gợi ý, người duyệt nên xem lại.
+    appearance_guessed: bool = False
 
 
 class SceneImage(BaseModel):
@@ -84,9 +86,14 @@ class Scene(BaseModel):
     unsupported: list[UnsupportedClaim] = Field(default_factory=list)
     # Cờ cho người duyệt, vd "LOW_FAITHFULNESS" khi viết lại 2 vòng vẫn dưới ngưỡng.
     flags: list[str] = Field(default_factory=list)
+    # Tab review có sẵn: chỗ lời đọc khác chữ người dùng viết (số, ký hiệu đọc thành chữ),
+    # dạng {"from": "1.200", "to": "một nghìn hai trăm"}, để màn duyệt đánh dấu.
+    tts_changes: list[dict[str, str]] = Field(default_factory=list)
 
 
 class Storyboard(BaseModel):
+    # "user_review": lời đọc là nguyên văn bài người dùng dán (tab "Từ bài review có sẵn").
+    source: Literal["book", "user_review"] = "book"
     book: BookIdentity
     book_category: Literal["fiction", "non_fiction"]
     spoiler_free: bool
