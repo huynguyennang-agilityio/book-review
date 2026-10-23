@@ -24,9 +24,11 @@ from book_review_api.providers.structured import (
     call_structured,
 )
 from book_review_api.rag.retrieve import Chunk
+from book_review_api.storyboard.duration import estimate_seconds, syllables_for
 from book_review_api.storyboard.schema import (
     CITED_SECTIONS,
     MAX_QUOTE_CHARS,
+    SECONDS_PER_SCENE,
     SECTION_ORDER,
     BookIdentity,
     Character,
@@ -48,6 +50,17 @@ PROMPT_VERSION = ACTIVE_PROMPTS["storyboard"]
 
 # Số đoạn tối đa đưa cho model viết một phần.
 MAX_PASSAGES = 12
+# Trần số cảnh trong một lần trả lời của model. Phải lớn hơn số cảnh của phần dài nhất
+# (`body` 27 cảnh với video 5 phút); trần cũ 6 chặn video 3 phút ở tối đa 19 cảnh.
+MAX_DRAFT_SCENES = 30
+# Phần ngắn hơn tỉ lệ này của mục tiêu (số cảnh hoặc thời lượng) thì bị yêu cầu viết lại.
+# Cùng ngưỡng với cờ `SHORT_SCRIPT` của cả kịch bản: phần nào cũng đạt thì tổng cũng đạt.
+MIN_SCENE_RATIO = 0.9
+MIN_SECONDS_RATIO = 0.9
+# Cả kịch bản ngắn hơn tỉ lệ này của thời lượng mục tiêu thì gắn cờ `SHORT_SCRIPT`.
+SHORT_SCRIPT_RATIO = 0.9
+# Số ký tự tối đa của mỗi cảnh đã viết đưa vào prompt phần sau (để không lặp ý).
+PREVIOUS_SCENE_CHARS = 160
 
 T = TypeVar("T", bound=BaseModel)
 Retrieve = Callable[[str], list[Chunk]]
@@ -96,7 +109,7 @@ class SceneDraft(BaseModel):
 
 
 class SectionDraft(BaseModel):
-    scenes: list[SceneDraft] = Field(min_length=1, max_length=6)
+    scenes: list[SceneDraft] = Field(min_length=1, max_length=MAX_DRAFT_SCENES)
 
 
 _MARKER_RE = re.compile(r"\s*\[\d+\]")
@@ -164,17 +177,41 @@ class StoryboardWriter:
     def _max_scenes(self) -> dict[str, int]:
         return section_max_scenes(self.settings.storyboard_minutes)
 
+    def _is_long(self, section: str) -> bool:
+        """Video dài hơn mặc định (~1 phút): phần này cần nhiều cảnh hơn quy tắc chung."""
+        return self._max_scenes()[section] > SECTION_DEFAULT_MAX[section]
+
+    def _min_scenes(self, section: str) -> int:
+        return max(1, round(self._max_scenes()[section] * MIN_SCENE_RATIO))
+
     def _scene_count_hint(self, section: str) -> str:
         """Ghi đè quy tắc số cảnh mặc định (video ~45 giây) khi người dùng chọn video dài hơn."""
-        limit = self._max_scenes()[section]
-        if limit <= SECTION_DEFAULT_MAX[section]:
+        if not self._is_long(section):
             return ""
-        low = max(1, round(limit * 0.9))
+        limit = self._max_scenes()[section]
+        words = syllables_for(SECONDS_PER_SCENE)
         return (
-            f"Video dài ~{self.settings.storyboard_minutes} phút nên phần này viết {limit} cảnh "
-            f"(không ít hơn {low}; thay cho số cảnh trong hướng dẫn chung), mỗi cảnh 2-3 câu "
-            "đọc được khoảng 7 giây (thay cho 1-2 câu), không lặp ý, không bịa thêm ngoài nguồn. "
-            "Chia nhỏ ý trong nguồn thành nhiều cảnh thay vì gộp.\n"
+            f"Video dài ~{self.settings.storyboard_minutes} phút nên phần này viết ĐÚNG {limit} "
+            f"cảnh (không ít hơn {self._min_scenes(section)}), mỗi cảnh 2-3 câu, khoảng {words} "
+            f"từ, đọc được khoảng {SECONDS_PER_SCENE:g} giây. Không lặp ý, không bịa thêm ngoài "
+            "nguồn. Chia nhỏ ý trong nguồn thành nhiều cảnh thay vì gộp; một đoạn nguồn có thể "
+            "cho nhiều cảnh.\n"
+        )
+
+    def _shortfall(self, section: str, scenes: Sequence[Scene]) -> str | None:
+        """Lỗi gửi lại cho model khi phần viết ra ngắn hơn mục tiêu (số cảnh hoặc thời lượng)."""
+        if not self._is_long(section):
+            return None
+        limit = self._max_scenes()[section]
+        want_s = limit * SECONDS_PER_SCENE
+        have_s = estimate_seconds(s.narration_vi for s in scenes)
+        if len(scenes) >= self._min_scenes(section) and have_s >= want_s * MIN_SECONDS_RATIO:
+            return None
+        return (
+            f"Phần {section} mới có {len(scenes)} cảnh, đọc khoảng {have_s:.0f} giây; cần "
+            f"{limit} cảnh, khoảng {want_s:.0f} giây. Viết lại cả phần cho đủ: tách ý dài thành "
+            f"nhiều cảnh, mỗi cảnh 2-3 câu khoảng {syllables_for(SECONDS_PER_SCENE)} từ, vẫn chỉ "
+            "dùng thông tin trong các đoạn nguồn."
         )
 
     def outline(self, book: BookIdentity, kind: str, seed: Sequence[Chunk]) -> Outline:
@@ -209,6 +246,7 @@ class StoryboardWriter:
         part: OutlineSection,
         passages: Sequence[Chunk],
         next_id: int,
+        previous: Sequence[Scene] = (),
     ) -> list[Scene]:
         needs_cite = part.section in CITED_SECTIONS
         if needs_cite and not passages:
@@ -223,21 +261,32 @@ class StoryboardWriter:
             )
             + self._scene_count_hint(part.section)
             + f"quote tối đa {MAX_QUOTE_CHARS} ký tự, chép nguyên văn từ đoạn.\n\n"
-            f"Các đoạn nguồn:\n{numbered or '(không có)'}"
+            + _previous_block(previous)
+            + f"Các đoạn nguồn:\n{numbered or '(không có)'}"
         )
         messages: list[BaseMessage] = [SystemMessage(self._system), HumanMessage(human)]
         by_id = {c.id: c for c in passages}
         problems: list[str] = []
+        # Bản hợp lệ dài nhất; viết lại vẫn thiếu cảnh thì dùng bản này thay vì thất bại.
+        best: list[Scene] | None = None
         for _ in range(self.settings.storyboard_retries + 1):
             draft = self._call(SectionDraft, messages)
             scenes, problems = self._resolve(draft, part.section, passages, by_id, next_id)
             if not problems:
-                return scenes
+                if best is None or _seconds(scenes) > _seconds(best):
+                    best = scenes
+                short = self._shortfall(part.section, scenes)
+                if short is None:
+                    return scenes
+                log.info("storyboard: %s", short)
+                problems = [short]
             messages = [
                 *messages,
                 AIMessage(draft.model_dump_json()),
                 HumanMessage("Sửa các lỗi sau rồi viết lại cả phần:\n- " + "\n- ".join(problems)),
             ]
+        if best is not None:
+            return best
         raise StoryboardError(f"Phần {part.section} không qua kiểm tra citation", problems)
 
     def _resolve(
@@ -301,8 +350,21 @@ class StoryboardWriter:
             passages = self.gather(
                 part.queries, max(MAX_PASSAGES, 2 * self._max_scenes()[part.section])
             )
-            scenes += self.write_section(book, kind, part, passages, len(scenes) + 1)
+            scenes += self.write_section(book, kind, part, passages, len(scenes) + 1, scenes)
         hook = next((s.narration_vi for s in scenes if s.section == "hook"), "")
+        target_s = float(self.settings.storyboard_minutes * 60)
+        estimated_s = _seconds(scenes)
+        flags: list[str] = []
+        if any(self._is_long(s) for s in SECTION_ORDER) and estimated_s < (
+            target_s * SHORT_SCRIPT_RATIO
+        ):
+            log.warning(
+                "storyboard ngắn: %d cảnh, ~%.0f giây, mục tiêu %.0f giây",
+                len(scenes),
+                estimated_s,
+                target_s,
+            )
+            flags.append("SHORT_SCRIPT")
         return Storyboard(
             book=book,
             book_category=kind,
@@ -314,4 +376,19 @@ class StoryboardWriter:
             caption_vi=outline.caption_vi,
             hashtags=outline.hashtags,
             prompt_version=PROMPT_VERSION,
+            target_seconds=target_s,
+            estimated_seconds=round(estimated_s, 1),
+            flags=flags,
         )
+
+
+def _seconds(scenes: Sequence[Scene]) -> float:
+    return estimate_seconds(s.narration_vi for s in scenes)
+
+
+def _previous_block(previous: Sequence[Scene]) -> str:
+    """Các cảnh đã viết ở phần trước, để phần sau không kể lại (vd giới thiệu nhân vật hai lần)."""
+    if not previous:
+        return ""
+    lines = "\n".join(f"- ({s.section}) {s.narration_vi[:PREVIOUS_SCENE_CHARS]}" for s in previous)
+    return f"Các cảnh đã viết ở phần trước, KHÔNG lặp lại ý trong đó:\n{lines}\n\n"

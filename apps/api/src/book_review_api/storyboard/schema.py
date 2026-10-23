@@ -19,11 +19,13 @@ SECONDS_PER_SCENE = 7.5
 
 def section_max_scenes(minutes: int) -> dict[str, int]:
     """Số cảnh tối đa mỗi phần cho video ~`minutes` phút. `hook` luôn 1 cảnh; ba phần còn lại chia
-    theo tỉ lệ 2:4:2 của bản gốc."""
+    1:4:1 theo cấu trúc review (mục 1 plan v5: bối cảnh ~30-40 giây, nội dung chính 1,5-2 phút,
+    nhận xét và CTA ~20-30 giây), không ít hơn số cảnh mặc định của video ngắn. Tỉ lệ 2:4:2 cũ cho
+    video 3 phút 6 cảnh CTA, model phải lặp lại nhận xét cho đủ."""
     total = max(sum(SECTION_MAX_SCENES.values()), round(minutes * 60 / SECONDS_PER_SCENE))
     rest = total - 1
-    context = round(rest * 2 / 8)
-    review_cta = round(rest * 2 / 8)
+    context = max(SECTION_MAX_SCENES["context"], round(rest / 6))
+    review_cta = max(SECTION_MAX_SCENES["review_cta"], round(rest / 6))
     return {
         "hook": 1,
         "context": context,
@@ -95,3 +97,8 @@ class Storyboard(BaseModel):
     caption_vi: str
     hashtags: list[str] = Field(default_factory=list)
     prompt_version: str = ""
+    # Thời lượng mục tiêu (số phút người dùng chọn) và ước lượng theo lời đọc lúc viết xong.
+    target_seconds: float | None = None
+    estimated_seconds: float | None = None
+    # Cờ cho người duyệt, vd "SHORT_SCRIPT" khi viết lại vẫn ngắn hơn mục tiêu.
+    flags: list[str] = Field(default_factory=list)

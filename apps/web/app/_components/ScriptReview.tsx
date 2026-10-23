@@ -4,6 +4,9 @@ import { useMemo, useState } from "react";
 import { errorText, type Pending, type Source } from "../_lib/run";
 import {
   CITED,
+  estimateSeconds,
+  formatDuration,
+  isShortScript,
   isUrl,
   parseReview,
   type RewriteResult,
@@ -138,6 +141,9 @@ export function ScriptReview({
   const estimate = review.costEstimate.total_usd ?? 0;
   const total = estimate + review.spentUsd;
   const overBudget = budget != null && total > budget;
+  // Tính lại theo lời đọc đang sửa để biết video dài bao nhiêu trước khi duyệt.
+  const seconds = estimateSeconds(review.scenes.map((s) => drafts[s.id]?.narration ?? ""));
+  const short = isShortScript(seconds, review.targetSeconds);
 
   async function rewrite(s: Scene) {
     const instruction = (asks[s.id] ?? "").trim();
@@ -180,6 +186,11 @@ export function ScriptReview({
           {review.costEstimate.images != null && ` (${review.costEstimate.images} ảnh)`}
         </span>
         <span className="muted">Đã tiêu: ${review.spentUsd.toFixed(3)}</span>
+        <span className={short ? "bad" : undefined} data-testid="duration-estimate">
+          Thời lượng ≈ <strong>{formatDuration(seconds)}</strong>
+          {review.targetSeconds != null && ` (mục tiêu ${formatDuration(review.targetSeconds)})`}
+          {short && ", kịch bản ngắn hơn mục tiêu"}
+        </span>
         {overBudget && (
           <span className="bad">Tổng ${total.toFixed(2)} vượt ngân sách ${budget?.toFixed(2)}</span>
         )}

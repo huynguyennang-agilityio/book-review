@@ -11,7 +11,7 @@ PROMPTS_DIR = Path(__file__).resolve().parent / "prompts"
 # Version đang dùng cho từng prompt. Đổi version ở đây (và thêm file mới), không sửa file cũ.
 ACTIVE_PROMPTS: dict[str, str] = {
     "research": "research_v1",
-    "storyboard": "storyboard_v2",
+    "storyboard": "storyboard_v3",
     "scene_rewrite": "scene_rewrite_instruction_v1",
     "faithfulness_judge": "faithfulness_judge_v1",
     "faithfulness_rewrite": "faithfulness_rewrite_v1",

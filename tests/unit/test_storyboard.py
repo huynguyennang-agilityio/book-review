@@ -155,6 +155,8 @@ def make_writer(script: list[Any], **settings: Any) -> tuple[StoryboardWriter, A
     model = ScriptedStructuredModel(messages=iter([]), script=script, calls=[])
     retriever = fixed_retriever(book.chunks()[:1])
     sleeps: list[float] = []
+    # Mặc định video 1 phút: số cảnh theo quy tắc chung, không bị yêu cầu viết thêm cảnh.
+    settings.setdefault("storyboard_minutes", 1)
     w = StoryboardWriter(model, retriever, Settings(**settings), sleep=sleeps.append)
     return w, model
 
@@ -171,7 +173,7 @@ def test_writer_builds_storyboard_with_resolved_citations() -> None:
     assert body.citations[0].chunk_id.startswith("nha-gia-kim/")
     assert body.citations[0].source_id.startswith("nha-gia-kim/")
     assert sb.hook_vi == sb.scenes[0].narration_vi
-    assert sb.prompt_version == "storyboard_v2"
+    assert sb.prompt_version == "storyboard_v3"
     assert w.usage.input_tokens == 500
 
 
@@ -254,7 +256,9 @@ def test_model_error_is_retried_with_backoff() -> None:
 def runner_for(script: list[Any]) -> Any:
     book = next(b for b in load_golden(GOLDEN) if b.slug == "nha-gia-kim")
     model = ScriptedStructuredModel(messages=iter([]), script=script, calls=[])
-    return make_storyboard_runner(model, fixed_retriever(book.chunks()[:1]), Settings())
+    return make_storyboard_runner(
+        model, fixed_retriever(book.chunks()[:1]), Settings(storyboard_minutes=1)
+    )
 
 
 RESEARCH = {"book": BOOK, "kind": "fiction"}
@@ -348,3 +352,164 @@ def test_writer_caps_scenes_per_section() -> None:
     sb = w.write(w_book(), "fiction")
     assert [s.narration_vi for s in sb.scenes if s.section == "hook"] == ["mở 0"]
     assert [s.id for s in sb.scenes] == [1, 2, 3, 4]
+
+
+# --- Độ dài video (video 3 phút: 24 cảnh, ~180 giây) ------------------------------
+
+# ~27 âm tiết: một cảnh đọc khoảng 7,5 giây.
+LONG_NARRATION = (
+    "Cậu bé chăn cừu Santiago rời quê hương Andalusia để đi tìm kho báu trong giấc mơ, "
+    "và trên đường đi cậu học được nhiều điều về chính mình."
+)
+
+
+def scenes_draft(n: int, cited: bool = True, narration: str = LONG_NARRATION) -> SectionDraft:
+    cites = [CitationDraft(passage=1, quote="Paulo Coelho")] if cited else []
+    return SectionDraft(
+        scenes=[
+            SceneDraft(narration_vi=narration, scene_type="title", mood="m", citations=cites)
+            for _ in range(n)
+        ]
+    )
+
+
+def test_section_draft_allows_long_sections() -> None:
+    """Trần 6 cảnh cũ làm video 3 phút tối đa 19 cảnh (body cần 15)."""
+    assert len(scenes_draft(27).scenes) == 27
+
+
+def test_section_split_follows_review_structure() -> None:
+    from book_review_api.storyboard.schema import section_max_scenes
+
+    assert section_max_scenes(1) == {"hook": 1, "context": 2, "body": 4, "review_cta": 2}
+    assert section_max_scenes(3) == {"hook": 1, "context": 4, "body": 15, "review_cta": 4}
+    five = section_max_scenes(5)
+    assert sum(five.values()) == 40 and five["body"] == 27
+
+
+def test_later_sections_see_earlier_scenes() -> None:
+    """Phần sau nhận lời đọc của các cảnh đã viết để không giới thiệu lại nhân vật."""
+    w, model = make_writer(
+        [
+            outline(),
+            scenes_draft(1, cited=False, narration="Câu mở đầu."),
+            scenes_draft(4),
+            scenes_draft(15),
+            scenes_draft(4, cited=False),
+        ],
+        storyboard_minutes=3,
+    )
+    w.write(w_book(), "fiction")
+    hook_prompt = model.calls[1][1][-1].content
+    body_prompt = model.calls[3][1][-1].content
+    assert "KHÔNG lặp lại" not in hook_prompt
+    assert "KHÔNG lặp lại" in body_prompt
+    assert "(hook) Câu mở đầu." in body_prompt
+    assert body_prompt.count("(context)") == 4
+
+
+def test_long_video_retries_short_section_until_long_enough() -> None:
+    w, model = make_writer(
+        [
+            outline(),
+            scenes_draft(1, cited=False),  # hook
+            scenes_draft(2),  # context: thiếu cảnh -> viết lại
+            scenes_draft(4),
+            scenes_draft(15),  # body
+            scenes_draft(4, cited=False),  # review_cta
+        ],
+        storyboard_minutes=3,
+    )
+    sb = w.write(w_book(), "fiction")
+    assert len(sb.scenes) == 24
+    assert [s.id for s in sb.scenes] == list(range(1, 25))
+    retry = model.calls[3][1][-1].content
+    assert "Phần context mới có 2 cảnh" in retry
+    assert "cần 4 cảnh" in retry
+    assert sb.flags == []
+    assert sb.target_seconds == 180
+    assert sb.estimated_seconds is not None and sb.estimated_seconds >= 162
+
+
+def test_short_narration_counts_as_too_short_even_with_enough_scenes() -> None:
+    """Đủ số cảnh nhưng mỗi cảnh chỉ vài từ thì video vẫn ngắn, phải viết lại."""
+    w, model = make_writer(
+        [
+            outline(),
+            scenes_draft(1, cited=False),
+            scenes_draft(4, narration="Cậu bé đi."),
+            scenes_draft(4),
+            scenes_draft(15),
+            scenes_draft(4, cited=False),
+        ],
+        storyboard_minutes=3,
+    )
+    sb = w.write(w_book(), "fiction")
+    assert "giây" in model.calls[3][1][-1].content
+    assert sb.flags == []
+
+
+def test_section_still_short_after_retries_keeps_longest_and_flags() -> None:
+    """Viết lại vẫn thiếu thì dùng bản dài nhất thay vì làm hỏng run, và gắn cờ cho người duyệt."""
+    w, model = make_writer(
+        [
+            outline(),
+            scenes_draft(1, cited=False),
+            scenes_draft(4),
+            scenes_draft(8),  # body: thiếu cả ba lần, bản thứ hai dài nhất
+            scenes_draft(10),
+            scenes_draft(9),
+            scenes_draft(4, cited=False),
+        ],
+        storyboard_minutes=3,
+    )
+    sb = w.write(w_book(), "fiction")
+    assert len([s for s in sb.scenes if s.section == "body"]) == 10
+    assert len(sb.scenes) == 19
+    assert sb.flags == ["SHORT_SCRIPT"]
+    assert len(model.calls) == 7
+
+
+def test_citation_error_still_fails_on_long_video() -> None:
+    def bad() -> SectionDraft:
+        return draft(quote="bịa")
+
+    w, _ = make_writer(
+        [outline(), scenes_draft(1, cited=False), bad(), bad(), bad()], storyboard_minutes=3
+    )
+    with pytest.raises(StoryboardError):
+        w.write(w_book(), "fiction")
+
+
+def test_hint_asks_for_exact_scene_count_and_length() -> None:
+    w, model = make_writer(
+        [
+            outline(),
+            scenes_draft(1, cited=False),
+            scenes_draft(4),
+            scenes_draft(15),
+            scenes_draft(4, cited=False),
+        ],
+        storyboard_minutes=3,
+    )
+    w.write(w_book(), "fiction")
+    body_prompt = model.calls[3][1][-1].content
+    assert "ĐÚNG 15 cảnh" in body_prompt
+    assert "khoảng 27 từ" in body_prompt
+    hook_prompt = model.calls[1][1][-1].content
+    assert "ĐÚNG" not in hook_prompt
+
+
+def test_duration_estimate() -> None:
+    from book_review_api.storyboard.duration import (
+        count_syllables,
+        estimate_seconds,
+        scene_seconds,
+        syllables_for,
+    )
+
+    assert count_syllables("Nhà giả kim, xuất bản 1988.") == 6
+    assert scene_seconds("một " * 38) == pytest.approx(10.45)
+    assert estimate_seconds(["một " * 38, "một " * 38]) == pytest.approx(20.9)
+    assert syllables_for(7.5) == 27
+    assert count_syllables(LONG_NARRATION) >= 26
