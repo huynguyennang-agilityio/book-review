@@ -11,6 +11,10 @@ Status = Literal["running", "done", "failed", "cancelled", "rejected"]
 ImageMode = Literal["auto", "manual"]
 IMAGE_MODES: tuple[str, ...] = ("auto", "manual")
 
+# Nguồn của kịch bản: "book" (research từ tên sách) hoặc "user_review" (bài review người dùng dán).
+Source = Literal["book", "user_review"]
+SOURCES: tuple[str, ...] = ("book", "user_review")
+
 # Trạng thái kết thúc: node sau không chạy nữa.
 TERMINAL_STATUSES: frozenset[str] = frozenset({"done", "failed", "cancelled", "rejected"})
 
@@ -20,6 +24,19 @@ class BookInput(TypedDict):
     author: NotRequired[str | None]
     # Tên series (vd "Harry Potter") để tái dùng nhân vật đã duyệt giữa các tập.
     series: NotRequired[str | None]
+
+
+class UserReview(TypedDict):
+    """Bài review có sẵn của người dùng (tab "Từ bài review có sẵn"), đã làm sạch ở `precheck`."""
+
+    # Mở đầu (tuỳ chọn), ý chính (bắt buộc), nhận xét/CTA (tuỳ chọn); giữ nguyên văn.
+    hook: NotRequired[str | None]
+    main: str
+    comment: NotRequired[str | None]
+    # Cảnh báo không chặn run, vd "HOOK_LONG".
+    warnings: NotRequired[list[str]]
+    # Số email/số điện thoại/số thẻ đã che trước khi gửi cho LLM.
+    pii_masked: NotRequired[int]
 
 
 class RunOptions(TypedDict, total=False):
@@ -34,6 +51,8 @@ class RunOptions(TypedDict, total=False):
     # Cách có ảnh nhân vật và ảnh cảnh: "auto" (Fal tạo) hoặc "manual" (người dùng tải lên).
     # Chưa có thì `choose_image_mode` hỏi sau khi duyệt kịch bản; mặc định auto.
     image_mode: ImageMode
+    # Thiếu thì là "book".
+    source: Source
 
 
 def merge_dicts(left: dict[str, Any] | None, right: dict[str, Any] | None) -> dict[str, Any]:
@@ -68,6 +87,7 @@ def merge_status(left: Status | None, right: Status | None) -> Status | None:
 class BookReviewState(TypedDict, total=False):
     book: BookInput
     options: RunOptions
+    user_review: UserReview | None
     research: dict[str, Any] | None
     storyboard: dict[str, Any] | None
     timeline: dict[str, Any] | None

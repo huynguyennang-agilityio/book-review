@@ -12,7 +12,7 @@ from langgraph.config import get_config, get_store
 
 from book_review_api.errors import ErrorCode
 from book_review_api.graph.nodes.common import NodeUpdate, node
-from book_review_api.graph.state import BookReviewState
+from book_review_api.graph.state import SOURCES, BookReviewState
 from book_review_api.memory.store import apply_preferences, load_preferences
 
 log = logging.getLogger(__name__)
@@ -82,7 +82,18 @@ def clean_author(author: str | None) -> str | None:
 def precheck(state: BookReviewState) -> NodeUpdate:
     if find_excluded_keyword(state["book"]["title"]):
         return {"status": "rejected", "error_code": ErrorCode.GENRE_EXCLUDED.value}
+    source = (state.get("options") or {}).get("source", "book")
+    if source not in SOURCES:
+        return {"status": "rejected", "error_code": ErrorCode.VALIDATION_ERROR.value}
     update: NodeUpdate = {"status": "running", "error_code": None}
+    if source == "user_review":
+        # Import muộn: `review_text` dùng `find_excluded_keyword` của module này.
+        from book_review_api.graph.nodes.review_text import precheck_review
+
+        checked = precheck_review(state)
+        if checked.get("status") == "rejected":
+            return checked
+        update.update(checked)
     book = state["book"]
     if "author" in book and clean_author(book["author"]) != book["author"]:
         update["book"] = {**book, "author": clean_author(book["author"])}

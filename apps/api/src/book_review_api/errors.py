@@ -23,6 +23,8 @@ class ErrorCode(StrEnum):
     IMAGE_TOO_LARGE = "IMAGE_TOO_LARGE"
     INVALID_IMAGE = "INVALID_IMAGE"
     UPLOAD_LIMIT = "UPLOAD_LIMIT"
+    REVIEW_TOO_SHORT = "REVIEW_TOO_SHORT"
+    REVIEW_TOO_LONG = "REVIEW_TOO_LONG"
     # Chung
     UNAUTHORIZED = "UNAUTHORIZED"
     TOKEN_EXPIRED = "TOKEN_EXPIRED"
@@ -98,6 +100,16 @@ ERROR_SPECS: dict[ErrorCode, ErrorSpec] = {
     ErrorCode.UPLOAD_LIMIT: ErrorSpec(
         status_code=409,
         message_vi="Project đã có đủ số ảnh tải lên tối đa.",
+        retryable=False,
+    ),
+    ErrorCode.REVIEW_TOO_SHORT: ErrorSpec(
+        status_code=422,
+        message_vi="Phần ý chính của bài review quá ngắn, cần ít nhất 100 từ.",
+        retryable=False,
+    ),
+    ErrorCode.REVIEW_TOO_LONG: ErrorSpec(
+        status_code=422,
+        message_vi="Bài review đọc dài hơn 5 phút, hãy cắt bớt.",
         retryable=False,
     ),
     ErrorCode.UNAUTHORIZED: ErrorSpec(

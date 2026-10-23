@@ -43,18 +43,21 @@ class ProjectCreate(BaseModel):
     book_author: Annotated[
         str | None, StringConstraints(strip_whitespace=True, max_length=MAX_AUTHOR_LEN)
     ] = None
+    # Tab "Từ tên sách" hay "Từ bài review có sẵn".
+    source: Literal["book", "user_review"] = "book"
 
 
 class Project(BaseModel):
     id: UUID
     book_title: str
+    source: Literal["book", "user_review"] = "book"
     thread_id: str = Field(description="thread_id của graph book_review cho project này")
     status: ProjectStatus
     created_at: datetime
     updated_at: datetime
 
 
-_COLUMNS = "id, book_title, thread_id, status, created_at, updated_at"
+_COLUMNS = "id, book_title, source, thread_id, status, created_at, updated_at"
 
 
 @router.post("", status_code=201)
@@ -64,8 +67,9 @@ async def create_project(body: ProjectCreate, db: UserDB) -> Project:
         raise AppError(ErrorCode.GENRE_EXCLUDED)
     # `user_id` lấy mặc định từ auth.uid(), RLS kiểm lại khi insert.
     cur = await db.execute(
-        f"insert into public.projects (book_title, thread_id) values (%s, %s) returning {_COLUMNS}",
-        [body.book_title, str(uuid4())],
+        "insert into public.projects (book_title, source, thread_id) values (%s, %s, %s)"
+        f" returning {_COLUMNS}",
+        [body.book_title, body.source, str(uuid4())],
     )
     row = await cur.fetchone()
     assert row is not None
