@@ -59,7 +59,7 @@ pnpm web:lint && pnpm web:typecheck && pnpm web:build
 ## CI và Docker
 
 - `ci.yml`: ruff, mypy, pytest (Postgres + pgvector), eslint/typecheck/build web, build 3 image Docker.
-- `evals.yml`: khi PR đổi prompt, RAG, storyboard hoặc config, chạy eval 5 sách và chặn merge nếu faithfulness < 0.9. Cần secret `GOOGLE_API_KEY` trong GitHub Environment `eval`.
+- `evals.yml`: chỉ chạy tay (`workflow_dispatch`), eval 5 sách và báo đỏ nếu faithfulness < 0.9. Cần secret `GOOGLE_API_KEY` trong GitHub Environment `eval`. Bình thường eval chạy local: `uv run --group eval python evals/run_ragas.py`.
 - Deploy: xem mục "Deploy và release" bên dưới.
 - Image: `infra/docker/{api,worker,web}.Dockerfile`, xem [infra/docker/README.md](infra/docker/README.md).
 

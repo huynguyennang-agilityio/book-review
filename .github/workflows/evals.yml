@@ -1,14 +1,7 @@
 name: Evals
 
-# Chỉ chạy khi PR đổi prompt, chunking, retrieval, storyboard hoặc model.
+# Chỉ chạy tay (Actions > Evals > Run workflow). Eval thường chạy local trên Mac khi cần.
 on:
-  pull_request:
-    paths:
-      - "apps/api/src/book_review_api/prompts/**"
-      - "apps/api/src/book_review_api/rag/**"
-      - "apps/api/src/book_review_api/storyboard/**"
-      - "apps/api/src/book_review_api/config.py"
-      - "evals/**"
   workflow_dispatch:
 
 jobs:
