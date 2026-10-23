@@ -2,6 +2,7 @@
 
 precheck → research_agent → identify_confirm → storyboard → faithfulness_eval
   → estimate_cost → review_script ✋
+(tab "Từ bài review có sẵn": precheck → ingest_review → estimate_cost → review_script ✋ …)
   → [tts_align → build_timeline → subtitles] ‖ [choose_image_mode ✋
      auto: character_sheets → review_characters ✋ (⟲ regen_characters) → scene_images (Fal)
      manual: manual_images → scene_images]
@@ -49,6 +50,7 @@ from book_review_api.graph.nodes.review import (
     review_characters,
     review_script,
 )
+from book_review_api.graph.nodes.review_text import is_user_review, make_ingest_review_node
 from book_review_api.graph.nodes.scene_images import (
     make_scene_images_node as make_real_scene_images_node,
 )
@@ -71,6 +73,7 @@ NODES: dict[str, NodeFn] = {
     "precheck": precheck,
     "research_agent": stub("research_agent"),
     "identify_confirm": identify_confirm,
+    "ingest_review": make_ingest_review_node(),
     "storyboard": stub("storyboard"),
     "faithfulness_eval": stub("faithfulness_eval"),
     "estimate_cost": make_estimate_cost_node(),
@@ -90,8 +93,8 @@ NODES: dict[str, NodeFn] = {
 
 # Cạnh có điều kiện: đi tiếp nếu graph chưa kết thúc, ngược lại về END.
 _STEPS: list[tuple[str, Sequence[str]]] = [
-    ("precheck", ["research_agent"]),
     ("research_agent", ["identify_confirm"]),
+    ("ingest_review", ["estimate_cost"]),
     ("identify_confirm", ["storyboard"]),
     ("storyboard", ["faithfulness_eval"]),
     ("faithfulness_eval", ["estimate_cost"]),
@@ -141,6 +144,12 @@ def _route(targets: Sequence[str]) -> Callable[[BookReviewState], list[str]]:
         return [END] if state.get("status") in TERMINAL_STATUSES else list(targets)
 
     return route
+
+
+def _after_precheck(state: BookReviewState) -> list[str]:
+    if state.get("status") in TERMINAL_STATUSES:
+        return [END]
+    return ["ingest_review"] if is_user_review(state) else ["research_agent"]
 
 
 def _after_image_mode(state: BookReviewState) -> list[str]:
@@ -211,6 +220,9 @@ def build_graph(
     for name, fn in nodes.items():
         builder.add_node(name, _announce(name, fn, cancel_flags))
     builder.add_edge(START, "precheck")
+    builder.add_conditional_edges(
+        "precheck", _after_precheck, ["research_agent", "ingest_review", END]
+    )
     for source, targets in _STEPS:
         builder.add_conditional_edges(source, _route(targets), [*targets, END])
     # Hợp hai nhánh: `motion` chờ cả phụ đề và ảnh cảnh. Nếu một nhánh đã huỷ thì `motion`

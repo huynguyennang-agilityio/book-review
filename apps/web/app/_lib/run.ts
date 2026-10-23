@@ -98,6 +98,8 @@ export const ERROR_TEXT: Record<string, string> = {
   IMAGE_TOO_LARGE: "Ảnh quá nặng, tối đa 10 MB.",
   INVALID_IMAGE: "Không mở được ảnh, file có thể bị hỏng.",
   UPLOAD_LIMIT: "Project đã có đủ số ảnh tải lên tối đa.",
+  REVIEW_TOO_SHORT: "Phần ý chính của bài review quá ngắn, cần ít nhất 100 từ.",
+  REVIEW_TOO_LONG: "Bài review đọc dài hơn 5 phút, hãy cắt bớt.",
   UNAUTHORIZED: "Bạn cần đăng nhập để tiếp tục.",
   TOKEN_EXPIRED: "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.",
   FORBIDDEN: "Bạn không có quyền thực hiện thao tác này.",

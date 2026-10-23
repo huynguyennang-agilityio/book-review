@@ -197,3 +197,30 @@ async def test_claims_do_not_leak_to_next_transaction(
         assert row is not None
         assert row["role"] != "authenticated"
         assert row["uid"] is None
+
+
+async def test_project_source_defaults_and_is_private(
+    app_pool: AppPool, users: tuple[CurrentUser, CurrentUser]
+) -> None:
+    """Cột `source` (migration 0006): mặc định "book", chỉ nhận book/user_review, RLS như cũ."""
+    a, b = users
+    ids = await seed(app_pool, a)
+    rows = await fetch_all(
+        app_pool, a, "select source from projects where id = %s", [ids["projects"]]
+    )
+    assert rows[0]["source"] == "book"
+    async with user_transaction(app_pool, a) as conn:
+        row = await (
+            await conn.execute(
+                "insert into projects (book_title, source, thread_id)"
+                " values ('Bài của tôi', 'user_review', gen_random_uuid()::text) returning id"
+            )
+        ).fetchone()
+    assert row is not None
+    assert await fetch_all(app_pool, b, "select * from projects where id = %s", [row["id"]]) == []
+    with pytest.raises(psycopg.errors.CheckViolation):
+        async with user_transaction(app_pool, a) as conn:
+            await conn.execute(
+                "insert into projects (book_title, source, thread_id)"
+                " values ('X', 'pdf', gen_random_uuid()::text)"
+            )

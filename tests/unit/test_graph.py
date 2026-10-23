@@ -14,6 +14,7 @@ PLAN_NODES = [
     "precheck",
     "research_agent",
     "identify_confirm",
+    "ingest_review",
     "storyboard",
     "faithfulness_eval",
     "estimate_cost",
@@ -62,7 +63,8 @@ def test_rejected_title_stops_after_precheck() -> None:
 def test_pause_and_resume_to_end() -> None:
     graph = build_graph(InMemorySaver())
     first = run(graph, {"book": {"title": "Nhà giả kim"}})
-    assert first == PLAN_NODES[:6]
+    # Tab "Từ tên sách" không đi qua `ingest_review`.
+    assert first == [n for n in PLAN_NODES[:7] if n != "ingest_review"]
     paused = graph.get_state(config())
     assert paused.next == ("review_script",)
     assert paused.interrupts[0].value["type"] == "review_script"
@@ -84,7 +86,8 @@ def test_pause_and_resume_to_end() -> None:
     assert done.values["status"] == "done"
     # Auto đi đúng đường cũ: mọi node của plan chạy, trừ nhánh manual.
     # (node chạy cùng bước với interrupt được lưu thành pending write nên có thể xuất hiện lại.)
-    assert set(first + second + third + fourth) == set(PLAN_NODES) - {"manual_images"}
+    ran = set(first + second + third + fourth)
+    assert ran == set(PLAN_NODES) - {"manual_images", "ingest_review"}
 
 
 def test_cancel_while_waiting_for_review() -> None:
