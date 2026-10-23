@@ -59,7 +59,9 @@ async def _rewind_failed(graph: CompiledStateGraph[Any], thread_id: str) -> None
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
     async for snap in graph.aget_state_history(config):
         if snap.next and str(snap.values.get("status") or "") not in _TERMINAL:
-            await graph.aupdate_state(snap.config, {})
+            # `__copy__` chép nguyên checkpoint; không ghi thay node nào, nên không lỗi "Ambiguous
+            # update" khi bước trước có nhiều node chạy song song (subtitles, review_characters).
+            await graph.aupdate_state(snap.config, None, as_node="__copy__")
             return
     raise AppError(ErrorCode.NOT_FOUND)
 
