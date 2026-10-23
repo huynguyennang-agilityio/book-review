@@ -17,8 +17,10 @@ from fastapi import APIRouter, Depends, Request
 from fastapi.responses import StreamingResponse
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph.state import CompiledStateGraph
+from langgraph.types import StateSnapshot
 
 from book_review_api.auth import CurrentUser, current_user
+from book_review_api.config import get_settings
 from book_review_api.db import ensure_local_user, user_transaction
 from book_review_api.errors import AppError, ErrorCode
 from book_review_api.prompt_loader import prompt_version_label, prompt_versions
@@ -53,17 +55,73 @@ async def _set_status(request: Request, user: CurrentUser, thread_id: str, statu
 _TERMINAL = {"done", "failed", "cancelled", "rejected"}
 
 
-async def _rewind_failed(graph: CompiledStateGraph[Any], thread_id: str) -> None:
+def _check_budget(budget_usd: Any, spent: float) -> float:
+    """Ngân sách mới khi chạy lại: số dương, lớn hơn số đã tiêu, không quá trần."""
+    cap = get_settings().max_budget_usd
+    if isinstance(budget_usd, bool) or not isinstance(budget_usd, int | float):
+        raise AppError(ErrorCode.VALIDATION_ERROR, "Ngân sách phải là một số.")
+    if budget_usd <= spent:
+        raise AppError(
+            ErrorCode.VALIDATION_ERROR,
+            f"Ngân sách mới phải lớn hơn số đã tiêu (${spent:.2f}).",
+        )
+    if budget_usd > cap:
+        raise AppError(ErrorCode.VALIDATION_ERROR, f"Ngân sách tối đa là ${cap:.0f}.")
+    return float(budget_usd)
+
+
+async def _rewind_failed(
+    graph: CompiledStateGraph[Any], thread_id: str, budget_usd: Any = None
+) -> None:
     """Chạy lại project lỗi từ node vừa lỗi: tạo checkpoint mới từ lần checkpoint cuối cùng còn
-    đang chạy (trước khi status chuyển sang `failed`), nên các bước đã xong không chạy lại."""
+    đang chạy (trước khi status chuyển sang `failed`), nên các bước đã xong không chạy lại.
+
+    Checkpoint mới giữ chi phí đã tiêu trong lần lỗi (tua lại không làm mất tiền đã trả) và, nếu
+    có, ngân sách mới người dùng nhập."""
     config: RunnableConfig = {"configurable": {"thread_id": thread_id}}
+    failed: Any = None
     async for snap in graph.aget_state_history(config):
-        if snap.next and str(snap.values.get("status") or "") not in _TERMINAL:
-            # `__copy__` chép nguyên checkpoint; không ghi thay node nào, nên không lỗi "Ambiguous
-            # update" khi bước trước có nhiều node chạy song song (subtitles, review_characters).
-            await graph.aupdate_state(snap.config, None, as_node="__copy__")
+        failed = failed or snap
+        if not snap.next or str(snap.values.get("status") or "") in _TERMINAL:
+            continue
+        spent = dict(failed.values.get("cost") or {})
+        update: dict[str, Any] = {}
+        if budget_usd is not None:
+            budget = _check_budget(budget_usd, float(spent.get("usd", 0.0)))
+            update["options"] = {**(snap.values.get("options") or {}), "budget_usd": budget}
+        before = snap.values.get("cost") or {}
+        delta = {k: v - before.get(k, 0.0) for k, v in spent.items() if v != before.get(k, 0.0)}
+        if delta:
+            # `cost` cộng dồn (reducer `add_costs`) nên chỉ ghi phần chênh.
+            update["cost"] = delta
+        if update and await _update_as_writer(graph, snap, update):
             return
+        # `__copy__` chép nguyên checkpoint; không ghi thay node nào, nên không lỗi "Ambiguous
+        # update" khi bước trước có nhiều node chạy song song (subtitles, review_characters).
+        # Cũng là checkpoint mới nhất, thay cho các lần ghi thử hỏng ở trên.
+        await graph.aupdate_state(snap.config, None, as_node="__copy__")
+        if "options" in update:
+            raise AppError(ErrorCode.INVALID_STATE, "Không đổi được ngân sách cho project này.")
+        return
     raise AppError(ErrorCode.NOT_FOUND)
+
+
+async def _update_as_writer(
+    graph: CompiledStateGraph[Any], snap: StateSnapshot, update: dict[str, Any]
+) -> bool:
+    """Ghi `update` vào bản sao của `snap` như thể do một trong các node vừa tạo ra nó ghi.
+
+    `__copy__` bỏ qua giá trị, nên phải ghi thay một node; chọn node trong `parent.next` (node
+    vừa chạy ra checkpoint này) mà sau khi ghi các node chờ chạy vẫn y như cũ."""
+    if snap.parent_config is None:
+        return False
+    parent = await graph.aget_state(snap.parent_config)
+    for writer in parent.next:
+        new_config = await graph.aupdate_state(snap.config, update, as_node=writer)
+        if (await graph.aget_state(new_config)).next == snap.next:
+            return True
+        log.warning("chạy lại: ghi thay %s làm đổi node chờ chạy, thử node khác", writer)
+    return False
 
 
 async def _final_status(graph: CompiledStateGraph[Any], thread_id: str) -> str:
@@ -93,7 +151,9 @@ async def agent_endpoint(
         failed_before = row["status"] == "failed"
         project_id = row["id"]
     if failed_before:
-        await _rewind_failed(request.app.state.graph, input_data.thread_id)
+        props = input_data.forwarded_props
+        budget_usd = props.get("budget_usd") if isinstance(props, dict) else None
+        await _rewind_failed(request.app.state.graph, input_data.thread_id, budget_usd)
         # Checkpoint mới còn node chưa chạy; lệnh resume giả buộc ag-ui-langgraph chạy tiếp
         # chúng thay vì bắt đầu run mới từ đầu.
         input_data.forwarded_props = {"command": {"resume": "true"}}
