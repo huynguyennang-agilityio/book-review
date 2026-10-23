@@ -8,7 +8,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Command
 
 from book_review_api.graph.build import NODES, build_graph
-from book_review_api.graph.state import BookReviewState, merge_status
+from book_review_api.graph.state import BookReviewState, merge_error_code, merge_status
 
 PLAN_NODES = [
     "precheck",
@@ -167,3 +167,31 @@ def test_status_reducer_keeps_terminal() -> None:
     assert merge_status("running", "cancelled") == "cancelled"
     assert merge_status("running", "done") == "done"
     assert merge_status(None, "running") == "running"
+
+
+def test_parallel_branches_can_both_write_error_code() -> None:
+    """Nhánh giọng đọc lỗi và nhánh ảnh cũng kết thúc lỗi trong cùng một bước: không sập graph,
+    giữ lỗi đầu tiên."""
+    from langgraph.graph import END, START, StateGraph
+
+    from book_review_api.graph.nodes.common import NodeUpdate, node
+
+    @node
+    def tts(state: BookReviewState) -> NodeUpdate:
+        return {"status": "failed", "error_code": "PROVIDER_UNAVAILABLE"}
+
+    @node
+    def images(state: BookReviewState) -> NodeUpdate:
+        return {"status": "cancelled", "error_code": "CANCELLED"}
+
+    b = StateGraph(BookReviewState)
+    b.add_node("tts", tts)
+    b.add_node("images", images)
+    b.add_edge(START, "tts")
+    b.add_edge(START, "images")
+    b.add_edge(["tts", "images"], END)
+    out = b.compile().invoke({"status": "running"})
+    assert out["error_code"] in ("PROVIDER_UNAVAILABLE", "CANCELLED")
+    assert merge_error_code("A", "B") == "A"
+    assert merge_error_code(None, "B") == "B"
+    assert merge_error_code("A", None) == "A"
