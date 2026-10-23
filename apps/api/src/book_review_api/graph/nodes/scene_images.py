@@ -8,6 +8,9 @@
   Vẫn hỏng thì dùng lại ảnh gần nhất đã có, để video không bị kẹt.
 - Tài khoản Fal bị từ chối (hết tiền, 429...) thì dừng hẳn với `PROVIDER_QUOTA`: không đánh dấu
   `.blocked`, không mượn ảnh, không gửi thêm ảnh nào; nạp tiền xong chạy lại tạo nốt ảnh còn thiếu.
+- Seedream đôi khi vẽ cả cảnh nằm ngang 90° (~24% ảnh text-to-image, đo 24/10). Có
+  `orientation_check` thì mỗi ảnh mới được kiểm tra; xoay thì tạo lại một lần với seed khác (nếu
+  còn ngân sách), vẫn xoay thì dùng cảnh ẩn dụ. Ảnh xoay không được ghi vào cache.
 - Cache theo hash(prompt + seed + tham chiếu + kích thước): chạy lại không tạo và không tính tiền
   ảnh đã có. Prompt (model viết, mỗi lần một khác) cũng lưu ở `images/prompts/` theo storyboard,
   để chạy lại dùng đúng prompt cũ.
@@ -16,6 +19,7 @@
 import hashlib
 import io
 import logging
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from functools import partial
@@ -37,6 +41,7 @@ from book_review_api.storyboard.images import (
     default_prompts,
     image_plan,
 )
+from book_review_api.storyboard.orientation import OrientationCheck
 from book_review_api.storyboard.schema import SceneImage, Storyboard
 
 log = logging.getLogger(__name__)
@@ -91,6 +96,7 @@ class Result:
     prompt_en: str
     job_ids: list[str]
     billed: int
+    rotated: int = 0
 
 
 def cache_key(prompt: str, seed: int, refs: list[str], cfg: Settings) -> str:
@@ -104,6 +110,7 @@ def make_scene_images_node(
     settings: Settings | None = None,
     cancel_flags: CancelFlags | None = None,
     prompt_writer: PromptWriter | None = None,
+    orientation_check: OrientationCheck | None = None,
 ) -> NodeFn:
     @node
     def scene_images(state: BookReviewState) -> NodeUpdate:
@@ -147,31 +154,59 @@ def make_scene_images_node(
                     paths.append(approved[slug])
             return names, paths
 
+        check = orientation_check if cfg.scene_orientation_check else None
+        # Số lần tạo lại ảnh xoay còn được phép trong ngân sách (đặt sau khi chọn `todo`).
+        retries = {"left": 0}
+        retry_lock = threading.Lock()
+
+        def take_retry() -> bool:
+            with retry_lock:
+                if budget is None:
+                    return True
+                if retries["left"] <= 0:
+                    return False
+                retries["left"] -= 1
+                return True
+
         def attempt(
             body: str, seed: int, names: list[str], paths: list[str], path: Path, ids: list[str]
-        ) -> tuple[bool, bool]:
-            """Tạo một ảnh và ghi `path`. Trả (thành công, có tính tiền)."""
+        ) -> tuple[bool, int, int]:
+            """Tạo một ảnh và ghi `path`. Trả (thành công, số ảnh tính tiền, số ảnh bị xoay).
+
+            Ảnh xoay được tạo lại một lần với seed khác; hết ngân sách thì giữ ảnh xoay."""
             data = [(media_dir / p).read_bytes() for p in paths if (media_dir / p).exists()]
             if len(data) < len(paths):  # thiếu file sheet thì bỏ tham chiếu, không đặt tên
                 names, data = [], []
-            try:
-                img = provider.generate(
-                    compose_prompt(sb.style_prompt_en, body, names),
-                    seed=seed,
-                    width=cfg.scene_image_width,
-                    height=cfg.scene_image_height,
-                    on_submit=ids.append,
-                    cancelled=cancelled,
-                    reference_images=data,
-                )
-                payload = fit_9_16(img.data, cfg.scene_out_width, cfg.scene_out_height)
-            except ImageAccountError:
-                raise  # không phải lỗi của ảnh: không đánh dấu `.blocked`, không đổi ẩn dụ
-            except (ImageError, OSError):
-                return False, False
+            billed = rotated = 0
+            for extra in range(2):
+                try:
+                    img = provider.generate(
+                        compose_prompt(sb.style_prompt_en, body, names),
+                        seed=seed + extra,
+                        width=cfg.scene_image_width,
+                        height=cfg.scene_image_height,
+                        on_submit=ids.append,
+                        cancelled=cancelled,
+                        reference_images=data,
+                    )
+                    payload = fit_9_16(img.data, cfg.scene_out_width, cfg.scene_out_height)
+                except ImageAccountError:
+                    raise  # không phải lỗi của ảnh: không đánh dấu `.blocked`, không đổi ẩn dụ
+                except (ImageError, OSError):
+                    return False, billed, rotated
+                billed += 1
+                if check is None or check(payload) != "rotated":
+                    break
+                rotated += 1
+                log.warning("ảnh cảnh %s bị xoay ngang (seed %d)", path.name, seed + extra)
+                if extra == 0 and not take_retry():
+                    log.warning("hết ngân sách tạo lại, giữ ảnh xoay %s", path.name)
+                    break
+            else:
+                return False, billed, rotated  # xoay cả hai lần: để nhánh ẩn dụ xử lý
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(payload)
-            return True, True
+            return True, billed, rotated
 
         def rel(p: Path) -> str:
             return p.relative_to(media_dir).as_posix()
@@ -185,23 +220,28 @@ def make_scene_images_node(
             ids: list[str] = []
             if path.exists():
                 return Result(rel(path), job.prompt.prompt_en, ids, 0)
+            billed = rotated = 0
             if not blocked.exists():
-                ok, billed = attempt(job.prompt.prompt_en, seed, names, paths, path, ids)
+                ok, billed, rotated = attempt(job.prompt.prompt_en, seed, names, paths, path, ids)
                 if ok:
-                    return Result(rel(path), job.prompt.prompt_en, ids, int(billed))
+                    return Result(rel(path), job.prompt.prompt_en, ids, billed, rotated)
                 log.warning(
-                    "ảnh cảnh %s/%s bị chặn hoặc lỗi, đổi sang cảnh ẩn dụ", job.scene_id, job.ref
+                    "ảnh cảnh %s/%s bị chặn, lỗi hoặc xoay, đổi sang cảnh ẩn dụ",
+                    job.scene_id,
+                    job.ref,
                 )
-                blocked.parent.mkdir(parents=True, exist_ok=True)
-                blocked.touch()
+                if not rotated:  # xoay không phải do prompt: lần sau vẫn thử prompt chính
+                    blocked.parent.mkdir(parents=True, exist_ok=True)
+                    blocked.touch()
             mkey = cache_key(job.prompt.metaphor_en, seed, [], cfg)
             mpath = out_dir / f"{mkey}.jpg"
             if mpath.exists():
-                return Result(rel(mpath), job.prompt.metaphor_en, ids, 0)
-            ok, billed = attempt(job.prompt.metaphor_en, seed, [], [], mpath, ids)
+                return Result(rel(mpath), job.prompt.metaphor_en, ids, billed, rotated)
+            ok, mbilled, mrotated = attempt(job.prompt.metaphor_en, seed, [], [], mpath, ids)
+            billed, rotated = billed + mbilled, rotated + mrotated
             if ok:
-                return Result(rel(mpath), job.prompt.metaphor_en, ids, int(billed))
-            return Result(None, job.prompt.prompt_en, ids, 0)
+                return Result(rel(mpath), job.prompt.metaphor_en, ids, billed, rotated)
+            return Result(None, job.prompt.prompt_en, ids, billed, rotated)
 
         # Chỉ tạo số ảnh mới mà ngân sách còn cho phép; ảnh đã có trên đĩa không tốn tiền.
         def is_cached(job: Job) -> bool:
@@ -218,6 +258,7 @@ def make_scene_images_node(
                 over_budget = True
                 skip = {(j.scene_id, j.ref) for j in pending[affordable:]}
                 todo = [j for j in jobs if (j.scene_id, j.ref) not in skip]
+            retries["left"] = max(affordable - len(pending), 0)
 
         results: dict[tuple[int, int], Result] = {}
         cancel_hit = False
@@ -252,6 +293,7 @@ def make_scene_images_node(
             if r.job_ids:
                 job_ids[f"image:{sid}:{ref}"] = r.job_ids[-1]
         billed_total = sum(r.billed for r in results.values())
+        rotated_total = sum(r.rotated for r in results.values())
         for scene in sb.scenes:
             scene.images = [
                 SceneImage(
@@ -266,7 +308,11 @@ def make_scene_images_node(
             "storyboard": sb.model_dump(mode="json"),
             "asset_refs": asset_refs,
             "fal_job_ids": job_ids,
-            "cost": {"usd": billed_total * cfg.price_image_usd, "images": float(billed_total)},
+            "cost": {
+                "usd": billed_total * cfg.price_image_usd,
+                "images": float(billed_total),
+                "rotated_images": float(rotated_total),
+            },
         }
         if cancel_hit:
             return {**update, "status": "cancelled", "error_code": ErrorCode.CANCELLED.value}
