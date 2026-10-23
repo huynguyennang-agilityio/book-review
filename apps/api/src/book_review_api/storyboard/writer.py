@@ -261,7 +261,8 @@ class StoryboardWriter:
             citations: list[Citation] = []
             for c in d.citations:
                 if not 1 <= c.passage <= len(passages):
-                    problems.append(f"Cảnh {sid}: không có đoạn [{c.passage}].")
+                    if section in CITED_SECTIONS:
+                        problems.append(f"Cảnh {sid}: không có đoạn [{c.passage}].")
                     continue
                 chunk = passages[c.passage - 1]
                 citations.append(
@@ -280,7 +281,12 @@ class StoryboardWriter:
                 on_screen_text_vi=d.on_screen_text_vi,
                 mood=d.mood,
             )
-            problems += scene_problems(scene, by_id)
+            found = scene_problems(scene, by_id)
+            if found and section not in CITED_SECTIONS:
+                # hook/review_cta không cần citation: trích sai thì bỏ trích, giữ lời dẫn.
+                scene.citations = []
+                found = scene_problems(scene, by_id)
+            problems += found
             scenes.append(scene)
         return scenes, problems
 

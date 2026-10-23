@@ -324,6 +324,16 @@ def test_writer_drops_uncited_scenes_in_cited_sections() -> None:
     assert [s.id for s in sb.scenes] == [1, 2, 3, 4]
 
 
+def test_bad_citation_in_cta_is_dropped_not_retried() -> None:
+    """hook/review_cta không cần citation: model tự trích sai thì bỏ trích, không thất bại."""
+    w, model = make_writer(
+        [outline(), draft(quote="không có thật"), draft(), draft(), draft(passage=99)]
+    )
+    sb = w.write(w_book(), "fiction")
+    assert [s.citations for s in sb.scenes if s.section in ("hook", "review_cta")] == [[], []]
+    assert len(model.calls) == 5  # không phải viết lại phần nào
+
+
 def test_clean_narration_removes_passage_markers() -> None:
     from book_review_api.storyboard.writer import clean_narration
 

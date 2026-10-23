@@ -17,6 +17,11 @@ def writer_uses_openai(settings: Settings) -> bool:
     return provider == "auto" and bool(settings.openai_api_key)
 
 
+def writer_name(settings: Settings) -> str:
+    """Tên model viết chính (ghi vào báo cáo, khoá cache)."""
+    return settings.writer_model if writer_uses_openai(settings) else settings.gemini_model
+
+
 def make_writer_model(settings: Settings | None = None) -> BaseChatModel:
     """Chat model viết storyboard và viết lại cảnh. Không có OpenAI thì dùng `gemini_model`.
     Quá tải thì chuyển sang Gemini dự phòng (cần `GOOGLE_API_KEY`)."""

@@ -33,6 +33,7 @@ from langchain_core.language_models import BaseChatModel
 from book_review_api.config import Settings, get_settings
 from book_review_api.prompt_loader import ACTIVE_PROMPTS
 from book_review_api.providers.llm_gemini import make_chat_model, make_embeddings, make_judge_model
+from book_review_api.providers.llm_writer import make_writer_model, writer_name, writer_uses_openai
 from book_review_api.rag.golden import GoldenBook, load_golden
 from book_review_api.rag.memory import InMemoryRetriever
 from book_review_api.storyboard.faithfulness import (
@@ -80,10 +81,14 @@ class RagasScorer:
         self.version = ragas.__version__
         self.metric = Faithfulness(llm=LangchainLLMWrapper(judge))
         self.metric.init(RunConfig(timeout=180, max_retries=6, max_wait=90))
+        # Hết quota ngày của giám khảo thì bỏ RAGAS cho phần còn lại, khỏi chờ thử lại mỗi cảnh.
+        self.out_of_quota = False
 
     def score(self, question: str, answer: str, contexts: Sequence[str]) -> float | None:
         from ragas.dataset_schema import SingleTurnSample
 
+        if self.out_of_quota:
+            return None
         sample = SingleTurnSample(
             user_input=question, response=answer, retrieved_contexts=list(contexts)
         )
@@ -91,6 +96,9 @@ class RagasScorer:
             value = asyncio.run(self.metric.single_turn_ascore(sample))
         except Exception as e:  # lỗi parse/quota của một cảnh không làm hỏng cả lần chạy
             print(f"    ragas lỗi: {type(e).__name__}: {str(e)[:200]}")
+            if "RESOURCE_EXHAUSTED" in str(e) or "exceeded your current quota" in str(e):
+                print("    hết quota giám khảo: bỏ RAGAS cho các cảnh còn lại")
+                self.out_of_quota = True
             return None
         return None if value != value else float(value)  # NaN: không tách được khẳng định
 
@@ -125,10 +133,14 @@ def _question(book: GoldenBook, scene: Scene) -> str:
     return f"Viết lời đọc phần `{scene.section}` cho video review sách {book.title}."
 
 
-def _sb_file(stem: str) -> str:
-    """Cache storyboard theo version prompt: v1 giữ tên cũ, version khác thêm hậu tố."""
+def _sb_file(stem: str, settings: Settings) -> str:
+    """Cache storyboard theo version prompt (v1 giữ tên cũ, version khác thêm hậu tố) và theo
+    model viết khi không phải Gemini mặc định."""
     version = ACTIVE_PROMPTS["storyboard"]
-    return f"{stem}.json" if version == "storyboard_v1" else f"{stem}_{version}.json"
+    name = f"{stem}" if version == "storyboard_v1" else f"{stem}_{version}"
+    if writer_uses_openai(settings):
+        name += f"_{settings.writer_model}"
+    return f"{name}.json"
 
 
 class BookEval:
@@ -149,7 +161,7 @@ class BookEval:
         self.cache = Cache(self.dir / "scores.json")
 
     def storyboard(self) -> Storyboard | None:
-        path = self.dir / _sb_file("storyboard")
+        path = self.dir / _sb_file("storyboard", self.settings)
         if path.is_file():
             return Storyboard.model_validate_json(path.read_text(encoding="utf-8"))
         runner = make_storyboard_runner(
@@ -167,7 +179,9 @@ class BookEval:
             return None
         self.dir.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(out["storyboard"], ensure_ascii=False, indent=1), "utf-8")
-        (self.dir / _sb_file("storyboard_cost")).write_text(json.dumps(out["cost"]), "utf-8")
+        (self.dir / _sb_file("storyboard_cost", self.settings)).write_text(
+            json.dumps(out["cost"]), "utf-8"
+        )
         return Storyboard.model_validate(out["storyboard"])
 
     def contexts(self, scene: Scene) -> list[str]:
@@ -196,7 +210,7 @@ class BookEval:
         return value
 
     def rewrite_loop(self, scene: Scene, contexts: list[str], first: Judgement) -> dict[str, Any]:
-        key = _key("loop", REWRITE_PROMPT_VERSION, self.settings.gemini_model, scene.narration_vi)
+        key = _key("loop", REWRITE_PROMPT_VERSION, writer_name(self.settings), scene.narration_vi)
         if (hit := self.cache.get(key)) is not None:
             return dict(hit)
         final, history = self.checker.check_scene(scene, contexts, initial=first)
@@ -244,7 +258,7 @@ class BookEval:
                 f" ragas={_fmt(row['ragas'])}"
                 + (f" → vi={row['vi_final']:.2f}" if row.get("rounds") else "")
             )
-        cost_path = self.dir / _sb_file("storyboard_cost")
+        cost_path = self.dir / _sb_file("storyboard_cost", self.settings)
         return {
             "slug": self.book.slug,
             "title": self.book.title,
@@ -330,11 +344,12 @@ def main() -> None:
     args = parser.parse_args()
 
     settings = get_settings().model_copy(update={"llm_rpm": args.rpm})
-    if settings.judge_model == settings.gemini_model:
-        raise SystemExit("JUDGE_MODEL phải khác GEMINI_MODEL (không tự chấm cho mình)")
-    writer, judge = make_chat_model(settings), make_judge_model(settings)
+    if settings.judge_model == writer_name(settings):
+        raise SystemExit("JUDGE_MODEL phải khác model viết (không tự chấm cho mình)")
+    writer, judge = make_writer_model(settings), make_judge_model(settings)
     checker = FaithfulnessChecker(judge, writer, settings)
-    ragas = None if args.no_ragas else RagasScorer(judge)
+    # RAGAS cần chat model thật (đặt temperature), không nhận model bọc dự phòng.
+    ragas = None if args.no_ragas else RagasScorer(make_chat_model(settings, settings.judge_model))
     embeddings = make_embeddings(settings)
 
     started = time.time()
@@ -350,7 +365,7 @@ def main() -> None:
     all_scenes = [s for b in books for s in b["scenes"]]
     report = {
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
-        "writer_model": settings.gemini_model,
+        "writer_model": writer_name(settings),
         "judge_model": settings.judge_model,
         "threshold": settings.faithfulness_threshold,
         "rewrite_rounds": settings.faithfulness_rounds,

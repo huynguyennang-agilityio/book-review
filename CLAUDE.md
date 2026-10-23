@@ -4,7 +4,7 @@ Hướng dẫn cho Claude khi làm việc trong repo này. Người dùng nói t
 
 ## Cấu trúc repo
 
-- `apps/api` (`book_review_api`): FastAPI, agents, RAG, storyboard, providers (Gemini, Tavily).
+- `apps/api` (`book_review_api`): FastAPI, agents, RAG, storyboard, providers (OpenAI viết kịch bản, Gemini, Tavily).
 - `apps/worker` (`book_review_worker`): worker arq: job `tts` (edge-tts), `timeline`, stub `images`/`motion`/`compose`. Media ghi vào `MEDIA_DIR` (`var/media`).
 - `apps/web`: web Next.js (pnpm).
 - `scripts/`: `run_agent.py` (gọi `/agent` như web), `run_media.py`, `run_characters.py`, `run_scene_images.py`, `run_research.py`, `run_storyboard.py`, `build_rag_fixtures.py`, `measure_embeddings.py`.
@@ -16,7 +16,7 @@ Script gọi Gemini/Tavily cần key. Cloud sandbox không có key và bị ch�
 
 - Repo: `/Users/nanghuy/Desktop/Projects/Review book/resource/book-review`
 - Key nằm trong `.env` ở thư mục đó (đã gitignore). Chỉ đọc tên biến; không in, không log, không commit giá trị.
-- Cấu hình hiện tại: `GEMINI_MODEL=gemini-3.5-flash-lite`, `SEARCH_PROVIDER=tavily` (cần `GOOGLE_API_KEY`, `TAVILY_API_KEY`).
+- Cấu hình hiện tại: `GEMINI_MODEL=gemini-3.5-flash-lite`, `SEARCH_PROVIDER=tavily` (cần `GOOGLE_API_KEY`, `TAVILY_API_KEY`). Có `OPENAI_API_KEY` thì kịch bản do `gpt-5.4-mini` viết (`WRITER_PROVIDER=auto`); quá tải (503, 429, timeout) thì tự chuyển sang Gemini dự phòng.
 - Giám khảo faithfulness mặc định `gemini-3.1-flash-lite`. Gói free của `gemini-3.5-flash` chỉ 20 request/ngày, không đủ chạy eval.
 
 ## Lệnh chuẩn
