@@ -84,6 +84,12 @@ def merge_status(left: Status | None, right: Status | None) -> Status | None:
     return right
 
 
+def merge_error_code(left: str | None, right: str | None) -> str | None:
+    # Hai nhánh song song (giọng đọc, ảnh) có thể cùng ghi lỗi trong một bước: giữ lỗi đầu tiên.
+    # `None` không xoá lỗi đã có (graph mới bắt đầu thì state chưa có lỗi nào).
+    return left if left is not None else right
+
+
 class BookReviewState(TypedDict, total=False):
     book: BookInput
     options: RunOptions
@@ -108,7 +114,7 @@ class BookReviewState(TypedDict, total=False):
     cost_estimate: dict[str, float] | None
     status: Annotated[Status | None, merge_status]
     # Mã lỗi trong `errors.ErrorCode` khi status là failed/rejected/cancelled.
-    error_code: str | None
+    error_code: Annotated[str | None, merge_error_code]
     cancel_requested: bool
     # Phản hồi của người dùng ở các điểm duyệt, ghi vào bộ nhớ cuối run (ngày 20).
     feedback: Annotated[list[dict[str, Any]], add_feedback]
