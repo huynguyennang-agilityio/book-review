@@ -7,8 +7,8 @@ Hướng dẫn cho Claude khi làm việc trong repo này. Người dùng nói t
 - `apps/api` (`book_review_api`): FastAPI, agents, RAG, storyboard, providers (OpenAI viết kịch bản, Gemini, Tavily).
 - `apps/worker` (`book_review_worker`): worker arq: job `tts` (edge-tts), `timeline`, stub `images`/`motion`/`compose`. Media ghi vào `MEDIA_DIR` (`var/media`).
 - `apps/web`: web Next.js (pnpm).
-- `scripts/`: `run_agent.py` (gọi `/agent` như web), `run_media.py`, `run_characters.py`, `run_scene_images.py`, `run_research.py`, `run_storyboard.py`, `build_rag_fixtures.py`, `measure_embeddings.py`.
-- `evals/golden/<slug>/`: 10 sách golden và nguồn của chúng. `db/migrations/`: SQL. `tests/`, `docs/`, `spikes/` (không lint).
+- `scripts/`: `run_agent.py` (gọi `/agent` như web; `--review <file>` cho tab review có sẵn, `--mode manual` tự tải ảnh mẫu), `run_media.py`, `run_review_text.py` (chia bài review nguyên văn + metadata Gemini, `--out` ghi storyboard JSON), `run_characters.py`, `run_scene_images.py`, `run_research.py`, `run_storyboard.py`, `build_rag_fixtures.py`, `measure_embeddings.py`.
+- `evals/golden/<slug>/`: 10 sách golden và nguồn của chúng. `evals/review-text/`: 3 bài review mẫu cho tab "Từ bài review có sẵn" ([docs/review-text.md](docs/review-text.md)). `db/migrations/`: SQL. `tests/`, `docs/`, `spikes/` (không lint).
 
 ## Chỗ chạy script thật
 
@@ -27,6 +27,7 @@ uv run pytest
 uv run ruff check . && uv run ruff format --check . && uv run mypy
 uv run python scripts/run_research.py "Đắc nhân tâm"
 uv run python scripts/run_storyboard.py nha-gia-kim sapiens   # slug trong evals/golden
+uv run python scripts/run_review_text.py evals/review-text/nha-gia-kim.md --out var/review-text
 uv run --group eval python evals/run_ragas.py                # eval faithfulness, báo cáo ở docs/evals/
 docker compose up -d                                          # Postgres + pgvector, Redis, worker
 uv run arq book_review_worker.main.WorkerSettings             # worker chạy ngoài docker

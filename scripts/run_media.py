@@ -25,6 +25,7 @@ from book_review_api.graph.nodes.media import (
 )
 from book_review_api.graph.state import BookReviewState
 from book_review_api.queue import ArqJobRunner
+from book_review_api.storyboard.duration import estimate_seconds, scene_seconds
 from book_review_api.storyboard.images import image_plan
 from book_review_api.storyboard.schema import Storyboard
 from book_review_worker.media.ffmpeg import probe_duration
@@ -73,15 +74,21 @@ def main(args: list[str]) -> None:
     if out2.get("status") == "failed":
         sys.exit(f"build_timeline lỗi: {out2.get('error_code')}")
     tl = out2["timeline"]
+    narrations = {s["id"]: s["narration_vi"] for s in storyboard["scenes"]}
     for scene in tl["scenes"]:
         probed = probe_duration(Path(settings.media_dir) / scene["audio_path"])
         shots = [round(s["end_s"] - s["start_s"], 2) for s in scene["shots"]]
         print(
             f"cảnh {scene['scene_id']}: {scene['start_s']:.2f}–{scene['end_s']:.2f}s, "
             f"{len(scene['words'])} từ, file {probed:.2f}s, lời {scene['narration_s']:.2f}s, "
-            f"shot {shots}"
+            f"ước tính {scene_seconds(narrations.get(scene['scene_id'], '')):.2f}s, shot {shots}"
         )
-    print(f"tổng {tl['total_duration_s']:.2f}s, {out['cost']['tts_chars']:.0f} ký tự TTS")
+    estimated = estimate_seconds(narrations.values())
+    total = tl["total_duration_s"]
+    print(
+        f"tổng {total:.2f}s, ước tính {estimated:.2f}s (lệch {(total - estimated) / total:+.1%}), "
+        f"{out['cost']['tts_chars']:.0f} ký tự TTS"
+    )
 
     state = {**state, **out, "timeline": tl, "asset_refs": {**out["asset_refs"]}}  # type: ignore[typeddict-item]
     for name, make in (

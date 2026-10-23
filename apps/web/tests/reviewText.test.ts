@@ -55,12 +55,12 @@ test("file quá 200 KB, sai đuôi, không phải UTF-8 thì báo lỗi", async 
   await assert.rejects(readReviewFile(file("a.txt", new Uint8Array([0xff, 0xfe, 0xc3]))), /UTF-8/);
 });
 
-test("thời lượng và ngưỡng khớp API: mỗi ô một cảnh", () => {
+test("thời lượng: ~25 âm tiết một cảnh, Hook luôn 1 cảnh", () => {
   const main = "một ".repeat(76);
-  // 76 âm tiết / 3,8 + 0,45 = 20,45 giây.
-  assert.ok(Math.abs(reviewSeconds({ ...EMPTY_FIELDS, main }) - 20.45) < 1e-9);
+  // 76 âm tiết / 3,8 + 4 cảnh × 0,45 = 21,8 giây.
+  assert.ok(Math.abs(reviewSeconds({ ...EMPTY_FIELDS, main }) - 21.8) < 1e-9);
   const two = reviewSeconds({ hook: "hai ".repeat(38), main, comment: "" });
-  assert.ok(Math.abs(two - 20.45 - 10.45) < 1e-9);
+  assert.ok(Math.abs(two - 21.8 - 10.45) < 1e-9);
   const check = checkReview({ hook: "a ".repeat(21), main, comment: "" });
   assert.equal(check.tooShort, true);
   assert.equal(check.hookLong, true);

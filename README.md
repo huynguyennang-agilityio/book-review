@@ -4,6 +4,7 @@ Web app nhập tên sách, AI research (RAG) và viết kịch bản có trích 
 
 - Kế hoạch tổng: [docs/project-plan-v5.md](docs/project-plan-v5.md)
 - Kế hoạch theo ngày: [docs/plan/](docs/plan/README.md)
+- Tab "Từ bài review có sẵn" (dán bài có sẵn, lời đọc giữ nguyên văn): [docs/review-text.md](docs/review-text.md)
 
 ## Cấu trúc
 
@@ -39,6 +40,13 @@ pnpm web:dev                  # http://localhost:3000
 ```bash
 uv run python scripts/run_scene_images.py --manual-dir var/manual-samples --make-samples nha-gia-kim
 uv run python scripts/run_media.py var/media/images/storyboard_nha-gia-kim.json
+```
+
+Tab "Từ bài review có sẵn" không qua web (chia cảnh nguyên văn, rồi dựng video), xem [docs/review-text.md](docs/review-text.md):
+
+```bash
+uv run python scripts/run_review_text.py evals/review-text/nha-gia-kim.md --title "Nhà giả kim" --out var/review-text
+uv run python scripts/run_media.py var/review-text/nha-gia-kim.json
 ```
 
 Kiểm tra trước khi push (CI chạy y hệt):

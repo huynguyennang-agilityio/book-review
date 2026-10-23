@@ -1,7 +1,7 @@
 // Dữ liệu và hàm thuần cho tab "Từ bài review có sẵn": 3 ô, tải file, thời lượng ước tính.
 // Không phụ thuộc React để test được bằng `node --test`. Ngưỡng khớp `graph/nodes/review_text.py`.
 
-import { countSyllables, estimateSeconds } from "./script.ts";
+import { countSyllables, SCENE_OVERHEAD_S, SYLLABLES_PER_S } from "./script.ts";
 
 export type RunSource = "book" | "user_review";
 
@@ -71,9 +71,20 @@ export async function readReviewFile(file: {
   return splitReviewText(text.replace(/^﻿/, ""));
 }
 
-// Thời lượng đọc ước tính của cả bài, mỗi ô tính như một cảnh (khớp `review_seconds` của API).
+// API gom ~25 âm tiết (~7 giây) một cảnh (`storyboard/verbatim.py`); mỗi cảnh cộng thêm phần nghỉ.
+export const SCENE_SYLLABLES = 25;
+
+// Thời lượng đọc ước tính của cả bài: Hook là 1 cảnh, Ý chính và Nhận xét ước số cảnh theo độ
+// dài. API chia cảnh thật và đọc số thành chữ nên số cuối (màn duyệt) có thể lệch vài giây.
 export function reviewSeconds(fields: ReviewFields): number {
-  return estimateSeconds([fields.hook, fields.main, fields.comment].filter((t) => t.trim()));
+  let seconds = 0;
+  for (const [key, text] of Object.entries(fields) as [keyof ReviewFields, string][]) {
+    const syllables = countSyllables(text);
+    if (syllables === 0) continue;
+    const scenes = key === "hook" ? 1 : Math.max(1, Math.ceil(syllables / SCENE_SYLLABLES));
+    seconds += syllables / SYLLABLES_PER_S + scenes * SCENE_OVERHEAD_S;
+  }
+  return seconds;
 }
 
 export interface ReviewCheck {

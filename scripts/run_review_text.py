@@ -4,7 +4,8 @@
 
 File `.md` có tiêu đề `## Hook`, `## Ý chính`, `## Nhận xét` thì tách vào 3 ô, không thì cả file
 là Ý chính. Cần GOOGLE_API_KEY trong .env. Không nạp RAG (không cần DB). In số cảnh, thời lượng
-ước tính và chi phí; `--json` in cả storyboard.
+ước tính và chi phí; `--json` in cả storyboard; `--out DIR` ghi `DIR/<tên file>.json` để
+`run_media.py` dựng video (đo thời lượng TTS thật so với ước tính).
 """
 
 import argparse
@@ -42,6 +43,7 @@ def main() -> None:
     parser.add_argument("files", nargs="+", type=Path)
     parser.add_argument("--title", help="Tên sách (mặc định lấy từ tên file)")
     parser.add_argument("--json", action="store_true", help="In cả storyboard")
+    parser.add_argument("--out", type=Path, help="Thư mục ghi storyboard JSON cho run_media.py")
     args = parser.parse_args()
     settings = get_settings()
     node = make_ingest_review_node(
@@ -66,6 +68,11 @@ def main() -> None:
         sb = Storyboard.model_validate(out["storyboard"])
         if args.json:
             print(json.dumps(out["storyboard"], ensure_ascii=False, indent=2))
+        if args.out:
+            args.out.mkdir(parents=True, exist_ok=True)
+            target = args.out / f"{path.stem}.json"
+            target.write_text(json.dumps(out["storyboard"], ensure_ascii=False), encoding="utf-8")
+            print("storyboard:", target)
         by_section = {
             s: sum(x.section == s for x in sb.scenes) for s in ("hook", "body", "review_cta")
         }

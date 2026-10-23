@@ -105,8 +105,12 @@ def clean_user_review(raw: Mapping[str, Any] | None) -> UserReview:
 
 
 def review_seconds(review: Mapping[str, str | None]) -> float:
-    """Thời lượng đọc ước tính của cả bài (mỗi ô tính như một cảnh)."""
-    return estimate_seconds(t for f in FIELDS if (t := review.get(f)))
+    """Thời lượng đọc ước tính của cả bài, chia cảnh và đọc số thành chữ y như `ingest_review`
+    nên khớp `estimated_seconds` của storyboard."""
+    scenes = split_review_into_scenes(
+        review.get("hook"), review.get("main") or "", review.get("comment")
+    )
+    return estimate_seconds(s.narration for s in scenes)
 
 
 def excluded_keyword(review: Mapping[str, Any]) -> str | None:
