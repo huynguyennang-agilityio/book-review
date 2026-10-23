@@ -16,7 +16,12 @@ from book_review_api.graph.nodes.scene_images import (
     make_scene_images_node,
 )
 from book_review_api.providers.image_fal import GeneratedImage, ImageAccountError, ImageError
-from book_review_api.storyboard.images import default_prompts, image_plan
+from book_review_api.storyboard.images import (
+    ImagePrompt,
+    cached_prompts,
+    default_prompts,
+    image_plan,
+)
 from book_review_api.storyboard.schema import Storyboard
 
 
@@ -244,3 +249,53 @@ def test_account_error_stops_without_blocked_or_borrowing(tmp_path: Path) -> Non
     assert "status" not in again
     assert len(good.calls) == total - 2
     assert again["cost"]["images"] == total - 2
+
+
+def changing_writer() -> tuple[Any, list[int]]:
+    """Như model thật: mỗi lần gọi viết prompt khác."""
+    calls: list[int] = []
+
+    def write(sb: Storyboard, plan: dict[int, int]) -> dict[int, list[ImagePrompt]]:
+        calls.append(1)
+        base = default_prompts(sb, plan)
+        return {
+            sid: [p.model_copy(update={"prompt_en": f"{p.prompt_en} v{len(calls)}"}) for p in ps]
+            for sid, ps in base.items()
+        }
+
+    return write, calls
+
+
+def test_rerun_reuses_saved_prompts_so_images_are_not_rebought(tmp_path: Path) -> None:
+    c = Settings(media_dir=str(tmp_path), fal_concurrency=1)
+    sbd = storyboard(6)
+    writer, calls = changing_writer()
+    out = make_scene_images_node(BrokeAfter(ok=3), c, prompt_writer=writer)({"storyboard": sbd})
+    assert out["error_code"] == ErrorCode.PROVIDER_QUOTA.value
+
+    total = sum(image_plan(Storyboard.model_validate(sbd), c).values())
+    good = FakeImages()
+    again = make_scene_images_node(good, c, prompt_writer=writer)({"storyboard": sbd})
+    assert "status" not in again
+    assert calls == [1]  # prompt đọc lại từ đĩa, không gọi model lần hai
+    assert len(good.calls) == total - 3
+    assert all(call["prompt"].count(" v1") == 1 for call in good.calls)
+
+
+def test_prompt_cache_is_per_storyboard_and_survives_bad_file(tmp_path: Path) -> None:
+    c = cfg(tmp_path)
+    writer, calls = changing_writer()
+    sb = Storyboard.model_validate(storyboard(2))
+    plan = image_plan(sb, c)
+    cache = tmp_path / "prompts"
+    first = cached_prompts(writer, sb, plan, cache)
+    assert cached_prompts(writer, sb, plan, cache) == first and calls == [1]
+
+    other = sb.model_copy(update={"style_prompt_en": "oil painting"})
+    cached_prompts(writer, other, plan, cache)
+    assert len(calls) == 2  # storyboard khác: khoá khác
+
+    for f in cache.glob("*.json"):
+        f.write_text("{hỏng")
+    cached_prompts(writer, sb, plan, cache)
+    assert len(calls) == 3

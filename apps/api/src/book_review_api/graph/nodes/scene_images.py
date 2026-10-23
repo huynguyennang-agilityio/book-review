@@ -9,7 +9,8 @@
 - Tài khoản Fal bị từ chối (hết tiền, 429...) thì dừng hẳn với `PROVIDER_QUOTA`: không đánh dấu
   `.blocked`, không mượn ảnh, không gửi thêm ảnh nào; nạp tiền xong chạy lại tạo nốt ảnh còn thiếu.
 - Cache theo hash(prompt + seed + tham chiếu + kích thước): chạy lại không tạo và không tính tiền
-  ảnh đã có.
+  ảnh đã có. Prompt (model viết, mỗi lần một khác) cũng lưu ở `images/prompts/` theo storyboard,
+  để chạy lại dùng đúng prompt cũ.
 """
 
 import hashlib
@@ -32,6 +33,7 @@ from book_review_api.providers.image_fal import ImageAccountError, ImageError, I
 from book_review_api.storyboard.images import (
     ImagePrompt,
     PromptWriter,
+    cached_prompts,
     default_prompts,
     image_plan,
 )
@@ -114,7 +116,7 @@ def make_scene_images_node(
         out_dir = media_dir / "images" / "scenes"
         plan = image_plan(sb, cfg)
         writer = prompt_writer or default_prompts
-        prompts = writer(sb, plan)
+        prompts = cached_prompts(writer, sb, plan, media_dir / "images" / "prompts")
         approved = {
             slug: str(v["sheet_path"])
             for slug, v in (state.get("characters_approved") or {}).items()
