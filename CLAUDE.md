@@ -46,3 +46,7 @@ Người dùng chỉ cần kết quả cuối cùng.
 3. Làm trên nhánh riêng, mở PR, đợi CI xanh rồi tự merge (`gh pr merge --merge`). Người dùng đã cho phép rõ ràng việc tự merge trên máy Mac, không cần hỏi lại. Không push thẳng `main`.
 4. Chỉ dừng lại báo người dùng khi lỗi do quota, rate limit, giới hạn key, key thiếu/hết hạn, hoặc việc cần họ quyết định.
 5. Báo cáo cuối chỉ nêu kết quả: đã làm gì, PR nào đã merge, script cho ra gì, chi phí nếu có.
+
+## Skills
+
+`.claude/skills/`: `create-tasks` (chia plan artifact thành task), `doing-tasks` (làm hết list task, tự PR + merge, không chạy eval trừ khi được bảo, cuối cùng gom issue thành artifact).
