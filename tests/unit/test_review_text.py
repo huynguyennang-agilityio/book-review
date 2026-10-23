@@ -335,3 +335,12 @@ def test_user_review_graph_stops_at_review_with_storyboard() -> None:
     assert snap.next == ("review_script",)
     assert snap.values["storyboard"]["scenes"][0]["narration_vi"] == "Mở đầu."
     assert snap.values["cost_estimate"]
+
+
+def test_review_screen_payload_has_user_review() -> None:
+    graph = build_graph(InMemorySaver())
+    visited(graph, state(review(hook="Mở đầu.")))
+    payload = graph.get_state(config()).interrupts[0].value
+    assert payload["type"] == "review_script"
+    assert payload["user_review"]["hook"] == "Mở đầu."
+    assert payload["storyboard"]["source"] == "user_review"

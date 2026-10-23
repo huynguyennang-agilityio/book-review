@@ -139,7 +139,8 @@ label.check {
 }
 
 input:not([type="checkbox"]),
-select {
+select,
+textarea {
   padding: 8px 10px;
   border: 1px solid var(--line);
   border-radius: 6px;
@@ -583,4 +584,46 @@ button.danger {
   border-radius: 8px;
   padding: 0.5rem 0.75rem;
   margin: 0.5rem 0;
+}
+
+/* Tab "Từ bài review có sẵn" */
+textarea {
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.tabs {
+  display: flex;
+  gap: 4px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.tabs button {
+  background: none;
+  color: var(--foreground);
+  border-radius: 6px 6px 0 0;
+  border-bottom: 2px solid transparent;
+}
+
+.tabs button[aria-selected="true"] {
+  border-bottom-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.verbatim-block {
+  font-size: 14px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.cited {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  border-radius: 3px;
+}
+
+.tts-change {
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
 }

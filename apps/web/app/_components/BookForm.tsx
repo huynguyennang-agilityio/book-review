@@ -3,7 +3,7 @@
 import { useState } from "react";
 import type { Options } from "../_lib/run";
 
-const VOICES = [
+export const VOICES = [
   { id: "vi-VN-HoaiMyNeural", label: "Hoài My (nữ)" },
   { id: "vi-VN-NamMinhNeural", label: "Nam Minh (nam)" },
 ];

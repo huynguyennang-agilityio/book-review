@@ -7,17 +7,22 @@
 Script tự thêm một người dùng thử vào `auth.users` của DB local rồi ký JWT HS256 bằng
 `SUPABASE_JWT_SECRET` (chỉ dùng với Postgres local, không dùng với Supabase thật).
 Nếu graph dừng ở `identify_confirm` thì chọn ứng viên `--pick` và chạy tiếp (resume).
+
+Tab "Từ bài review có sẵn": `--review evals/review-text/nha-gia-kim.md` gửi bài (`.md` có
+`## Hook` / `## Ý chính` / `## Nhận xét` thì tách 3 ô) thay cho research.
 """
 
 import argparse
 import json
 import time
 import uuid
+from pathlib import Path
 from typing import Any
 
 import httpx
 import jwt
 import psycopg
+from run_review_text import split_fields
 
 from book_review_api.config import get_settings
 from book_review_api.graph.build import NODES
@@ -58,6 +63,7 @@ def main() -> None:
     parser.add_argument(
         "--approve", action="store_true", help="tự duyệt kịch bản (review_script) để dựng video"
     )
+    parser.add_argument("--review", type=Path, help="file bài review (.txt/.md) cho tab review")
     parser.add_argument(
         "--print-token", action="store_true", help="chỉ in user_id và JWT thử (để dán vào web)"
     )
@@ -85,12 +91,20 @@ def main() -> None:
         return
     headers = {"Authorization": f"Bearer {token}"}
     with httpx.Client(base_url=args.api) as client:
-        project = client.post("/projects", json={"book_title": args.title}, headers=headers).json()
-        print("project:", project["id"], project["status"])
+        state: dict[str, Any] = {"book": {"title": args.title}}
+        source = "book"
+        if args.review:
+            source = "user_review"
+            state["options"] = {"source": source}
+            state["user_review"] = split_fields(args.review.read_text(encoding="utf-8"))
+        project = client.post(
+            "/projects", json={"book_title": args.title, "source": source}, headers=headers
+        ).json()
+        print("project:", project["id"], project["status"], project.get("source"))
         base = {
             "threadId": project["thread_id"],
             "runId": str(uuid.uuid4()),
-            "state": {"book": {"title": args.title}},
+            "state": state,
             "messages": [{"id": "m1", "role": "user", "content": args.title}],
             "tools": [],
             "context": [],

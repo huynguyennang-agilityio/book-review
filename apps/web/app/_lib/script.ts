@@ -1,5 +1,17 @@
 // Dữ liệu và hàm thuần cho màn duyệt kịch bản (interrupt `review_script`).
 
+// Chỗ lời đọc khác chữ người dùng viết (tab review có sẵn), vd "1.200" đọc "một nghìn hai trăm".
+export interface TtsChange {
+  from: string;
+  to: string;
+}
+
+export interface UserReviewText {
+  hook?: string | null;
+  main: string;
+  comment?: string | null;
+}
+
 export interface Citation {
   source_id: string;
   chunk_id: string;
@@ -20,6 +32,7 @@ export interface Scene {
   faithfulness?: number | null;
   flags: string[];
   unsupported: UnsupportedClaim[];
+  tts_changes: TtsChange[];
 }
 
 export interface CostEstimate {
@@ -41,8 +54,11 @@ export interface ReviewPayload {
   evalScores: Record<string, number>;
   costEstimate: CostEstimate;
   spentUsd: number;
-  // Thời lượng mục tiêu (số phút đã chọn), null với storyboard cũ.
+  // Thời lượng mục tiêu (số phút đã chọn), null với storyboard cũ và tab review có sẵn.
   targetSeconds: number | null;
+  // "user_review": lời đọc là nguyên văn bài của người dùng, không chấm bám nguồn.
+  source: "book" | "user_review";
+  userReview: UserReviewText | null;
 }
 
 export interface SceneEdit {
@@ -74,6 +90,7 @@ export function parseReview(raw: Record<string, unknown>): ReviewPayload {
   const storyboard = (raw.storyboard ?? {}) as {
     scenes?: Partial<Scene>[];
     target_seconds?: number | null;
+    source?: string;
   };
   const scenes = (storyboard.scenes ?? []).map(
     (s): Scene => ({
@@ -85,6 +102,7 @@ export function parseReview(raw: Record<string, unknown>): ReviewPayload {
       faithfulness: s.faithfulness ?? null,
       flags: s.flags ?? [],
       unsupported: s.unsupported ?? [],
+      tts_changes: s.tts_changes ?? [],
     }),
   );
   const cost = (raw.cost ?? {}) as { usd?: number };
@@ -99,7 +117,49 @@ export function parseReview(raw: Record<string, unknown>): ReviewPayload {
     costEstimate: (raw.cost_estimate ?? {}) as CostEstimate,
     spentUsd: typeof cost.usd === "number" ? cost.usd : 0,
     targetSeconds: typeof storyboard.target_seconds === "number" ? storyboard.target_seconds : null,
+    source: storyboard.source === "user_review" ? "user_review" : "book",
+    userReview: (raw.user_review as UserReviewText | null | undefined) ?? null,
   };
+}
+
+export interface Segment {
+  text: string;
+  // Chữ gốc người dùng viết khi đoạn này là chỗ đã đổi cho TTS.
+  from?: string;
+}
+
+// Tách lời đọc thành đoạn thường và đoạn đã đổi cho TTS (mỗi chỗ đổi khớp một lần, theo thứ tự).
+export function markChanges(narration: string, changes: TtsChange[]): Segment[] {
+  const spans: { start: number; end: number; from: string }[] = [];
+  for (const c of changes) {
+    if (!c.to) continue;
+    let at = narration.indexOf(c.to);
+    while (at >= 0 && spans.some((s) => at < s.end && at + c.to.length > s.start)) {
+      at = narration.indexOf(c.to, at + 1);
+    }
+    if (at >= 0) spans.push({ start: at, end: at + c.to.length, from: c.from });
+  }
+  spans.sort((a, b) => a.start - b.start);
+  const out: Segment[] = [];
+  let cursor = 0;
+  for (const s of spans) {
+    if (s.start > cursor) out.push({ text: narration.slice(cursor, s.start) });
+    out.push({ text: narration.slice(s.start, s.end), from: s.from });
+    cursor = s.end;
+  }
+  if (cursor < narration.length) out.push({ text: narration.slice(cursor) });
+  return out;
+}
+
+// Vị trí câu trích (quote của citation) trong văn bản gốc, bỏ qua khác biệt khoảng trắng.
+// Trả [đầu, khớp, cuối] hoặc null nếu không tìm thấy (vd bài có markdown đã bị bỏ ở API).
+export function findQuote(text: string, quote: string): [string, string, string] | null {
+  const words = quote.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return null;
+  const escaped = words.map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const m = new RegExp(escaped.join("\\s+"), "u").exec(text);
+  if (!m) return null;
+  return [text.slice(0, m.index), m[0], text.slice(m.index + m[0].length)];
 }
 
 // Ước lượng thời lượng đọc, khớp `storyboard/duration.py`: ~3,8 âm tiết/giây (edge-tts, spike
