@@ -2,6 +2,7 @@
 
 import { HttpAgent, type Interrupt, type RunAgentParameters } from "@ag-ui/client";
 import { useCallback, useRef, useState } from "react";
+import type { CostEstimate } from "./budget";
 import { emptyDraft, resetDraft, type ImageMode, type UploadDraft } from "./images";
 import { keepPending } from "./interrupts";
 import { NODES } from "./nodes";
@@ -67,6 +68,8 @@ export const ERROR_TEXT: Record<string, string> = {
   GENRE_EXCLUDED: "Thể loại sách này chưa được hỗ trợ.",
   BUDGET_EXCEEDED: "Đã vượt hạn mức chi phí cho phép.",
   PROVIDER_UNAVAILABLE: "Dịch vụ AI tạm thời không phản hồi, vui lòng thử lại sau.",
+  PROVIDER_QUOTA:
+    "Tài khoản tạo ảnh (Fal) hết tiền hoặc đang bị giới hạn. Nạp thêm hoặc đợi vài phút rồi bấm Thử lại.",
   LOW_FAITHFULNESS: "Kịch bản có trích dẫn không khớp nguồn. Bấm Thử lại để viết lại.",
   RENDER_FAILED: "Dựng video thất bại.",
   CANCELLED: "Yêu cầu đã bị huỷ.",
@@ -164,6 +167,11 @@ export function useReviewRun(getToken: () => Promise<string>) {
   // Node đã bắt đầu/kết thúc, giữ qua các lần resume của cùng một project.
   const progressRef = useRef({ started: new Set<string>(), finished: new Set<string>() });
   const [cost, setCost] = useState<number | null>(null);
+  // Số ảnh đã trả tiền và ước tính chi phí media: để gợi ý ngân sách mới khi BUDGET_EXCEEDED.
+  const [imagesBought, setImagesBought] = useState(0);
+  const [costEstimate, setCostEstimate] = useState<CostEstimate | null>(null);
+  // Mã lỗi của lần chạy vừa thất bại (null khi đang chạy hoặc xong).
+  const [errorCode, setErrorCode] = useState<string | null>(null);
   const [outputs, setOutputs] = useState<OutputFile[]>([]);
   const [imageMode, setImageMode] = useState<ImageMode | null>(null);
   // Tab của run hiện tại: "book" (từ tên sách) hoặc "user_review" (bài review có sẵn).
@@ -179,6 +187,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
     async (agent: HttpAgent, params: RunAgentParameters) => {
       setStatus("running");
       setPending(null);
+      setErrorCode(null);
       // Token Supabase hết hạn sau ~1 giờ: lấy lại mỗi lần chạy.
       agent.headers = { authorization: `Bearer ${await getToken()}` };
       const { started, finished } = progressRef.current;
@@ -226,7 +235,8 @@ export function useReviewRun(getToken: () => Promise<string>) {
           onStateSnapshotEvent: ({ event }) => {
             const snap = event.snapshot as
               | {
-                  cost?: { usd?: number };
+                  cost?: { usd?: number; images?: number };
+                  cost_estimate?: CostEstimate | null;
                   status?: string;
                   error_code?: string;
                   options?: { image_mode?: string };
@@ -238,6 +248,9 @@ export function useReviewRun(getToken: () => Promise<string>) {
               costRef.current = usd;
               setCost(usd);
             }
+            const images = snap?.cost?.images;
+            if (typeof images === "number") setImagesBought(images);
+            if (snap?.cost_estimate) setCostEstimate(snap.cost_estimate);
             const mode = snap?.options?.image_mode;
             if (mode === "auto" || mode === "manual") setImageMode(mode);
             finalRef.current = {
@@ -267,6 +280,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
               say("assistant", codeText(errorCode ?? "CANCELLED"));
             } else if (final === "failed" || final === "rejected") {
               setStatus("failed");
+              setErrorCode(errorCode ?? "INTERNAL_ERROR");
               say("error", codeText(errorCode ?? "INTERNAL_ERROR"));
             } else {
               setStatus("done");
@@ -321,6 +335,8 @@ export function useReviewRun(getToken: () => Promise<string>) {
       progressRef.current = { started: new Set(), finished: new Set() };
       setCost(null);
       costRef.current = null;
+      setImagesBought(0);
+      setCostEstimate(null);
       finalRef.current = {};
       setOutputs([]);
       setImageMode(null);
@@ -380,12 +396,18 @@ export function useReviewRun(getToken: () => Promise<string>) {
 
   // Chạy lại sách vừa lỗi (lỗi tạm thời của nhà cung cấp) mà không phải nhập lại.
   // Có project rồi thì chạy tiếp từ bước vừa lỗi (API tua checkpoint); chưa có thì bắt đầu lại.
-  const retry = useCallback(async () => {
+  // `budgetUsd`: ngân sách mới khi lỗi là BUDGET_EXCEEDED, API ghi vào state trước khi chạy tiếp.
+  const retry = useCallback(async (budgetUsd?: number) => {
     const agent = agentRef.current;
     if (agent && projectRef.current) {
       cancelledRef.current = false;
       finalRef.current = {};
       setStatus("running");
+      if (budgetUsd != null) {
+        await execute(agent, { forwardedProps: { budget_usd: budgetUsd } });
+        if (finalRef.current.status) setBudget(budgetUsd); // API đã nhận ngân sách mới
+        return;
+      }
       await execute(agent, {});
       return;
     }
@@ -519,6 +541,9 @@ export function useReviewRun(getToken: () => Promise<string>) {
     pending,
     cost,
     budget,
+    imagesBought,
+    costEstimate,
+    errorCode,
     cancelling,
     start,
     retry,
