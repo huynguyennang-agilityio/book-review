@@ -3,6 +3,7 @@
 Mọi lần gọi model dùng structured output. Citation do model chọn theo số thứ tự đoạn
 (`[1]`, `[2]`...) rồi được đổi thành `chunk_id`/`source_id` thật, nên model không thể bịa id.
 Phần nào vi phạm validator thì được gửi lại kèm danh sách lỗi, tối đa `storyboard_retries` lần.
+Hết lượt vẫn còn cảnh trích sai thì sửa riêng từng cảnh đó, sửa không được mới bỏ cảnh.
 """
 
 import logging
@@ -267,7 +268,7 @@ class StoryboardWriter:
         needs_cite = part.section in CITED_SECTIONS
         if needs_cite and not passages:
             raise StoryboardError(f"Không tìm được đoạn nguồn nào cho phần {part.section}")
-        numbered = "\n\n".join(f"[{i}] {c.content}" for i, c in enumerate(passages, start=1))
+        numbered = _numbered(passages)
         human = (
             f"{self._context(book, kind)}\n\nViết phần `{part.section}`: {part.brief}\n"
             + (
@@ -304,13 +305,82 @@ class StoryboardWriter:
             ]
         if best is not None:
             return best
-        # Viết lại hết lượt vẫn còn trích sai: bỏ trích sai, bỏ cảnh không còn trích nào, giữ phần
-        # còn lại thay vì huỷ cả kịch bản.
+        # Viết lại hết lượt vẫn còn trích sai: sửa riêng từng cảnh sai, rồi bỏ trích sai, bỏ cảnh
+        # không còn trích nào, giữ phần còn lại thay vì huỷ cả kịch bản.
+        scenes = self._repair_scenes(book, kind, scenes, passages, by_id, previous)
+        problems = [p for s in scenes for p in scene_problems(s, by_id)]
         kept = salvage_scenes(scenes, by_id, next_id)
         if kept:
-            log.warning("storyboard: phần %s bỏ cảnh trích sai: %s", part.section, problems)
+            if problems:
+                log.warning("storyboard: phần %s bỏ cảnh trích sai: %s", part.section, problems)
             return kept
         raise StoryboardError(f"Phần {part.section} không qua kiểm tra citation", problems)
+
+    def _repair_scenes(
+        self,
+        book: BookIdentity,
+        kind: str,
+        scenes: Sequence[Scene],
+        passages: Sequence[Chunk],
+        by_id: dict[str, Chunk],
+        previous: Sequence[Scene],
+    ) -> list[Scene]:
+        """Thay từng cảnh trích sai bằng bản sửa riêng; cảnh sửa không được thì giữ nguyên."""
+        out: list[Scene] = []
+        for scene in scenes:
+            if scene_problems(scene, by_id):
+                others = [*previous, *(s for s in scenes if s.id != scene.id)]
+                fixed = self._repair_scene(book, kind, scene, passages, by_id, others)
+                log.info(
+                    "storyboard: cảnh %d (%s) %s",
+                    scene.id,
+                    scene.section,
+                    "đã sửa riêng" if fixed else "sửa riêng không được",
+                )
+                scene = fixed or scene
+            out.append(scene)
+        return out
+
+    def _repair_scene(
+        self,
+        book: BookIdentity,
+        kind: str,
+        scene: Scene,
+        passages: Sequence[Chunk],
+        by_id: dict[str, Chunk],
+        others: Sequence[Scene],
+    ) -> Scene | None:
+        """Viết lại riêng một cảnh trích sai, giữ id; tối đa `storyboard_scene_repairs` lần."""
+        problems = scene_problems(scene, by_id)
+        human = (
+            f"{self._context(book, kind)}\n\n"
+            f"Cảnh {scene.id} của phần `{scene.section}` có trích dẫn sai:\n- "
+            + "\n- ".join(problems)
+            + f"\n\nLời đọc hiện tại:\n{scene.narration_vi}\n\n"
+            "Viết lại RIÊNG cảnh này: giữ ý và độ dài lời đọc; mỗi citation chép NGUYÊN VĂN từ "
+            f"đoạn nguồn, quote tối đa {MAX_QUOTE_CHARS} ký tự. Nếu các đoạn nguồn không có ý này "
+            "thì viết một cảnh khác cùng chủ đề, chỉ dùng thông tin trong các đoạn nguồn.\n\n"
+            + _previous_block(others)
+            + f"Các đoạn nguồn:\n{_numbered(passages)}"
+        )
+        messages: list[BaseMessage] = [SystemMessage(self._system), HumanMessage(human)]
+        for _ in range(self.settings.storyboard_scene_repairs):
+            try:
+                d = self._call(SceneDraft, messages)
+            except StoryboardError as e:
+                log.warning("storyboard: sửa riêng cảnh %d lỗi model: %s", scene.id, e)
+                return None
+            fixed, found = self._resolve(
+                SectionDraft(scenes=[d]), scene.section, passages, by_id, scene.id
+            )
+            if fixed and not found:
+                return fixed[0]
+            messages = [
+                *messages,
+                AIMessage(d.model_dump_json()),
+                HumanMessage("Sửa các lỗi sau rồi viết lại cảnh:\n- " + "\n- ".join(found)),
+            ]
+        return None
 
     def _resolve(
         self,
@@ -407,6 +477,10 @@ class StoryboardWriter:
 
 def _seconds(scenes: Sequence[Scene]) -> float:
     return estimate_seconds(s.narration_vi for s in scenes)
+
+
+def _numbered(passages: Sequence[Chunk]) -> str:
+    return "\n\n".join(f"[{i}] {c.content}" for i, c in enumerate(passages, start=1))
 
 
 def _previous_block(previous: Sequence[Scene]) -> str:
