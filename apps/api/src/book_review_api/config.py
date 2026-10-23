@@ -85,6 +85,8 @@ class Settings(BaseSettings):
     # Ước tính chi phí media (ngày 11). Seedream v4 edit 0,03 USD/ảnh (ADR 0003); edge-tts miễn
     # phí; I2V (Phase 2) tính theo clip, `i2v_clips` = 0 khi chưa bật.
     price_image_usd: float = 0.03
+    # Trần ngân sách người dùng được đặt khi chạy lại project lỗi, chặn gõ nhầm.
+    max_budget_usd: float = 20.0
     images_per_scene: int = 1
     character_sheet_images: int = 4
     # Số nhân vật chính tối đa được tạo sheet (ngày 16) và kích thước sheet (ngang, nhiều góc).
