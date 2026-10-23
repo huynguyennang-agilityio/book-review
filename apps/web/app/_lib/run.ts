@@ -3,35 +3,11 @@
 import { HttpAgent, type Interrupt, type RunAgentParameters } from "@ag-ui/client";
 import { useCallback, useRef, useState } from "react";
 import { emptyDraft, resetDraft, type ImageMode, type UploadDraft } from "./images";
+import { NODES } from "./nodes";
+import type { RunSource } from "./reviewText";
 import type { RewriteResult, SceneEdit } from "./script";
 
-// Node của graph theo thứ tự chạy (apps/api/.../graph/build.py). Tiến độ lấy từ event tuỳ biến
-// `node` do graph tự phát, không dùng `STEP_*` của adapter (lẫn tên bước nội bộ của research agent).
-export const NODES = [
-  { id: "precheck", label: "Kiểm tra tên sách" },
-  { id: "research_agent", label: "Tìm hiểu sách" },
-  { id: "identify_confirm", label: "Xác nhận đúng sách" },
-  { id: "storyboard", label: "Viết kịch bản" },
-  { id: "faithfulness_eval", label: "Kiểm tra bám nguồn" },
-  { id: "estimate_cost", label: "Ước tính chi phí" },
-  { id: "review_script", label: "Duyệt kịch bản" },
-  { id: "tts_align", label: "Tạo giọng đọc" },
-  { id: "build_timeline", label: "Dựng timeline" },
-  { id: "subtitles", label: "Phụ đề" },
-  { id: "choose_image_mode", label: "Chọn cách làm ảnh" },
-  { id: "review_characters", label: "Chọn ảnh nhân vật", mode: "auto" },
-  { id: "scene_images", label: "Ảnh cảnh", mode: "auto" },
-  { id: "manual_images", label: "Tải ảnh lên", mode: "manual" },
-  { id: "motion", label: "Chuyển động" },
-  { id: "compose_render", label: "Ghép video" },
-] as const;
-
-export type NodeId = (typeof NODES)[number]["id"];
-
-// Bước chỉ thuộc một chế độ ảnh bị ẩn khi chế độ đã chọn là chế độ kia (chưa chọn thì coi là auto).
-export function visibleNodes(mode: ImageMode | null) {
-  return NODES.filter((n) => !("mode" in n) || n.mode === (mode ?? "auto"));
-}
+export { NODES, visibleNodes, type NodeId } from "./nodes";
 
 export interface UploadedImage {
   path: string;
@@ -189,6 +165,8 @@ export function useReviewRun(getToken: () => Promise<string>) {
   const [cost, setCost] = useState<number | null>(null);
   const [outputs, setOutputs] = useState<OutputFile[]>([]);
   const [imageMode, setImageMode] = useState<ImageMode | null>(null);
+  // Tab của run hiện tại: "book" (từ tên sách) hoặc "user_review" (bài review có sẵn).
+  const [source, setSource] = useState<RunSource>("book");
   // Ô ảnh manual đã tải, sống qua các lần server hỏi lại (xem `UploadDraft`).
   const [uploadDraft] = useState<UploadDraft>(emptyDraft);
 
@@ -318,11 +296,24 @@ export function useReviewRun(getToken: () => Promise<string>) {
     [getToken, say],
   );
 
-  const lastStartRef = useRef<{ title: string; options: Options; author: string | null } | null>(null);
+  const lastStartRef = useRef<{
+    title: string;
+    options: Options;
+    author: string | null;
+    userReview: Record<string, string> | null;
+  } | null>(null);
 
+  // `userReview` có thì chạy tab "Từ bài review có sẵn": graph bỏ research, đọc nguyên văn bài.
   const start = useCallback(
-    async (title: string, options: Options, author: string | null = null) => {
-      lastStartRef.current = { title, options, author };
+    async (
+      title: string,
+      options: Options,
+      author: string | null = null,
+      userReview: Record<string, string> | null = null,
+    ) => {
+      lastStartRef.current = { title, options, author, userReview };
+      const runSource: RunSource = userReview ? "user_review" : "book";
+      setSource(runSource);
       setMessages([{ role: "user", text: title }]);
       setSources([]);
       setSteps({});
@@ -340,7 +331,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
         const token = await getToken();
         const project = await api<Project>("/projects", token, {
           method: "POST",
-          body: JSON.stringify({ book_title: title, book_author: author }),
+          body: JSON.stringify({ book_title: title, book_author: author, source: runSource }),
         });
         projectRef.current = project;
         const agent = new HttpAgent({
@@ -349,7 +340,9 @@ export function useReviewRun(getToken: () => Promise<string>) {
           // Không gửi `image_mode`: sau khi duyệt kịch bản graph dừng ở `choose_image_mode` để hỏi.
           initialState: {
             book: author ? { title, author } : { title },
-            options,
+            ...(userReview
+              ? { options: { ...options, source: runSource }, user_review: userReview }
+              : { options }),
           },
         });
         agentRef.current = agent;
@@ -385,7 +378,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
       return;
     }
     const last = lastStartRef.current;
-    if (last) await start(last.title, last.options, last.author);
+    if (last) await start(last.title, last.options, last.author, last.userReview);
   }, [execute, start]);
 
   // Huỷ: API đặt cờ để node và worker dừng, chi phí đã tiêu vẫn giữ trong state.
@@ -525,6 +518,7 @@ export function useReviewRun(getToken: () => Promise<string>) {
     chooseImageMode,
     uploadImage,
     imageMode,
+    source,
     uploadDraft,
     loadImage,
   };

@@ -5,9 +5,11 @@ import { errorText, type Pending, type Source } from "../_lib/run";
 import {
   CITED,
   estimateSeconds,
+  findQuote,
   formatDuration,
   isShortScript,
   isUrl,
+  markChanges,
   parseReview,
   type RewriteResult,
   SECTION_LABEL,
@@ -18,6 +20,7 @@ import {
   splitSentences,
   unsupportedSentences,
   type UnsupportedClaim,
+  type UserReviewText,
 } from "../_lib/script";
 
 interface Draft {
@@ -64,6 +67,72 @@ function SourceLink({
   );
 }
 
+// Tab review có sẵn: lời đọc nguyên văn, chỉ gạch chân chỗ số/ký hiệu đã đọc thành chữ.
+function VerbatimNarration({ scene, draft }: { scene: Scene; draft: Draft }) {
+  // Sửa tay rồi thì vị trí chỗ đổi không còn đúng.
+  const changes = draft.narration === scene.narration_vi ? scene.tts_changes : [];
+  return (
+    <p className="narration">
+      {markChanges(draft.narration, changes).map((seg, i) =>
+        seg.from ? (
+          <span
+            key={i}
+            className="tts-change"
+            data-testid="tts-change"
+            title={`Bài viết "${seg.from}", đọc thành chữ`}
+          >
+            {seg.text}
+          </span>
+        ) : (
+          <span key={i}>{seg.text}</span>
+        ),
+      )}
+    </p>
+  );
+}
+
+const REVIEW_BLOCKS: { key: keyof UserReviewText; label: string }[] = [
+  { key: "hook", label: "Hook" },
+  { key: "main", label: "Ý chính" },
+  { key: "comment", label: "Nhận xét" },
+];
+
+// Nguồn của tab review có sẵn là chính bài của người dùng: 3 khối, tô câu của cảnh đang chọn.
+function ReviewBlocks({ review, quote }: { review: UserReviewText; quote: string | null }) {
+  // Chỉ tô ở khối đầu tiên chứa câu trích.
+  const hits = REVIEW_BLOCKS.map(({ key }) => {
+    const text = review[key];
+    return text && quote ? findQuote(text, quote) : null;
+  });
+  const first = hits.findIndex(Boolean);
+  return (
+    <>
+      <h4>Bài review của bạn</h4>
+      {REVIEW_BLOCKS.map(({ key, label }, i) => {
+        const text = review[key];
+        if (!text) return null;
+        const hit = i === first ? hits[i] : null;
+        return (
+          <div key={key}>
+            <p className="muted">{label}</p>
+            <p className="verbatim-block" data-testid={`review-block-${key}`}>
+              {hit ? (
+                <>
+                  {hit[0]}
+                  <mark className="cited">{hit[1]}</mark>
+                  {hit[2]}
+                </>
+              ) : (
+                text
+              )}
+            </p>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
 function Narration({ scene, draft }: { scene: Scene; draft: Draft }) {
   const sentences = splitSentences(draft.narration);
   // Chỉ tô khi lời đọc vẫn là bản đã được chấm; sửa tay rồi thì điểm cũ không còn đúng.
@@ -107,6 +176,8 @@ export function ScriptReview({
   onRewrite: (sceneId: number, instruction: string, narration: string) => Promise<RewriteResult>;
 }) {
   const review = useMemo(() => parseReview(pending.raw), [pending.raw]);
+  // Tab review có sẵn: lời đọc nguyên văn, không chấm bám nguồn, không viết lại bằng AI.
+  const verbatim = review.source === "user_review";
   const [drafts, setDrafts] = useState<Record<number, Draft>>(() =>
     Object.fromEntries(review.scenes.map((s) => [s.id, initialDraft(s)])),
   );
@@ -173,14 +244,22 @@ export function ScriptReview({
     <section className="card review" data-testid="script-review">
       <h3>{pending.message || "Duyệt kịch bản trước khi dựng video."}</h3>
       <div className="stats">
-        <span>
-          Bám nguồn: <strong>{pct(score)}</strong>
-        </span>
-        <span className={lowScenes.length ? "bad" : "good"} data-testid="low-faithfulness">
-          {lowScenes.length
-            ? `LOW_FAITHFULNESS: ${lowScenes.length} cảnh (${lowScenes.map((s) => s.id).join(", ")})`
-            : "Không có cảnh nào điểm thấp"}
-        </span>
+        {verbatim ? (
+          <span data-testid="verbatim">
+            Lời đọc: <strong>Nguyên văn</strong>
+          </span>
+        ) : (
+          <>
+            <span>
+              Bám nguồn: <strong>{pct(score)}</strong>
+            </span>
+            <span className={lowScenes.length ? "bad" : "good"} data-testid="low-faithfulness">
+              {lowScenes.length
+                ? `LOW_FAITHFULNESS: ${lowScenes.length} cảnh (${lowScenes.map((s) => s.id).join(", ")})`
+                : "Không có cảnh nào điểm thấp"}
+            </span>
+          </>
+        )}
         <span data-testid="cost-estimate">
           Ước tính dựng video: <strong>${estimate.toFixed(2)}</strong>
           {review.costEstimate.images != null && ` (${review.costEstimate.images} ảnh)`}
@@ -221,7 +300,9 @@ export function ScriptReview({
                       <span className="chip bad">LOW_FAITHFULNESS</span>
                     )}
                     {d.edited && <span className="chip">Đã sửa</span>}
-                    {CITED.has(s.section) && <span className="chip">{pct(d.score)}</span>}
+                    {!verbatim && CITED.has(s.section) && (
+                      <span className="chip">{pct(d.score)}</span>
+                    )}
                   </span>
                 </button>
                 {isOpen ? (
@@ -244,34 +325,40 @@ export function ScriptReview({
                   </div>
                 ) : (
                   <>
-                    <Narration scene={s} draft={d} />
+                    {verbatim ? (
+                      <VerbatimNarration scene={s} draft={d} />
+                    ) : (
+                      <Narration scene={s} draft={d} />
+                    )}
                     {d.onScreen && <p className="muted">Chữ trên màn hình: {d.onScreen}</p>}
                     <button type="button" className="link" onClick={() => setEditing(s.id)}>
                       Sửa
                     </button>
                   </>
                 )}
-                <div className="ask">
-                  <input
-                    aria-label={`Yêu cầu viết lại cảnh ${s.id}`}
-                    placeholder="Viết lại bằng lời, ví dụ: ngắn hơn, bớt khô khan"
-                    value={asks[s.id] ?? ""}
-                    onChange={(e) => setAsks((a) => ({ ...a, [s.id]: e.target.value }))}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") {
-                        e.preventDefault();
-                        void rewrite(s);
-                      }
-                    }}
-                  />
-                  <button
-                    type="button"
-                    disabled={working !== null || busy || !(asks[s.id] ?? "").trim()}
-                    onClick={() => void rewrite(s)}
-                  >
-                    {working === s.id ? "Đang viết lại…" : "Viết lại"}
-                  </button>
-                </div>
+                {!verbatim && (
+                  <div className="ask">
+                    <input
+                      aria-label={`Yêu cầu viết lại cảnh ${s.id}`}
+                      placeholder="Viết lại bằng lời, ví dụ: ngắn hơn, bớt khô khan"
+                      value={asks[s.id] ?? ""}
+                      onChange={(e) => setAsks((a) => ({ ...a, [s.id]: e.target.value }))}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          void rewrite(s);
+                        }
+                      }}
+                    />
+                    <button
+                      type="button"
+                      disabled={working !== null || busy || !(asks[s.id] ?? "").trim()}
+                      onClick={() => void rewrite(s)}
+                    >
+                      {working === s.id ? "Đang viết lại…" : "Viết lại"}
+                    </button>
+                  </div>
+                )}
                 {notes[s.id] && <p className="muted">{notes[s.id]}</p>}
               </li>
             );
@@ -279,7 +366,9 @@ export function ScriptReview({
         </ol>
 
         <aside className="citations" aria-label="Nguồn trích dẫn">
-          {scene ? (
+          {scene && verbatim && review.userReview ? (
+            <ReviewBlocks review={review.userReview} quote={scene.citations[0]?.quote ?? null} />
+          ) : scene ? (
             <>
               <h4>Nguồn của cảnh {scene.id}</h4>
               {scene.citations.length === 0 ? (

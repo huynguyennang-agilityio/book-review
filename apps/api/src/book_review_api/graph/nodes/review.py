@@ -127,6 +127,8 @@ def make_review_script(lookup: SourceLookup | None = None) -> NodeFn:
                 "low_faithfulness_scenes": flagged,
                 "cost": state.get("cost") or {},
                 "cost_estimate": state.get("cost_estimate") or {},
+                # Tab review có sẵn: màn duyệt hiện bài gốc làm nguồn của từng cảnh.
+                "user_review": state.get("user_review"),
             }
         )
         if update or not decision.get("edits"):
