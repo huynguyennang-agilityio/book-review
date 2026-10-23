@@ -374,8 +374,38 @@ def scenes_draft(n: int, cited: bool = True, narration: str = LONG_NARRATION) ->
 
 
 def test_section_draft_allows_long_sections() -> None:
-    """Trần 6 cảnh cũ làm video 3 phút tối đa 19 cảnh (body cần 11)."""
-    assert len(scenes_draft(11).scenes) == 11
+    """Trần 6 cảnh cũ làm video 3 phút tối đa 19 cảnh (body cần 15)."""
+    assert len(scenes_draft(27).scenes) == 27
+
+
+def test_section_split_follows_review_structure() -> None:
+    from book_review_api.storyboard.schema import section_max_scenes
+
+    assert section_max_scenes(1) == {"hook": 1, "context": 2, "body": 4, "review_cta": 2}
+    assert section_max_scenes(3) == {"hook": 1, "context": 4, "body": 15, "review_cta": 4}
+    five = section_max_scenes(5)
+    assert sum(five.values()) == 40 and five["body"] == 27
+
+
+def test_later_sections_see_earlier_scenes() -> None:
+    """Phần sau nhận lời đọc của các cảnh đã viết để không giới thiệu lại nhân vật."""
+    w, model = make_writer(
+        [
+            outline(),
+            scenes_draft(1, cited=False, narration="Câu mở đầu."),
+            scenes_draft(4),
+            scenes_draft(15),
+            scenes_draft(4, cited=False),
+        ],
+        storyboard_minutes=3,
+    )
+    w.write(w_book(), "fiction")
+    hook_prompt = model.calls[1][1][-1].content
+    body_prompt = model.calls[3][1][-1].content
+    assert "KHÔNG lặp lại" not in hook_prompt
+    assert "KHÔNG lặp lại" in body_prompt
+    assert "(hook) Câu mở đầu." in body_prompt
+    assert body_prompt.count("(context)") == 4
 
 
 def test_long_video_retries_short_section_until_long_enough() -> None:
@@ -384,9 +414,9 @@ def test_long_video_retries_short_section_until_long_enough() -> None:
             outline(),
             scenes_draft(1, cited=False),  # hook
             scenes_draft(2),  # context: thiếu cảnh -> viết lại
-            scenes_draft(6),
-            scenes_draft(11),  # body
-            scenes_draft(6, cited=False),  # review_cta
+            scenes_draft(4),
+            scenes_draft(15),  # body
+            scenes_draft(4, cited=False),  # review_cta
         ],
         storyboard_minutes=3,
     )
@@ -395,7 +425,7 @@ def test_long_video_retries_short_section_until_long_enough() -> None:
     assert [s.id for s in sb.scenes] == list(range(1, 25))
     retry = model.calls[3][1][-1].content
     assert "Phần context mới có 2 cảnh" in retry
-    assert "cần 6 cảnh" in retry
+    assert "cần 4 cảnh" in retry
     assert sb.flags == []
     assert sb.target_seconds == 180
     assert sb.estimated_seconds is not None and sb.estimated_seconds >= 162
@@ -407,10 +437,10 @@ def test_short_narration_counts_as_too_short_even_with_enough_scenes() -> None:
         [
             outline(),
             scenes_draft(1, cited=False),
-            scenes_draft(6, narration="Cậu bé đi."),
-            scenes_draft(6),
-            scenes_draft(11),
-            scenes_draft(6, cited=False),
+            scenes_draft(4, narration="Cậu bé đi."),
+            scenes_draft(4),
+            scenes_draft(15),
+            scenes_draft(4, cited=False),
         ],
         storyboard_minutes=3,
     )
@@ -425,16 +455,16 @@ def test_section_still_short_after_retries_keeps_longest_and_flags() -> None:
         [
             outline(),
             scenes_draft(1, cited=False),
-            scenes_draft(1),
-            scenes_draft(2),  # dài nhất
-            scenes_draft(1),
-            scenes_draft(11),
-            scenes_draft(5, cited=False),
+            scenes_draft(4),
+            scenes_draft(8),  # body: thiếu cả ba lần, bản thứ hai dài nhất
+            scenes_draft(10),
+            scenes_draft(9),
+            scenes_draft(4, cited=False),
         ],
         storyboard_minutes=3,
     )
     sb = w.write(w_book(), "fiction")
-    assert len([s for s in sb.scenes if s.section == "context"]) == 2
+    assert len([s for s in sb.scenes if s.section == "body"]) == 10
     assert len(sb.scenes) == 19
     assert sb.flags == ["SHORT_SCRIPT"]
     assert len(model.calls) == 7
@@ -456,15 +486,15 @@ def test_hint_asks_for_exact_scene_count_and_length() -> None:
         [
             outline(),
             scenes_draft(1, cited=False),
-            scenes_draft(6),
-            scenes_draft(11),
-            scenes_draft(6, cited=False),
+            scenes_draft(4),
+            scenes_draft(15),
+            scenes_draft(4, cited=False),
         ],
         storyboard_minutes=3,
     )
     w.write(w_book(), "fiction")
     body_prompt = model.calls[3][1][-1].content
-    assert "ĐÚNG 11 cảnh" in body_prompt
+    assert "ĐÚNG 15 cảnh" in body_prompt
     assert "khoảng 27 từ" in body_prompt
     hook_prompt = model.calls[1][1][-1].content
     assert "ĐÚNG" not in hook_prompt

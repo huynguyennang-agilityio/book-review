@@ -51,13 +51,16 @@ PROMPT_VERSION = ACTIVE_PROMPTS["storyboard"]
 # Số đoạn tối đa đưa cho model viết một phần.
 MAX_PASSAGES = 12
 # Trần số cảnh trong một lần trả lời của model. Phải lớn hơn số cảnh của phần dài nhất
-# (`body` ~19 cảnh với video 5 phút); trần cũ 6 chặn video 3 phút ở tối đa 19 cảnh.
-MAX_DRAFT_SCENES = 25
+# (`body` 27 cảnh với video 5 phút); trần cũ 6 chặn video 3 phút ở tối đa 19 cảnh.
+MAX_DRAFT_SCENES = 30
 # Phần ngắn hơn tỉ lệ này của mục tiêu (số cảnh hoặc thời lượng) thì bị yêu cầu viết lại.
+# Cùng ngưỡng với cờ `SHORT_SCRIPT` của cả kịch bản: phần nào cũng đạt thì tổng cũng đạt.
 MIN_SCENE_RATIO = 0.9
-MIN_SECONDS_RATIO = 0.85
+MIN_SECONDS_RATIO = 0.9
 # Cả kịch bản ngắn hơn tỉ lệ này của thời lượng mục tiêu thì gắn cờ `SHORT_SCRIPT`.
 SHORT_SCRIPT_RATIO = 0.9
+# Số ký tự tối đa của mỗi cảnh đã viết đưa vào prompt phần sau (để không lặp ý).
+PREVIOUS_SCENE_CHARS = 160
 
 T = TypeVar("T", bound=BaseModel)
 Retrieve = Callable[[str], list[Chunk]]
@@ -243,6 +246,7 @@ class StoryboardWriter:
         part: OutlineSection,
         passages: Sequence[Chunk],
         next_id: int,
+        previous: Sequence[Scene] = (),
     ) -> list[Scene]:
         needs_cite = part.section in CITED_SECTIONS
         if needs_cite and not passages:
@@ -257,7 +261,8 @@ class StoryboardWriter:
             )
             + self._scene_count_hint(part.section)
             + f"quote tối đa {MAX_QUOTE_CHARS} ký tự, chép nguyên văn từ đoạn.\n\n"
-            f"Các đoạn nguồn:\n{numbered or '(không có)'}"
+            + _previous_block(previous)
+            + f"Các đoạn nguồn:\n{numbered or '(không có)'}"
         )
         messages: list[BaseMessage] = [SystemMessage(self._system), HumanMessage(human)]
         by_id = {c.id: c for c in passages}
@@ -345,7 +350,7 @@ class StoryboardWriter:
             passages = self.gather(
                 part.queries, max(MAX_PASSAGES, 2 * self._max_scenes()[part.section])
             )
-            scenes += self.write_section(book, kind, part, passages, len(scenes) + 1)
+            scenes += self.write_section(book, kind, part, passages, len(scenes) + 1, scenes)
         hook = next((s.narration_vi for s in scenes if s.section == "hook"), "")
         target_s = float(self.settings.storyboard_minutes * 60)
         estimated_s = _seconds(scenes)
@@ -379,3 +384,11 @@ class StoryboardWriter:
 
 def _seconds(scenes: Sequence[Scene]) -> float:
     return estimate_seconds(s.narration_vi for s in scenes)
+
+
+def _previous_block(previous: Sequence[Scene]) -> str:
+    """Các cảnh đã viết ở phần trước, để phần sau không kể lại (vd giới thiệu nhân vật hai lần)."""
+    if not previous:
+        return ""
+    lines = "\n".join(f"- ({s.section}) {s.narration_vi[:PREVIOUS_SCENE_CHARS]}" for s in previous)
+    return f"Các cảnh đã viết ở phần trước, KHÔNG lặp lại ý trong đó:\n{lines}\n\n"
