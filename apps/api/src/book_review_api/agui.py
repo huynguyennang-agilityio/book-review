@@ -84,6 +84,10 @@ async def _rewind_failed(
         failed = failed or snap
         if not snap.next or str(snap.values.get("status") or "") in _TERMINAL:
             continue
+        # Bỏ qua checkpoint do các lần chạy lại trước ghi (`update`, `fork`): node nào ghi ra
+        # chúng không còn trong `parent.next`, và chạy lại lần hai phải tua về đúng chỗ graph dừng.
+        if (snap.metadata or {}).get("source") not in (None, "loop"):
+            continue
         spent = dict(failed.values.get("cost") or {})
         update: dict[str, Any] = {}
         if budget_usd is not None:

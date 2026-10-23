@@ -101,7 +101,7 @@ def test_skeleton_graph_scene_images_over_budget_then_raised(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     """Graph thật: `scene_images` dừng vì ngân sách sau bước song song (subtitles,
-    review_characters); tăng ngân sách rồi chạy tiếp tới `done`."""
+    review_characters); tăng ngân sách hai lần (lần đầu chưa đủ) rồi chạy tiếp tới `done`."""
 
     calls: list[float] = []
 
@@ -126,6 +126,10 @@ def test_skeleton_graph_scene_images_over_budget_then_raised(
         failed = await graph.ainvoke(Command(resume={"approved": True}), CONFIG)  # nhân vật
         assert failed["status"] == "failed"
         assert failed["error_code"] == "BUDGET_EXCEEDED"
+        # Lần 1 tăng chưa đủ: vẫn lỗi. Lần 2 tua từ lịch sử đã có checkpoint của lần chạy lại.
+        await _rewind_failed(graph, "t", 1.5)
+        again = await graph.ainvoke(None, CONFIG)
+        assert again["error_code"] == "BUDGET_EXCEEDED"
         await _rewind_failed(graph, "t", 2.5)
         snap = await graph.aget_state(CONFIG)
         assert snap.next == ("scene_images",)
@@ -134,6 +138,24 @@ def test_skeleton_graph_scene_images_over_budget_then_raised(
 
     done = asyncio.run(scenario())
     assert done["status"] == "done"
-    assert calls == [1, 2.5]
+    assert calls == [1, 1.5, 2.5]
     assert done["options"]["budget_usd"] == 2.5
-    assert done["cost"]["usd"] == pytest.approx(1.4)
+    assert done["cost"]["usd"] == pytest.approx(2.3)  # 0,9 × 2 lần lỗi + 0,5
+
+
+def test_rewind_twice_first_budget_still_too_low() -> None:
+    """Lần 1 tăng chưa đủ (vẫn lỗi), lần 2 tăng tiếp: vẫn tua về đúng chỗ, cộng đủ chi phí."""
+    graph = make_graph()
+
+    async def scenario() -> tuple[dict[str, Any], dict[str, Any]]:
+        await graph.ainvoke({"options": {"budget_usd": 1}}, CONFIG)
+        await _rewind_failed(graph, "t", 1.5)
+        second = await graph.ainvoke(None, CONFIG)
+        await _rewind_failed(graph, "t", 3)
+        return second, await graph.ainvoke(None, CONFIG)
+
+    second, third = asyncio.run(scenario())
+    assert second["status"] == "failed" and second["options"]["budget_usd"] == 1.5
+    assert third["status"] == "done" and third["options"]["budget_usd"] == 3
+    # 0,1 + 0,2 trước bước lỗi, 0,5 mỗi lần lỗi (2 lần), 0,3 lần xong.
+    assert third["cost"]["usd"] == pytest.approx(1.6)
