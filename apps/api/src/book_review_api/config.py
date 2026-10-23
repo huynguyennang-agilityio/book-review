@@ -70,6 +70,9 @@ class Settings(BaseSettings):
     # Storyboard (ngày 10): độ dài video đích và số lần viết lại một phần khi citation sai.
     storyboard_minutes: int = 3
     storyboard_retries: int = 2
+    # Viết lại hết lượt vẫn còn cảnh trích sai: sửa riêng từng cảnh tối đa chừng này lần trước
+    # khi bỏ cảnh. 0 = bỏ luôn.
+    storyboard_scene_repairs: int = 2
 
     # Faithfulness (ngày 11): giám khảo dùng model khác model viết kịch bản. Cảnh context/body
     # dưới ngưỡng được viết lại tối đa `faithfulness_rounds` vòng rồi gắn cờ LOW_FAITHFULNESS.

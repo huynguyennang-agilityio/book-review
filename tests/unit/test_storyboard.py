@@ -150,6 +150,15 @@ def draft(passage: int = 1, quote: str = "Paulo Coelho", cited: bool = True) -> 
     )
 
 
+def repair(quote: str = "Paulo Coelho", narration: str = "đã sửa") -> SceneDraft:
+    """Bản sửa riêng một cảnh; mặc định trích đúng."""
+    cites = [CitationDraft(passage=1, quote=quote)]
+    return SceneDraft(narration_vi=narration, scene_type="title", mood="m", citations=cites)
+
+
+BAD_REPAIRS = [repair("bịa"), repair("bịa")]
+
+
 def make_writer(script: list[Any], **settings: Any) -> tuple[StoryboardWriter, Any]:
     book = next(b for b in load_golden(GOLDEN) if b.slug == "nha-gia-kim")
     model = ScriptedStructuredModel(messages=iter([]), script=script, calls=[])
@@ -198,14 +207,15 @@ def test_writer_gives_up_after_retries() -> None:
     def bad() -> SectionDraft:
         return draft(quote="không có thật")
 
-    w, _ = make_writer([outline(), draft(cited=False), bad(), bad(), bad()])
+    w, _ = make_writer([outline(), draft(cited=False), bad(), bad(), bad(), *BAD_REPAIRS])
     with pytest.raises(StoryboardError) as err:
         w.write(w_book(), "fiction")
     assert err.value.problems
 
 
 def test_writer_rejects_unknown_passage_number() -> None:
-    w, _ = make_writer([outline(), draft(cited=False), draft(passage=99)] * 3)
+    bad = draft(passage=99)
+    w, _ = make_writer([outline(), draft(cited=False), bad, bad, bad, *BAD_REPAIRS])
     with pytest.raises(StoryboardError):
         w.write(w_book(), "fiction")
 
@@ -278,7 +288,7 @@ def test_runner_fails_with_low_faithfulness_when_citations_stay_invalid() -> Non
     def bad() -> SectionDraft:
         return draft(quote="bịa")
 
-    out = runner_for([outline(), draft(cited=False), bad(), bad(), bad()])(RESEARCH)
+    out = runner_for([outline(), draft(cited=False), bad(), bad(), bad(), *BAD_REPAIRS])(RESEARCH)
     assert out["status"] == "failed"
     assert out["error_code"] == "LOW_FAITHFULNESS"
     assert "storyboard" not in out
@@ -346,12 +356,98 @@ def test_writer_drops_scene_with_bad_quote_after_retries() -> None:
             ),
         ]
     )
-    w, _ = make_writer(
-        [outline(), draft(cited=False), mixed, mixed, mixed, draft(), draft(cited=False)]
+    w, model = make_writer(
+        [
+            outline(),
+            draft(cited=False),
+            mixed,
+            mixed,
+            mixed,
+            *BAD_REPAIRS,
+            draft(),
+            draft(cited=False),
+        ]
     )
     sb = w.write(w_book(), "fiction")
     assert [s.narration_vi for s in sb.scenes if s.section == "context"] == ["trích đúng"]
     assert [s.id for s in sb.scenes] == [1, 2, 3, 4]
+    second_repair = model.calls[6][1]
+    assert "Sửa các lỗi sau rồi viết lại cảnh" in second_repair[-1].content
+
+
+def mixed_context() -> SectionDraft:
+    return SectionDraft(
+        scenes=[
+            SceneDraft(
+                narration_vi="trích sai",
+                scene_type="title",
+                mood="m",
+                citations=[CitationDraft(passage=1, quote="câu không có trong nguồn")],
+            ),
+            SceneDraft(
+                narration_vi="trích đúng",
+                scene_type="title",
+                mood="m",
+                citations=[CitationDraft(passage=1, quote="Paulo Coelho")],
+            ),
+        ]
+    )
+
+
+def test_writer_repairs_bad_scene_instead_of_dropping() -> None:
+    """Hết lượt viết lại vẫn một cảnh trích sai: sửa riêng cảnh đó, giữ vị trí và id."""
+    m = mixed_context()
+    w, model = make_writer(
+        [outline(), draft(cited=False), m, m, m, repair(), draft(), draft(cited=False)]
+    )
+    sb = w.write(w_book(), "fiction")
+    assert [s.narration_vi for s in sb.scenes if s.section == "context"] == ["đã sửa", "trích đúng"]
+    assert [s.id for s in sb.scenes] == [1, 2, 3, 4, 5]
+    assert sb.scenes[1].citations[0].quote == "Paulo Coelho"
+    prompt = model.calls[5][1][-1].content
+    assert "quote không có nguyên văn" in prompt
+    assert "Lời đọc hiện tại:\ntrích sai" in prompt
+    assert "trích đúng" in prompt  # cảnh khác trong phần, để không lặp ý
+
+
+def test_repair_model_error_drops_scene_without_failing() -> None:
+    class BrokenRepair(ScriptedStructuredModel):
+        def with_structured_output(self, schema: Any, **kwargs: Any) -> Any:
+            if schema is not SceneDraft:
+                return super().with_structured_output(schema)
+
+            class Broken:
+                def invoke(self, messages: list[BaseMessage]) -> dict[str, Any]:
+                    return {"raw": AIMessage(content=""), "parsed": None, "parsing_error": "x"}
+
+            return Broken()
+
+    m = mixed_context()
+    book = next(b for b in load_golden(GOLDEN) if b.slug == "nha-gia-kim")
+    model = BrokenRepair(
+        messages=iter([]),
+        script=[outline(), draft(cited=False), m, m, m, draft(), draft(cited=False)],
+        calls=[],
+    )
+    w = StoryboardWriter(
+        model,
+        fixed_retriever(book.chunks()[:1]),
+        Settings(storyboard_minutes=1),
+        sleep=lambda _: None,
+    )
+    sb = w.write(w_book(), "fiction")
+    assert [s.narration_vi for s in sb.scenes if s.section == "context"] == ["trích đúng"]
+
+
+def test_scene_repairs_zero_drops_like_before() -> None:
+    m = mixed_context()
+    w, model = make_writer(
+        [outline(), draft(cited=False), m, m, m, draft(), draft(cited=False)],
+        storyboard_scene_repairs=0,
+    )
+    sb = w.write(w_book(), "fiction")
+    assert [s.narration_vi for s in sb.scenes if s.section == "context"] == ["trích đúng"]
+    assert len(model.calls) == 7
 
 
 def test_bad_citation_in_cta_is_dropped_not_retried() -> None:
@@ -501,7 +597,8 @@ def test_citation_error_still_fails_on_long_video() -> None:
         return draft(quote="bịa")
 
     w, _ = make_writer(
-        [outline(), scenes_draft(1, cited=False), bad(), bad(), bad()], storyboard_minutes=3
+        [outline(), scenes_draft(1, cited=False), bad(), bad(), bad(), *BAD_REPAIRS],
+        storyboard_minutes=3,
     )
     with pytest.raises(StoryboardError):
         w.write(w_book(), "fiction")
