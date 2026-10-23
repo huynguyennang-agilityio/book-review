@@ -159,3 +159,25 @@ def test_rewind_twice_first_budget_still_too_low() -> None:
     assert third["status"] == "done" and third["options"]["budget_usd"] == 3
     # 0,1 + 0,2 trước bước lỗi, 0,5 mỗi lần lỗi (2 lần), 0,3 lần xong.
     assert third["cost"]["usd"] == pytest.approx(1.6)
+
+
+def test_cost_comes_from_failed_state_not_a_newer_copy() -> None:
+    """Một lần chạy lại hỏng để lại bản chép (chi phí cũ) nằm trên state lỗi: chi phí vẫn đủ."""
+    graph = make_graph()
+
+    async def scenario() -> dict[str, Any]:
+        await graph.ainvoke({"options": {"budget_usd": 1}}, CONFIG)
+        await _rewind_failed(graph, "t", 1.5)
+        await graph.ainvoke(None, CONFIG)  # lỗi lần 2, tổng 1,3
+        # Bản chép checkpoint trước bước lỗi (chi phí 0,3 + 0,5 lần 1) nằm trên cùng lịch sử.
+        async for snap in graph.aget_state_history(CONFIG):
+            if snap.next == ("finish",) and (snap.metadata or {}).get("source") == "update":
+                await graph.aupdate_state(snap.config, None, as_node="__copy__")
+                break
+        await _rewind_failed(graph, "t", 3)
+        done: dict[str, Any] = await graph.ainvoke(None, CONFIG)
+        return done
+
+    done = asyncio.run(scenario())
+    assert done["status"] == "done"
+    assert done["cost"]["usd"] == pytest.approx(1.6)  # 0,3 + 0,5 × 2 lần lỗi + 0,3
