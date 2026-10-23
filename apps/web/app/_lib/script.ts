@@ -41,6 +41,8 @@ export interface ReviewPayload {
   evalScores: Record<string, number>;
   costEstimate: CostEstimate;
   spentUsd: number;
+  // Thời lượng mục tiêu (số phút đã chọn), null với storyboard cũ.
+  targetSeconds: number | null;
 }
 
 export interface SceneEdit {
@@ -69,7 +71,10 @@ export const SECTION_LABEL: Record<Scene["section"], string> = {
 export const CITED = new Set<Scene["section"]>(["context", "body"]);
 
 export function parseReview(raw: Record<string, unknown>): ReviewPayload {
-  const storyboard = (raw.storyboard ?? {}) as { scenes?: Partial<Scene>[] };
+  const storyboard = (raw.storyboard ?? {}) as {
+    scenes?: Partial<Scene>[];
+    target_seconds?: number | null;
+  };
   const scenes = (storyboard.scenes ?? []).map(
     (s): Scene => ({
       id: Number(s.id),
@@ -93,7 +98,32 @@ export function parseReview(raw: Record<string, unknown>): ReviewPayload {
     evalScores: (raw.eval_scores ?? {}) as Record<string, number>,
     costEstimate: (raw.cost_estimate ?? {}) as CostEstimate,
     spentUsd: typeof cost.usd === "number" ? cost.usd : 0,
+    targetSeconds: typeof storyboard.target_seconds === "number" ? storyboard.target_seconds : null,
   };
+}
+
+// Ước lượng thời lượng đọc, khớp `storyboard/duration.py`: ~3,8 âm tiết/giây (edge-tts, spike
+// ngày 1) cộng ~0,45 s mỗi cảnh cho lặng đầu, hơi thở cuối và khoảng nghỉ giữa cảnh.
+export const SYLLABLES_PER_S = 3.8;
+export const SCENE_OVERHEAD_S = 0.45;
+// Ngắn hơn tỉ lệ này của mục tiêu thì cảnh báo (cờ `SHORT_SCRIPT` của API).
+export const SHORT_SCRIPT_RATIO = 0.9;
+
+export function countSyllables(text: string): number {
+  return text.match(/[\p{L}\p{N}_]+/gu)?.length ?? 0;
+}
+
+export function estimateSeconds(narrations: string[]): number {
+  return narrations.reduce((t, n) => t + countSyllables(n) / SYLLABLES_PER_S + SCENE_OVERHEAD_S, 0);
+}
+
+export function formatDuration(seconds: number): string {
+  const total = Math.round(seconds);
+  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, "0")}`;
+}
+
+export function isShortScript(estimated: number, target: number | null): boolean {
+  return target != null && estimated < target * SHORT_SCRIPT_RATIO;
 }
 
 export function splitSentences(text: string): string[] {

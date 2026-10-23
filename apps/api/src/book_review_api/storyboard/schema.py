@@ -95,3 +95,8 @@ class Storyboard(BaseModel):
     caption_vi: str
     hashtags: list[str] = Field(default_factory=list)
     prompt_version: str = ""
+    # Thời lượng mục tiêu (số phút người dùng chọn) và ước lượng theo lời đọc lúc viết xong.
+    target_seconds: float | None = None
+    estimated_seconds: float | None = None
+    # Cờ cho người duyệt, vd "SHORT_SCRIPT" khi viết lại vẫn ngắn hơn mục tiêu.
+    flags: list[str] = Field(default_factory=list)

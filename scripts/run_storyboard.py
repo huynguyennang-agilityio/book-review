@@ -39,6 +39,10 @@ def run(book: GoldenBook, model, embeddings) -> None:  # type: ignore[no-untyped
     problems = storyboard_problems(sb, {c.id: c for c in chunks})
     print(json.dumps(out["storyboard"], ensure_ascii=False, indent=2))
     print("citation hợp lệ" if not problems else f"LỖI citation: {problems}")
+    print(
+        f"{len(sb.scenes)} cảnh, ước tính ~{sb.estimated_seconds or 0:.0f} giây"
+        f" / mục tiêu {sb.target_seconds or 0:.0f} giây, cờ: {sb.flags or 'không'}"
+    )
 
 
 def main(slugs: list[str]) -> None:
